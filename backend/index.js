@@ -1,11 +1,18 @@
-const express = require("express");
+import express from "express";
+import cors from "cors";
 
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send("ok");
+app.use(cors());
+
+app.get("/api", (req, res) => {
+  console.log(req);
+  res.send({
+    clen: 13,
+    name: "Egor",
+  });
 });
 
 app.listen(4000, () => {
-  console.log("server i running on port 4000");
+  console.log("Server is running on port 4000");
 });
