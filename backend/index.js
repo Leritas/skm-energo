@@ -5,11 +5,11 @@ const app = express();
 
 app.use(cors());
 
-app.get("/api", (req, res) => {
+app.get("/api/admin", (req, res) => {
   console.log(req);
   res.send({
-    clen: 13,
-    name: "Egor",
+    age: 21,
+    name: "Artem",
   });
 });
 

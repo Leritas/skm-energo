@@ -1,14 +1,10 @@
 import "./App.css";
 
 function App() {
-  return (
-    <>
-      {fetch("http://localhost:4000/api").then((response) => {
-        console.log(response);
-        return response;
-      })}
-    </>
-  );
+  fetch("http://localhost:4000/api/admin")
+    .then((response) => response.json())
+    .then((data) => console.log(data));
+  return <></>;
 }
 
 export default App;
