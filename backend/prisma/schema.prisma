@@ -13,7 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 // model Post {
 //   id        Int      @id @default(autoincrement())
 //   createdAt DateTime @default(now())
@@ -41,9 +40,51 @@ datasource db {
 // }
 
 model Category {
-  id  Int @id @default(autoincrement())
-  title String @db.VarChar(255)
-  parent Category? @relation("CategoryParent",fields: [parentID], references: [id])
+  id               String     @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title            String     @db.VarChar(255)
+  url              String     @db.VarChar(255)
+  imgUrl           String?    @db.VarChar(255)
+  parent           Category?  @relation("CategoryParent", fields: [parentID], references: [id])
   categoryAsParent Category[] @relation("CategoryParent")
-  parentID Int?
+  parentID         String?
+  products         Product[]
+}
+
+model Product {
+  id          String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  imgUrl      String?  @db.VarChar(255)
+  docUrl      String?  @db.VarChar(255)
+  available   Boolean  @default(true)
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model News {
+  id        String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title     String   @db.VarChar(255)
+  text      String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id       String  @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email    String  @unique
+  name     String?
+  password String
+
+  Feedback Feedback[]
+}
+
+model Feedback {
+  id        String   @id @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  text      String   @db.Text
+  stars     Float
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String   @db.Uuid
+  createdAt DateTime @default(now())
 }
