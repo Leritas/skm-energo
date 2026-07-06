@@ -3,11 +3,31 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   ssr: true,
-  modules: ['@pinia/nuxt', '@vueuse/nuxt', '@nuxtjs/tailwindcss'],
+  css: ['~/assets/css/main.css'],
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false,
+    },
+  ],
+  modules: [
+    '@nuxt/ui',
+    '@pinia/nuxt',
+    '@vueuse/nuxt',
+    '@nuxtjs/sitemap',
+  ],
   runtimeConfig: {
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:3001/api',
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://skmenergo.ru',
     },
+  },
+  site: {
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://skmenergo.ru',
+    name: 'СКМ-Энергосервис',
+  },
+  sitemap: {
+    exclude: ['/admin/**'],
   },
   devServer: {
     port: 3000,
@@ -25,6 +45,7 @@ export default defineNuxtConfig({
             'ООО СКМ-Энергосервис — поставка высоковольтных компонентов и электрооборудования',
         },
       ],
+      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
     },
   },
 })

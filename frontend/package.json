@@ -7,16 +7,26 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@nuxt/ui": "^4.9.0",
     "@pinia/nuxt": "^0.11.3",
     "@vueuse/nuxt": "^14.3.0",
     "nuxt": "^4.4.8",
+    "pinia": "^3.0.4",
+    "tailwindcss": "^4.3.2",
     "vue": "^3.5.38",
     "vue-router": "^5.1.0"
   },
   "devDependencies": {
-    "@nuxtjs/tailwindcss": "^6.14.0"
+    "@nuxtjs/sitemap": "^8.2.2",
+    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/vue3": "^8.6.14",
+    "@storybook/vue3-vite": "^8.6.14",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "storybook": "^8.6.14"
   }
 }

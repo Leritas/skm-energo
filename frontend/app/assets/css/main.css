@@ -1,0 +1,61 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme {
+  /* Accent — orange from logo */
+  --color-accent-50: #fff7ed;
+  --color-accent-100: #ffedd5;
+  --color-accent-200: #fed7aa;
+  --color-accent-300: #fdba74;
+  --color-accent-400: #fb923c;
+  --color-accent-500: #e85d04;
+  --color-accent-600: #c2410c;
+  --color-accent-700: #9a3412;
+  --color-accent-800: #7c2d12;
+  --color-accent-900: #431407;
+  --color-accent-950: #2a0d04;
+
+  /* Neutral — B2B gray scale */
+  --color-neutral-50: #f9fafb;
+  --color-neutral-100: #f3f4f6;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-500: #6b7280;
+  --color-neutral-600: #4b5563;
+  --color-neutral-700: #374151;
+  --color-neutral-800: #1f2937;
+  --color-neutral-900: #111827;
+  --color-neutral-950: #030712;
+
+  /* Brand purple — dark theme surfaces */
+  --color-brand-purple-50: #faf5ff;
+  --color-brand-purple-100: #f3e8ff;
+  --color-brand-purple-200: #e9d5ff;
+  --color-brand-purple-300: #d8b4fe;
+  --color-brand-purple-400: #c084fc;
+  --color-brand-purple-500: #a855f7;
+  --color-brand-purple-600: #9333ea;
+  --color-brand-purple-700: #7e22ce;
+  --color-brand-purple-800: #6b21a8;
+  --color-brand-purple-900: #581c87;
+  --color-brand-purple-950: #2e1065;
+}
+
+/* Dark theme tokens — prepared, toggle UI deferred to later stage */
+.dark {
+  --color-neutral-0: #1e1b2e;
+  --color-neutral-50: #252238;
+  --color-neutral-100: #2f2b42;
+  --color-neutral-900: #f3f4f6;
+  --color-accent-500: #f97316;
+  --color-accent-600: #ea580c;
+}
+
+body {
+  @apply bg-white text-neutral-900 antialiased;
+}
+
+.dark body {
+  @apply bg-brand-purple-950 text-neutral-100;
+}
