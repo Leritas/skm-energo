@@ -16,6 +16,10 @@ const email = ref('')
 const message = ref('')
 const submitted = ref(false)
 
+const formFieldUi = {
+  base: 'bg-white text-neutral-900 placeholder:text-neutral-400 ring-neutral-200',
+}
+
 function handleSubmit() {
   submitted.value = true
 }
@@ -61,22 +65,35 @@ function handleSubmit() {
           </div>
         </div>
 
-        <div class="rounded-xl border border-neutral-100 bg-white p-6 shadow-sm">
-          <h2 class="text-lg font-semibold text-neutral-900">
+        <div class="rounded-xl bg-brand-purple-950 p-6 shadow-sm lg:p-8">
+          <h2 class="text-lg font-semibold text-white">
             Форма обратной связи
           </h2>
-          <div v-if="submitted" class="mt-6 rounded-lg bg-neutral-50 p-4 text-sm text-neutral-600">
+          <div
+            v-if="submitted"
+            class="mt-6 rounded-lg bg-brand-purple-900 p-4 text-sm text-brand-purple-100"
+          >
             Функция отправки будет доступна на этапе 8 roadmap.
           </div>
-          <form v-else class="mt-6 space-y-4" @submit.prevent="handleSubmit">
+          <form
+            v-else
+            class="mt-6 space-y-4 [&_label]:text-brand-purple-100"
+            @submit.prevent="handleSubmit"
+          >
             <UFormField label="Имя">
-              <UInput v-model="name" placeholder="Ваше имя" required />
+              <UInput
+                v-model="name"
+                placeholder="Ваше имя"
+                :ui="formFieldUi"
+                required
+              />
             </UFormField>
             <UFormField label="Email">
               <UInput
                 v-model="email"
                 type="email"
                 placeholder="email@example.com"
+                :ui="formFieldUi"
                 required
               />
             </UFormField>
@@ -84,11 +101,14 @@ function handleSubmit() {
               <UTextarea
                 v-model="message"
                 placeholder="Ваш вопрос или комментарий"
+                :ui="formFieldUi"
                 :rows="4"
                 required
               />
             </UFormField>
-            <AppButton type="submit">Отправить</AppButton>
+            <AppButton type="submit" variant="primary">
+              Отправить
+            </AppButton>
           </form>
         </div>
       </div>

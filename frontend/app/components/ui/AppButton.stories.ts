@@ -60,7 +60,7 @@ export const AllVariants: Story = {
 export const DarkTheme: Story = {
   render: () => ({
     template: `
-      <div class="dark bg-brand-purple-950 p-8 rounded-xl">
+      <div class="storybook-dark-preview dark bg-brand-purple-950 p-8 rounded-xl">
         <div class="flex flex-wrap gap-3">
           <button class="${variantClasses.primary}">Primary CTA</button>
           <button class="${variantClasses.secondary}">Secondary</button>

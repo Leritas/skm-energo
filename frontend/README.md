@@ -15,7 +15,7 @@
 | UI | Vue 3.5, Nuxt UI v4, Tailwind CSS v4 |
 | State | Pinia |
 | Utils | VueUse |
-| Storybook | 8.6 (standalone, `@storybook/vue3-vite`) |
+| Storybook | 10.4 (standalone, `@storybook/vue3-vite`) |
 | Язык | TypeScript |
 
 ## Команды
@@ -90,7 +90,7 @@ frontend/
 |------|----------|-----|
 | `/` | Главная (hero, направления, about-teaser) | ✅ |
 | `/about` | О компании | ✅ |
-| `/services` | Виды работ | ✅ |
+| `/services` | Услуги | ✅ |
 | `/contacts` | Контакты + форма (UI) | ✅ |
 | `/catalog` | Каталог (заглушка + дерево категорий) | ✅ |
 | `/news` | Новости (заглушка) | ✅ |
@@ -122,7 +122,7 @@ npm run storybook
 
 Stories: `AppButton` (variants + dark theme), `AppCard`, `AppBreadcrumbs`, `AppContainer`.
 
-> `@nuxtjs/storybook` пока несовместим с Nuxt 4 — используется standalone Storybook 8 + `@storybook/vue3-vite`.
+> `@nuxtjs/storybook` пока несовместим с Nuxt 4 — используется standalone Storybook 10 + `@storybook/vue3-vite` (совместим с Vite 7).
 
 ## Запуск (локально)
 

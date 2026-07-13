@@ -19,22 +19,22 @@ function handleSearch() {
 <template>
   <header class="sticky top-0 z-50 border-b border-neutral-100 bg-white">
     <AppContainer>
-      <div class="flex h-16 items-center justify-between gap-4 md:h-20">
+      <div
+        class="flex h-16 flex-nowrap items-center justify-between gap-2 md:h-20 md:gap-3"
+      >
         <!-- Logo -->
-        <NuxtLink to="/" class="flex shrink-0 items-center gap-3">
+        <NuxtLink to="/" class="flex shrink-0 items-center">
           <img
             src="/logo.jpg"
             alt="СКМ-Энергосервис"
-            class="h-10 w-auto md:h-12"
+            class="h-9 w-auto md:h-10 lg:h-12"
           />
-          <span class="hidden text-sm font-bold tracking-wide text-neutral-900 sm:block">
-            SKM<br class="md:hidden" />
-            <span class="hidden md:inline"> </span>ENERGOSERVICE
-          </span>
         </NuxtLink>
 
-        <!-- Desktop nav -->
-        <nav class="hidden items-center gap-6 md:flex">
+        <!-- Desktop nav (768+) -->
+        <nav
+          class="hidden min-w-0 shrink items-center gap-3 whitespace-nowrap md:flex lg:gap-5 xl:gap-6"
+        >
           <template v-for="item in MAIN_NAV" :key="item.to">
             <AppCatalogMenu v-if="item.children" />
             <NuxtLink
@@ -48,22 +48,30 @@ function handleSearch() {
           </template>
         </nav>
 
-        <!-- Desktop actions -->
-        <div class="hidden items-center gap-4 md:flex">
+        <!-- Desktop actions (768+): контакты → заказ звонка → поиск -->
+        <div class="hidden shrink-0 items-center gap-1 md:flex md:gap-2">
           <div class="flex flex-col items-end text-right">
             <a
               :href="SITE.phoneHref"
-              class="text-sm font-semibold text-neutral-900 hover:text-accent-600"
+              class="whitespace-nowrap text-xs font-semibold text-neutral-900 hover:text-accent-600 lg:text-sm"
             >
               {{ SITE.phone }}
             </a>
             <a
               :href="`mailto:${SITE.email}`"
-              class="text-xs text-neutral-500 hover:text-accent-600"
+              class="whitespace-nowrap text-[11px] text-neutral-500 hover:text-accent-600 lg:text-xs"
             >
               {{ SITE.email }}
             </a>
           </div>
+
+          <UButton
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-phone-call"
+            aria-label="Заказать звонок"
+            @click="callModalOpen = true"
+          />
           <UButton
             color="neutral"
             variant="ghost"
@@ -71,13 +79,17 @@ function handleSearch() {
             aria-label="Поиск"
             @click="handleSearch"
           />
-          <AppButton size="sm" @click="callModalOpen = true">
-            Заказать звонок
-          </AppButton>
         </div>
 
-        <!-- Mobile burger -->
-        <div class="flex items-center gap-2 md:hidden">
+        <!-- Mobile (<768) -->
+        <div class="flex shrink-0 items-center gap-1 md:hidden">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            icon="i-lucide-phone-call"
+            aria-label="Заказать звонок"
+            @click="callModalOpen = true"
+          />
           <UButton
             color="neutral"
             variant="ghost"

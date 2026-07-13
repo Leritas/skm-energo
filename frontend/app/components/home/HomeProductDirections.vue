@@ -6,10 +6,10 @@ import { PRODUCT_DIRECTIONS } from '~/constants/navigation'
   <AppSection alt>
     <AppContainer>
       <div class="mb-10 max-w-2xl">
-        <h2 class="text-2xl font-bold text-neutral-900 md:text-3xl">
+        <h2 class="text-2xl font-bold text-white md:text-3xl">
           Направления продукции
         </h2>
-        <p class="mt-3 text-neutral-500">
+        <p class="mt-3 text-brand-purple-200">
           Некоторые разделы предлагаемой нами продукции
         </p>
       </div>

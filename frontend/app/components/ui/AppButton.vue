@@ -19,7 +19,7 @@ const props = withDefaults(
 )
 
 const color = computed(() =>
-  props.variant === 'primary' ? 'accent' : 'neutral',
+  props.variant === 'primary' ? 'primary' : 'neutral',
 )
 
 const uiVariant = computed(() => {

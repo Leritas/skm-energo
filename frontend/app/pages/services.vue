@@ -2,14 +2,14 @@
 import { SITE } from '~/constants/site'
 
 useSeoMeta({
-  title: `Виды работ — ${SITE.name}`,
+  title: `Услуги — ${SITE.name}`,
   description:
-    'Виды осуществляемых работ ООО «СКМ-Энергосервис»: подбор, поставка и установка электрооборудования.',
+    'Услуги ООО «СКМ-Энергосервис»: подбор, поставка и установка электрооборудования.',
 })
 
 const breadcrumbs = [
   { label: 'Главная', to: '/' },
-  { label: 'Виды работ' },
+  { label: 'Услуги' },
 ]
 
 const services = [
@@ -51,7 +51,7 @@ const services = [
     <AppContainer>
       <AppBreadcrumbs :items="breadcrumbs" />
       <h1 class="text-3xl font-bold text-neutral-900 md:text-4xl">
-        Виды осуществляемых работ
+        Услуги
       </h1>
       <p class="mt-4 max-w-2xl text-neutral-600">
         Компания предлагает комплекс услуг по подбору, поставке и установке

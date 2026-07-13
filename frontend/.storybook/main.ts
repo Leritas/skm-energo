@@ -5,7 +5,7 @@ import { resolve } from 'node:path'
 
 const config: StorybookConfig = {
   stories: ['../app/components/**/*.stories.@(js|jsx|ts|tsx|mdx)'],
-  addons: ['@storybook/addon-essentials'],
+  addons: ['@storybook/addon-docs'],
   framework: {
     name: '@storybook/vue3-vite',
     options: {},
@@ -16,8 +16,8 @@ const config: StorybookConfig = {
     config.resolve = config.resolve ?? {}
     config.resolve.alias = {
       ...config.resolve.alias,
-      '~': resolve(__dirname, '../app'),
-      '@': resolve(__dirname, '../app'),
+      '~': resolve(import.meta.dirname, '../app'),
+      '@': resolve(import.meta.dirname, '../app'),
     }
     return config
   },

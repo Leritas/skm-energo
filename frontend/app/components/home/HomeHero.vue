@@ -14,7 +14,7 @@ useSeoMeta({
         <p class="text-sm font-medium uppercase tracking-wide text-accent-600">
           Высоковольтные компоненты
         </p>
-        <h1 class="mt-3 text-4xl font-bold tracking-tight text-neutral-900 md:text-5xl">
+        <h1 class="mt-3 text-4xl font-bold tracking-tight text-neutral-950 md:text-5xl">
           {{ SITE.name }}
         </h1>
         <p class="mt-6 text-lg leading-relaxed text-neutral-600">

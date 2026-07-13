@@ -42,8 +42,8 @@
   --color-brand-purple-950: #2e1065;
 }
 
-/* Dark theme tokens — prepared, toggle UI deferred to later stage */
-.dark {
+/* Dark theme tokens — for Storybook preview only; not active in production (colorMode: light) */
+.dark.storybook-dark-preview {
   --color-neutral-0: #1e1b2e;
   --color-neutral-50: #252238;
   --color-neutral-100: #2f2b42;
@@ -54,8 +54,4 @@
 
 body {
   @apply bg-white text-neutral-900 antialiased;
-}
-
-.dark body {
-  @apply bg-brand-purple-950 text-neutral-100;
 }

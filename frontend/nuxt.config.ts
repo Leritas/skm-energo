@@ -4,6 +4,11 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: true,
   css: ['~/assets/css/main.css'],
+  colorMode: {
+    preference: 'light',
+    fallback: 'light',
+    storageKey: 'skm-energo-color-mode',
+  },
   components: [
     {
       path: '~/components',

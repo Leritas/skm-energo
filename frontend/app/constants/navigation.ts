@@ -50,7 +50,7 @@ export interface NavItem {
 export const MAIN_NAV: NavItem[] = [
   { label: 'Главная', to: '/' },
   { label: 'Продукция', to: '/catalog', children: CATALOG_TREE },
-  { label: 'Виды работ', to: '/services' },
+  { label: 'Услуги', to: '/services' },
   { label: 'Новости', to: '/news' },
   { label: 'Контакты', to: '/contacts' },
 ]

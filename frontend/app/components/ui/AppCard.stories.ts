@@ -39,7 +39,7 @@ export const DarkTheme: Story = {
   render: () => ({
     components: { AppCard },
     template: `
-      <div class="dark bg-brand-purple-950 p-8 rounded-xl max-w-sm">
+      <div class="storybook-dark-preview dark bg-brand-purple-950 p-8 rounded-xl max-w-sm">
         <AppCard
           title="Высоковольтные разъединители"
           description="Оборудование для высоковольтных распределительных сетей"
