@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { SkmPopoverVariant } from '../presets'
+import { skmPopoverContent, type SkmPopoverVariant } from '../presets'
 
 const props = withDefaults(
   defineProps<{
@@ -14,15 +14,9 @@ const open = defineModel<boolean>('open', { default: false })
 const content = computed(() => {
   switch (props.variant) {
     case 'default':
-      return {
-        side: 'bottom' as const,
-        sideOffset: 8,
-      }
+      return skmPopoverContent.default
     case 'catalog':
-      return {
-        align: 'start' as const,
-        class: '!bg-white p-0 shadow-lg ring-1 ring-neutral-100/80',
-      }
+      return skmPopoverContent.catalog
     default: {
       const _exhaustive: never = props.variant
       return _exhaustive

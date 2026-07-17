@@ -12,10 +12,11 @@
 | | |
 |---|---|
 | Framework | Nuxt 4.4 |
-| UI | Vue 3.5, Nuxt UI v4, Tailwind CSS v4 |
+| UI | Vue 3.5, Nuxt UI v4 (через SKM wrappers), Tailwind CSS v4 |
 | State | Pinia |
 | Utils | VueUse |
 | Storybook | 10.4 (standalone, `@storybook/vue3-vite`) |
+| Lint | ESLint 9 + `@nuxt/eslint` + guardrail `skm-ui-kit/no-raw-nuxt-ui` |
 | Язык | TypeScript |
 
 ## Команды
@@ -27,6 +28,8 @@ npm run build        # production-сборка
 npm run preview      # preview production-сборки
 npm run storybook    # Storybook → http://localhost:6006
 npm run build-storybook
+npm run lint         # ESLint (в т.ч. запрет сырых U* вне ui/)
+npm run lint:fix    # ESLint --fix
 ```
 
 ## Переменные окружения
@@ -40,47 +43,80 @@ cp .env.example .env
 | `NUXT_PUBLIC_API_BASE` | Base URL NestJS API | `http://localhost:3001/api` |
 | `NUXT_PUBLIC_SITE_URL` | Канонический URL сайта (sitemap) | `https://skmenergo.ru` |
 
-## Дизайн-система
+## SKM UI Kit
 
-White-first B2B-стиль. Акцентные цвета из логотипа (`public/logo.jpg`):
+Дизайн-система проекта: тонкие `Skm*` обёртки над Nuxt UI + layout-примитивы. Spec: [docs/superpowers/specs/2026-07-13-skm-ui-kit-design.md](../docs/superpowers/specs/2026-07-13-skm-ui-kit-design.md).
+
+### Импорт
+
+```ts
+import { SkmButton, SkmInput, SkmModal } from '@skm/components'
+```
+
+Не импортируйте `*.vue` напрямую и не тяните `presets.ts` в pages/layout — только через wrappers в `app/components/ui/`.
+
+### Структура
+
+```
+app/components/
+├── index.ts                 # public API → @skm/components
+├── ui/                      # UI Kit (Storybook + wrappers)
+│   ├── presets.ts           # :ui пресеты (только для ui/)
+│   ├── SkmButton/
+│   ├── SkmInput/
+│   ├── SkmTextarea/
+│   ├── SkmFormField/
+│   ├── SkmPopover/
+│   ├── SkmModal/
+│   ├── SkmCard/
+│   ├── SkmBreadcrumbs/
+│   ├── SkmContainer/
+│   ├── SkmSection/
+│   └── SkmDesignSystem/     # Overview story
+└── layout/                  # shell сайта (SkmHeader, SkmFooter, …)
+```
+
+### Правила
+
+| ✅ Do | ❌ Don't |
+|------|---------|
+| `<SkmButton variant="primary">` | `<UButton>` в pages / layout / home |
+| `<SkmInput variant="onBrand">` | `class="!bg-white"` на сыром `UInput` |
+| `tone="brand"` на кнопках поверх `brand-purple-*` | Импорт `presets` вне `components/ui/` |
+| Layout использует `Skm*` | Новые `App*` компоненты |
+
+**Allowlist без обёртки (пока):** `UIcon`, `USlideover`.
+
+ESLint-правило `skm-ui-kit/no-raw-nuxt-ui` запрещает `UButton` / `UInput` / `UTextarea` / `UFormField` / `UPopover` / `UModal` / `UCard` / `UContainer` / `UBreadcrumb` вне `app/components/ui/`.
+
+### Токены
+
+White-first B2B. Акцент из логотипа (`public/logo.jpg`):
 
 | Token | Light | Роль |
 |-------|-------|------|
 | `accent-500` | `#E85D04` | Primary CTA, active nav |
 | `accent-300` | `#FDBA74` | Hover, focus |
 | `neutral-*` | gray scale | Фон, текст, borders |
-| `brand-purple-950` | `#2E1065` | Dark theme (токены, toggle позже) |
+| `brand-purple-950` | `#2E1065` | Brand-поверхности (секции, onBrand) |
 
-Токены заданы в `app/assets/css/main.css` и `app/app.config.ts`.
+Токены: `app/assets/css/main.css`, тема Nuxt UI: `app/app.config.ts` (`primary: accent`).
 
-## Структура
+## Структура приложения
 
 ```
 frontend/
 ├── app/
-│   ├── assets/css/main.css     # Tailwind + Nuxt UI + design tokens
-│   ├── app.config.ts             # Nuxt UI theme (accent, neutral)
+│   ├── assets/css/main.css
+│   ├── app.config.ts
 │   ├── constants/
-│   │   ├── navigation.ts         # MAIN_NAV, CATALOG_TREE
-│   │   └── site.ts               # контакты, tagline
-│   ├── components/
-│   │   ├── ui/                   # AppButton, AppCard, AppBreadcrumbs, …
-│   │   ├── layout/               # AppHeader, AppFooter, AppMobileNav, …
-│   │   └── home/                 # HomeHero, HomeProductDirections, …
+│   ├── components/           # ui/ + layout/ + home/ → @skm/components
 │   ├── layouts/default.vue
 │   └── pages/
-│       ├── index.vue             # Главная
-│       ├── about.vue
-│       ├── services.vue
-│       ├── contacts.vue
-│       ├── catalog/index.vue
-│       ├── news/index.vue
-│       └── admin/index.vue
-├── .storybook/                   # Storybook config
+├── eslint.config.mjs
+├── eslint-rules/skm-ui-kit.mjs
+├── .storybook/
 ├── public/
-│   ├── favicon.ico
-│   ├── logo.jpg
-│   └── robots.txt
 └── nuxt.config.ts
 ```
 
@@ -100,7 +136,8 @@ frontend/
 
 | Модуль | Назначение |
 |--------|------------|
-| `@nuxt/ui` | UI-кит (кнопки, модалки, формы) |
+| `@nuxt/eslint` | ESLint flat config |
+| `@nuxt/ui` | UI primitives (только внутри `components/ui/`) |
 | `@pinia/nuxt` | State management |
 | `@vueuse/nuxt` | Composables |
 | `@nuxtjs/sitemap` | `/sitemap.xml` |
@@ -114,15 +151,13 @@ frontend/
 
 ## Storybook
 
-Компоненты UI-kit документированы в Storybook (stories рядом с компонентами в `app/components/ui/`):
-
 ```bash
 npm run storybook
 ```
 
-Stories: `AppButton` (variants + dark theme), `AppCard`, `AppBreadcrumbs`, `AppContainer`.
+Навигация: **SKM Design System** → Overview + per-component stories (`SkmButton`, `SkmInput`, `SkmPopover`, `SkmModal`, …).
 
-> `@nuxtjs/storybook` пока несовместим с Nuxt 4 — используется standalone Storybook 10 + `@storybook/vue3-vite` (совместим с Vite 7).
+> Standalone Storybook 10 + `@storybook/vue3-vite` + `@nuxt/ui/vite` (без Nuxt runtime).
 
 ## Запуск (локально)
 
@@ -136,7 +171,7 @@ npm run dev
 
 ## Node.js
 
-Nuxt 4 официально требует Node 22+. На Node 20 проект может работать с предупреждениями `EBADENGINE`. Рекомендуется обновить Node до 22 LTS.
+Nuxt 4 официально требует Node 22+. На Node 20 проект может работать; для ESLint добавлен полифилл `Object.groupBy` (`eslint-node20-polyfill.mjs`). Рекомендуется Node 22 LTS.
 
 ## Дальнейшая разработка
 

@@ -288,9 +288,9 @@ Storybook остаётся standalone (без Nuxt runtime). Для `SkmButton` 
 3. Довести layout shell на `Skm*`-примитивы (если остались прямые `U*`) ✅ (`UButton`/`UPopover`/`UModal`; `USlideover`/`UIcon` — out of scope)
 4. Storybook: Nuxt UI vite plugin для полного рендера ✅
 
-### Phase 3 — Guardrails (optional)
+### Phase 3 — Guardrails ✅
 
-- ESLint rule / comment convention: запрет `UButton`, `UInput`, … вне `components/ui/`
+- ESLint rule: запрет `UButton`, `UInput`, … вне `components/ui/` (`skm-ui-kit/no-raw-nuxt-ui`)
 - README: раздел «SKM UI Kit»
 
 ---
@@ -320,11 +320,11 @@ Storybook остаётся standalone (без Nuxt runtime). Для `SkmButton` 
 
 ## Success criteria
 
-- [ ] Нет `App*` компонентов в `components/ui/` и `components/layout/`
-- [ ] Нет прямого `UInput` / `UButton` / `UFormField` в `pages/` и `components/layout/` (кроме временного Phase 1 tail)
-- [ ] Storybook: страница Overview с демо всех Tier 1 + Tier 2 примитивов
-- [ ] `npm run build` и `npm run build-storybook` проходят
-- [ ] Форма на `/contacts` — белые инпуты + оранжевая кнопка через `Skm*`
+- [x] Нет `App*` компонентов в `components/ui/` и `components/layout/`
+- [x] Нет прямого `UInput` / `UButton` / `UFormField` в `pages/` и `components/layout/` (кроме временного Phase 1 tail)
+- [x] Storybook: страница Overview с демо всех Tier 1 + Tier 2 примитивов
+- [x] `npm run build` и `npm run build-storybook` проходят
+- [x] Форма на `/contacts` — белые инпуты + оранжевая кнопка через `Skm*`
 
 ---
 

@@ -17,7 +17,7 @@ const footerNav = MAIN_NAV.filter((item) => item.to !== '/')
             src="/logo.jpg"
             alt="СКМ-Энергосервис"
             class="mb-4 h-10 w-auto"
-          />
+          >
           <p class="text-sm leading-relaxed text-neutral-500">
             {{ SITE.tagline }}
           </p>

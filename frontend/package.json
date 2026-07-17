@@ -9,7 +9,9 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@nuxt/ui": "^4.9.0",
@@ -22,12 +24,14 @@
     "vue-router": "^5.1.0"
   },
   "devDependencies": {
+    "@nuxt/eslint": "^1.16.0",
     "@nuxtjs/sitemap": "^8.2.2",
     "@storybook/addon-docs": "10.4.6",
     "@storybook/vue3": "10.4.6",
     "@storybook/vue3-vite": "10.4.6",
     "@types/node": "^26.1.1",
     "@vitejs/plugin-vue": "^6.0.7",
+    "eslint": "^10.7.0",
     "storybook": "10.4.6"
   }
 }

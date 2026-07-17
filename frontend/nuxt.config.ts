@@ -23,11 +23,17 @@ export default defineNuxtConfig({
     },
   ],
   modules: [
+    '@nuxt/eslint',
     '@nuxt/ui',
     '@pinia/nuxt',
     '@vueuse/nuxt',
     '@nuxtjs/sitemap',
   ],
+  eslint: {
+    config: {
+      stylistic: false,
+    },
+  },
   runtimeConfig: {
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:3001/api',

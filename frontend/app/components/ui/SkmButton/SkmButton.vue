@@ -24,6 +24,8 @@ const props = withDefaults(
     size: 'md',
     type: 'button',
     disabled: false,
+    to: undefined,
+    icon: undefined,
   },
 )
 

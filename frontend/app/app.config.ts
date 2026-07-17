@@ -9,5 +9,15 @@ export default defineAppConfig({
         size: 'md',
       },
     },
+    input: {
+      defaultVariants: {
+        size: 'md',
+      },
+    },
+    textarea: {
+      defaultVariants: {
+        size: 'md',
+      },
+    },
   },
 })

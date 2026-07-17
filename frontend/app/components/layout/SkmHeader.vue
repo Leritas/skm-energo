@@ -28,7 +28,7 @@ function handleSearch() {
             src="/logo.jpg"
             alt="СКМ-Энергосервис"
             class="h-9 w-auto md:h-10 lg:h-12"
-          />
+          >
         </NuxtLink>
 
         <!-- Desktop nav (768+) -->
