@@ -14,9 +14,9 @@ const breadcrumbs = [
 </script>
 
 <template>
-  <AppSection>
-    <AppContainer>
-      <AppBreadcrumbs :items="breadcrumbs" />
+  <SkmSection>
+    <SkmContainer>
+      <SkmBreadcrumbs :items="breadcrumbs" />
       <h1 class="text-3xl font-bold text-neutral-900 md:text-4xl">
         О компании
       </h1>
@@ -71,6 +71,6 @@ const breadcrumbs = [
           С уважением, коллектив ООО «СКМ-Энергосервис».
         </p>
       </div>
-    </AppContainer>
-  </AppSection>
+    </SkmContainer>
+  </SkmSection>
 </template>

@@ -99,7 +99,7 @@ function close() {
           <UIcon name="i-lucide-mail" class="size-4 text-accent-500" />
           {{ SITE.email }}
         </a>
-        <AppButton
+        <SkmButton
           class="w-full justify-center"
           @click="
             () => {
@@ -109,8 +109,9 @@ function close() {
           "
         >
           Заказать звонок
-        </AppButton>
+        </SkmButton>
       </div>
     </template>
   </USlideover>
 </template>
+

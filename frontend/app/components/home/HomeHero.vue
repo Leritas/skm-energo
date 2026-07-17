@@ -8,8 +8,8 @@ useSeoMeta({
 </script>
 
 <template>
-  <AppSection>
-    <AppContainer>
+  <SkmSection>
+    <SkmContainer>
       <div class="max-w-3xl">
         <p class="text-sm font-medium uppercase tracking-wide text-accent-600">
           Высоковольтные компоненты
@@ -21,10 +21,10 @@ useSeoMeta({
           {{ SITE.tagline }}
         </p>
         <div class="mt-8 flex flex-wrap gap-3">
-          <AppButton to="/catalog">Каталог продукции</AppButton>
-          <AppButton variant="outline" to="/contacts">Связаться с нами</AppButton>
+          <SkmButton to="/catalog">Каталог продукции</SkmButton>
+          <SkmButton variant="outline" to="/contacts">Связаться с нами</SkmButton>
         </div>
       </div>
-    </AppContainer>
-  </AppSection>
+    </SkmContainer>
+  </SkmSection>
 </template>

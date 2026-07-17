@@ -1,9 +1,11 @@
 <script setup lang="ts">
-type SectionTone = 'light' | 'muted' | 'brand'
+import { computed } from 'vue'
+
+type SkmSectionTone = 'light' | 'muted' | 'brand'
 
 const props = withDefaults(
   defineProps<{
-    tone?: SectionTone
+    tone?: SkmSectionTone
     /** Секция с фиолетовым фоном бренда */
     alt?: boolean
   }>(),
@@ -29,3 +31,4 @@ const sectionClass = computed(() => {
     <slot />
   </section>
 </template>
+

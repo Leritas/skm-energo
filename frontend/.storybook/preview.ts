@@ -1,5 +1,6 @@
 import type { Preview } from '@storybook/vue3'
 import { setup } from '@storybook/vue3'
+import ui from '@nuxt/ui/vue-plugin'
 import { defineComponent, h } from 'vue'
 import '../app/assets/css/main.css'
 
@@ -17,6 +18,7 @@ const NuxtLinkStub = defineComponent({
 })
 
 setup((app) => {
+  app.use(ui)
   app.component('NuxtLink', NuxtLinkStub)
 })
 

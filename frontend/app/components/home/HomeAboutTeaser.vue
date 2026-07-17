@@ -1,6 +1,6 @@
 <template>
-  <AppSection>
-    <AppContainer>
+  <SkmSection>
+    <SkmContainer>
       <div class="grid gap-10 md:grid-cols-2 md:items-center">
         <div>
           <h2 class="text-2xl font-bold text-neutral-950 md:text-3xl">
@@ -16,9 +16,9 @@
             Сотрудничество с ведущими мировыми производителями позволяет нам в
             кратчайшие сроки осуществлять поставку необходимого оборудования.
           </p>
-          <AppButton class="mt-6" variant="outline" to="/about">
+          <SkmButton class="mt-6" variant="outline" to="/about">
             Подробнее о компании
-          </AppButton>
+          </SkmButton>
         </div>
         <div class="rounded-xl border border-brand-purple-800 bg-brand-purple-950 p-8">
           <h3 class="text-lg font-semibold text-white">
@@ -44,6 +44,6 @@
           </ul>
         </div>
       </div>
-    </AppContainer>
-  </AppSection>
+    </SkmContainer>
+  </SkmSection>
 </template>

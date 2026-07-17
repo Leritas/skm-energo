@@ -13,9 +13,9 @@ const breadcrumbs = [
 </script>
 
 <template>
-  <AppSection>
-    <AppContainer>
-      <AppBreadcrumbs :items="breadcrumbs" />
+  <SkmSection>
+    <SkmContainer>
+      <SkmBreadcrumbs :items="breadcrumbs" />
       <h1 class="text-3xl font-bold text-neutral-900 md:text-4xl">
         Новости
       </h1>
@@ -23,6 +23,6 @@ const breadcrumbs = [
         Раздел в разработке. Новости будут добавляться через админ-панель на
         этапе 4 roadmap.
       </p>
-    </AppContainer>
-  </AppSection>
+    </SkmContainer>
+  </SkmSection>
 </template>

@@ -1,9 +1,14 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { fileURLToPath, URL } from 'node:url'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   ssr: true,
   css: ['~/assets/css/main.css'],
+  alias: {
+    '@skm/components': fileURLToPath(new URL('./app/components', import.meta.url)),
+  },
   colorMode: {
     preference: 'light',
     fallback: 'light',
@@ -13,6 +18,8 @@ export default defineNuxtConfig({
     {
       path: '~/components',
       pathPrefix: false,
+      // Keep barrel .ts exports for @skm/components; only auto-import SFCs.
+      extensions: ['.vue'],
     },
   ],
   modules: [

@@ -16,19 +16,15 @@ const email = ref('')
 const message = ref('')
 const submitted = ref(false)
 
-const formFieldUi = {
-  base: 'bg-white text-neutral-900 placeholder:text-neutral-400 ring-neutral-200',
-}
-
 function handleSubmit() {
   submitted.value = true
 }
 </script>
 
 <template>
-  <AppSection>
-    <AppContainer>
-      <AppBreadcrumbs :items="breadcrumbs" />
+  <SkmSection>
+    <SkmContainer>
+      <SkmBreadcrumbs :items="breadcrumbs" />
       <h1 class="text-3xl font-bold text-neutral-900 md:text-4xl">
         Контакты
       </h1>
@@ -77,41 +73,41 @@ function handleSubmit() {
           </div>
           <form
             v-else
-            class="mt-6 space-y-4 [&_label]:text-brand-purple-100"
+            class="mt-6 space-y-4"
             @submit.prevent="handleSubmit"
           >
-            <UFormField label="Имя">
-              <UInput
+            <SkmFormField tone="brand" label="Имя">
+              <SkmInput
                 v-model="name"
                 placeholder="Ваше имя"
-                :ui="formFieldUi"
+                variant="onBrand"
                 required
               />
-            </UFormField>
-            <UFormField label="Email">
-              <UInput
+            </SkmFormField>
+            <SkmFormField tone="brand" label="Email">
+              <SkmInput
                 v-model="email"
                 type="email"
                 placeholder="email@example.com"
-                :ui="formFieldUi"
+                variant="onBrand"
                 required
               />
-            </UFormField>
-            <UFormField label="Сообщение">
-              <UTextarea
+            </SkmFormField>
+            <SkmFormField tone="brand" label="Сообщение">
+              <SkmTextarea
                 v-model="message"
                 placeholder="Ваш вопрос или комментарий"
-                :ui="formFieldUi"
+                variant="onBrand"
                 :rows="4"
                 required
               />
-            </UFormField>
-            <AppButton type="submit" variant="primary">
+            </SkmFormField>
+            <SkmButton type="submit" variant="primary">
               Отправить
-            </AppButton>
+            </SkmButton>
           </form>
         </div>
       </div>
-    </AppContainer>
-  </AppSection>
+    </SkmContainer>
+  </SkmSection>
 </template>

@@ -1,11 +1,8 @@
 <script setup lang="ts">
-export interface BreadcrumbItem {
-  label: string
-  to?: string
-}
+import type { SkmBreadcrumbItem } from './types'
 
 defineProps<{
-  items: BreadcrumbItem[]
+  items: SkmBreadcrumbItem[]
 }>()
 </script>
 
@@ -23,7 +20,7 @@ defineProps<{
         <NuxtLink
           v-if="item.to"
           :to="item.to"
-          class="hover:text-accent-600 transition-colors"
+          class="transition-colors hover:text-accent-600"
         >
           {{ item.label }}
         </NuxtLink>
@@ -38,3 +35,4 @@ defineProps<{
     </ol>
   </nav>
 </template>
+

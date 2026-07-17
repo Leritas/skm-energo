@@ -25,3 +25,4 @@ defineProps<{
     <slot />
   </component>
 </template>
+

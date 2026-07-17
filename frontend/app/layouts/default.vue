@@ -1,9 +1,9 @@
 <template>
   <div class="flex min-h-screen flex-col bg-white text-neutral-900">
-    <AppHeader />
+    <SkmHeader />
     <main class="flex-1">
       <slot />
     </main>
-    <AppFooter />
+    <SkmFooter />
   </div>
 </template>

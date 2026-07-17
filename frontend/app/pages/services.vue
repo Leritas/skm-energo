@@ -47,9 +47,9 @@ const services = [
 </script>
 
 <template>
-  <AppSection>
-    <AppContainer>
-      <AppBreadcrumbs :items="breadcrumbs" />
+  <SkmSection>
+    <SkmContainer>
+      <SkmBreadcrumbs :items="breadcrumbs" />
       <h1 class="text-3xl font-bold text-neutral-900 md:text-4xl">
         Услуги
       </h1>
@@ -58,13 +58,13 @@ const services = [
         электрооборудования для промышленных предприятий.
       </p>
       <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <AppCard
+        <SkmCard
           v-for="service in services"
           :key="service.title"
           :title="service.title"
           :description="service.description"
         />
       </div>
-    </AppContainer>
-  </AppSection>
+    </SkmContainer>
+  </SkmSection>
 </template>

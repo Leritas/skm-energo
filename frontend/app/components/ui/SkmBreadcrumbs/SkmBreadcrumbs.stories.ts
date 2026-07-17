@@ -1,21 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
-import AppBreadcrumbs from './AppBreadcrumbs.vue'
+import { SkmBreadcrumbs } from '@skm/components'
 
 const meta = {
-  title: 'UI/AppBreadcrumbs',
-  component: AppBreadcrumbs,
+  title: 'SKM Design System/SkmBreadcrumbs',
+  component: SkmBreadcrumbs,
   tags: ['autodocs'],
-} satisfies Meta<typeof AppBreadcrumbs>
+} satisfies Meta<typeof SkmBreadcrumbs>
 
 export default meta
 type Story = StoryObj<typeof meta>
 
 export const TwoLevels: Story = {
   args: {
-    items: [
-      { label: 'Главная', to: '/' },
-      { label: 'Каталог' },
-    ],
+    items: [{ label: 'Главная', to: '/' }, { label: 'Каталог' }],
   },
 }
 
@@ -39,3 +36,4 @@ export const FourLevels: Story = {
     ],
   },
 }
+

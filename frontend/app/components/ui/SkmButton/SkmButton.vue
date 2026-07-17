@@ -1,11 +1,13 @@
 <script setup lang="ts">
-type ButtonVariant = 'primary' | 'secondary' | 'outline'
-type ButtonSize = 'sm' | 'md' | 'lg'
+import { computed } from 'vue'
+
+type SkmButtonVariant = 'primary' | 'secondary' | 'outline'
+type SkmButtonSize = 'sm' | 'md' | 'lg'
 
 const props = withDefaults(
   defineProps<{
-    variant?: ButtonVariant
-    size?: ButtonSize
+    variant?: SkmButtonVariant
+    size?: SkmButtonSize
     to?: string
     type?: 'button' | 'submit' | 'reset'
     disabled?: boolean
@@ -50,3 +52,4 @@ const uiVariant = computed(() => {
     <slot />
   </UButton>
 </template>
+

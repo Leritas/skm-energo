@@ -18,7 +18,7 @@ function handleSearch() {
 
 <template>
   <header class="sticky top-0 z-50 border-b border-neutral-100 bg-white">
-    <AppContainer>
+    <SkmContainer>
       <div
         class="flex h-16 flex-nowrap items-center justify-between gap-2 md:h-20 md:gap-3"
       >
@@ -36,7 +36,7 @@ function handleSearch() {
           class="hidden min-w-0 shrink items-center gap-3 whitespace-nowrap md:flex lg:gap-5 xl:gap-6"
         >
           <template v-for="item in MAIN_NAV" :key="item.to">
-            <AppCatalogMenu v-if="item.children" />
+            <SkmCatalogMenu v-if="item.children" />
             <NuxtLink
               v-else
               :to="item.to"
@@ -106,9 +106,10 @@ function handleSearch() {
           />
         </div>
       </div>
-    </AppContainer>
+    </SkmContainer>
 
-    <AppMobileNav v-model:open="mobileNavOpen" @call-order="callModalOpen = true" />
-    <AppCallOrderModal v-model:open="callModalOpen" />
+    <SkmMobileNav v-model:open="mobileNavOpen" @call-order="callModalOpen = true" />
+    <SkmCallOrderModal v-model:open="callModalOpen" />
   </header>
 </template>
+

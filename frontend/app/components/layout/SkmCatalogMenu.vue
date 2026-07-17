@@ -9,8 +9,7 @@ const open = ref(false)
     v-model:open="open"
     :content="{
       align: 'start',
-      class:
-        '!bg-white p-0 shadow-lg ring-1 ring-neutral-100/80',
+      class: '!bg-white p-0 shadow-lg ring-1 ring-neutral-100/80',
     }"
   >
     <button
@@ -52,3 +51,4 @@ const open = ref(false)
     </template>
   </UPopover>
 </template>
+

@@ -9,7 +9,7 @@ const footerNav = MAIN_NAV.filter((item) => item.to !== '/')
 
 <template>
   <footer class="border-t border-neutral-100 bg-white">
-    <AppContainer>
+    <SkmContainer>
       <div class="grid gap-10 py-12 md:grid-cols-3">
         <!-- About -->
         <div>
@@ -25,7 +25,9 @@ const footerNav = MAIN_NAV.filter((item) => item.to !== '/')
 
         <!-- Navigation -->
         <div>
-          <h3 class="mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-900">
+          <h3
+            class="mb-4 text-sm font-semibold uppercase tracking-wide text-neutral-900"
+          >
             Навигация
           </h3>
           <ul class="space-y-2">
@@ -49,7 +51,7 @@ const footerNav = MAIN_NAV.filter((item) => item.to !== '/')
             <li>
               <a
                 :href="SITE.phoneHref"
-                class="hover:text-accent-600 transition-colors"
+                class="transition-colors hover:text-accent-600"
               >
                 {{ SITE.phone }}
               </a>
@@ -57,7 +59,7 @@ const footerNav = MAIN_NAV.filter((item) => item.to !== '/')
             <li>
               <a
                 :href="`mailto:${SITE.email}`"
-                class="hover:text-accent-600 transition-colors"
+                class="transition-colors hover:text-accent-600"
               >
                 {{ SITE.email }}
               </a>
@@ -70,6 +72,7 @@ const footerNav = MAIN_NAV.filter((item) => item.to !== '/')
       <div class="border-t border-neutral-100 py-6 text-center text-xs text-neutral-400">
         © {{ year }} {{ SITE.legalName }}
       </div>
-    </AppContainer>
+    </SkmContainer>
   </footer>
 </template>
+
