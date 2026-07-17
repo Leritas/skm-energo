@@ -65,15 +65,13 @@ function handleSearch() {
             </a>
           </div>
 
-          <UButton
-            color="neutral"
+          <SkmButton
             variant="ghost"
             icon="i-lucide-phone-call"
             aria-label="Заказать звонок"
             @click="callModalOpen = true"
           />
-          <UButton
-            color="neutral"
+          <SkmButton
             variant="ghost"
             icon="i-lucide-search"
             aria-label="Поиск"
@@ -83,22 +81,19 @@ function handleSearch() {
 
         <!-- Mobile (<768) -->
         <div class="flex shrink-0 items-center gap-1 md:hidden">
-          <UButton
-            color="neutral"
+          <SkmButton
             variant="ghost"
             icon="i-lucide-phone-call"
             aria-label="Заказать звонок"
             @click="callModalOpen = true"
           />
-          <UButton
-            color="neutral"
+          <SkmButton
             variant="ghost"
             icon="i-lucide-search"
             aria-label="Поиск"
             @click="handleSearch"
           />
-          <UButton
-            color="neutral"
+          <SkmButton
             variant="ghost"
             icon="i-lucide-menu"
             aria-label="Открыть меню"
@@ -112,4 +107,3 @@ function handleSearch() {
     <SkmCallOrderModal v-model:open="callModalOpen" />
   </header>
 </template>
-

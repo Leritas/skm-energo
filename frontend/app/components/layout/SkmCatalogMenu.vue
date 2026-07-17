@@ -5,13 +5,7 @@ const open = ref(false)
 </script>
 
 <template>
-  <UPopover
-    v-model:open="open"
-    :content="{
-      align: 'start',
-      class: '!bg-white p-0 shadow-lg ring-1 ring-neutral-100/80',
-    }"
-  >
+  <SkmPopover v-model:open="open" variant="catalog">
     <button
       type="button"
       class="flex items-center gap-1 text-sm font-medium text-neutral-700 transition-colors hover:text-accent-600"
@@ -49,6 +43,5 @@ const open = ref(false)
         </div>
       </div>
     </template>
-  </UPopover>
+  </SkmPopover>
 </template>
-

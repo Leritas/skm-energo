@@ -283,10 +283,10 @@ Storybook остаётся standalone (без Nuxt runtime). Для `SkmButton` 
 
 ### Phase 2 — Overlay components
 
-1. `SkmPopover` — вынести стили из `SkmCatalogMenu`
-2. `SkmModal` — вынести из `SkmCallOrderModal`
-3. Довести layout shell на `Skm*`-примитивы (если остались прямые `U*`)
-4. Storybook: Nuxt UI vite plugin для полного рендера
+1. `SkmPopover` — вынести стили из `SkmCatalogMenu` ✅
+2. `SkmModal` — вынести из `SkmCallOrderModal` ✅
+3. Довести layout shell на `Skm*`-примитивы (если остались прямые `U*`) ✅ (`UButton`/`UPopover`/`UModal`; `USlideover`/`UIcon` — out of scope)
+4. Storybook: Nuxt UI vite plugin для полного рендера ✅
 
 ### Phase 3 — Guardrails (optional)
 

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3'
+import { ref } from 'vue'
 import {
   SkmBreadcrumbs,
   SkmButton,
@@ -6,6 +7,8 @@ import {
   SkmContainer,
   SkmFormField,
   SkmInput,
+  SkmModal,
+  SkmPopover,
   SkmSection,
   SkmTextarea,
 } from '@skm/components'
@@ -27,6 +30,8 @@ export const Overview: Story = {
       SkmContainer,
       SkmFormField,
       SkmInput,
+      SkmModal,
+      SkmPopover,
       SkmSection,
       SkmTextarea,
     },
@@ -36,6 +41,7 @@ export const Overview: Story = {
         { label: 'Каталог', to: '/catalog' },
         { label: 'MERSEN' },
       ],
+      modalOpen: ref(false),
     }),
     template: `
       <div class="space-y-12">
@@ -44,7 +50,7 @@ export const Overview: Story = {
             <SkmBreadcrumbs :items="breadcrumbs" />
             <h2 class="text-2xl font-semibold text-neutral-950">SKM Design System</h2>
             <p class="mt-2 max-w-2xl text-sm text-neutral-600">
-              Обзор основных примитивов UI Kit: кнопки, форма, карточки и layout-примитивы.
+              Обзор основных примитивов UI Kit: кнопки, форма, карточки, overlays и layout-примитивы.
             </p>
           </SkmContainer>
         </SkmSection>
@@ -56,6 +62,7 @@ export const Overview: Story = {
               <SkmButton variant="primary">Primary</SkmButton>
               <SkmButton variant="secondary">Secondary</SkmButton>
               <SkmButton variant="outline">Outline</SkmButton>
+              <SkmButton variant="ghost" icon="i-lucide-search" aria-label="Поиск" />
               <SkmButton variant="primary" disabled>Disabled</SkmButton>
             </div>
           </SkmContainer>
@@ -78,6 +85,32 @@ export const Overview: Story = {
           </SkmContainer>
         </SkmSection>
 
+        <SkmSection tone="muted">
+          <SkmContainer>
+            <h3 class="text-sm font-semibold uppercase tracking-wide text-neutral-900">Overlays</h3>
+            <div class="mt-4 flex flex-wrap gap-3">
+              <SkmPopover variant="catalog">
+                <SkmButton variant="outline">Popover catalog</SkmButton>
+                <template #content>
+                  <div class="w-56 py-2">
+                    <div class="px-4 py-2 text-sm font-semibold text-neutral-900">Предохранители</div>
+                    <div class="px-4 py-2 text-sm font-semibold text-neutral-900">Контакторы</div>
+                  </div>
+                </template>
+              </SkmPopover>
+              <SkmButton variant="primary" @click="modalOpen = true">Открыть modal</SkmButton>
+              <SkmModal v-model:open="modalOpen" title="Заказать звонок">
+                <template #body>
+                  <p class="text-sm text-neutral-600">Демо SkmModal из Overview.</p>
+                  <div class="mt-4 flex justify-end">
+                    <SkmButton variant="outline" @click="modalOpen = false">Закрыть</SkmButton>
+                  </div>
+                </template>
+              </SkmModal>
+            </div>
+          </SkmContainer>
+        </SkmSection>
+
         <SkmSection tone="brand">
           <SkmContainer>
             <h3 class="text-sm font-semibold uppercase tracking-wide text-brand-purple-100">Form (on brand)</h3>
@@ -92,7 +125,7 @@ export const Overview: Story = {
                 <SkmTextarea variant="onBrand" :rows="4" placeholder="Ваш вопрос или комментарий" />
               </SkmFormField>
               <div class="pt-2">
-                <SkmButton variant="primary" type="button">Отправить</SkmButton>
+                <SkmButton tone="brand" variant="primary" type="button">Отправить</SkmButton>
               </div>
             </div>
           </SkmContainer>
@@ -101,4 +134,3 @@ export const Overview: Story = {
     `,
   }),
 }
-

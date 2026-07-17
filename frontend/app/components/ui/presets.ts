@@ -26,3 +26,33 @@ export const skmFormFieldUi: Record<
   },
 } as const
 
+export type SkmPopoverVariant = 'default' | 'catalog'
+
+export const skmPopoverContent = {
+  default: {
+    side: 'bottom' as const,
+    sideOffset: 8,
+  },
+  catalog: {
+    align: 'start' as const,
+    class: '!bg-white p-0 shadow-lg ring-1 ring-neutral-100/80',
+  },
+} as const
+
+export type SkmButtonTone = 'light' | 'brand'
+
+/** Extra `:ui.base` classes for buttons on brand-purple surfaces */
+export const skmButtonBrandUi = {
+  primary: {
+    base: '!bg-accent-500 !text-white hover:!bg-accent-600 disabled:!bg-accent-500 aria-disabled:!bg-accent-500',
+  },
+  secondary: {
+    base: '!bg-white/12 !text-white hover:!bg-white/18 disabled:!bg-white/12',
+  },
+  outline: {
+    base: '!bg-transparent ring-1 ring-inset !ring-white/45 !text-white hover:!bg-white/10',
+  },
+  ghost: {
+    base: '!bg-transparent !text-white hover:!bg-white/10',
+  },
+} as const

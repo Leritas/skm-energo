@@ -18,7 +18,7 @@ function handleClose() {
 </script>
 
 <template>
-  <UModal v-model:open="open" title="Заказать звонок">
+  <SkmModal v-model:open="open" title="Заказать звонок">
     <template #body>
       <div v-if="submitted" class="py-4 text-center">
         <p class="text-neutral-600">
@@ -48,6 +48,5 @@ function handleClose() {
         </div>
       </form>
     </template>
-  </UModal>
+  </SkmModal>
 </template>
-

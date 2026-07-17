@@ -42,12 +42,8 @@
   --color-brand-purple-950: #2e1065;
 }
 
-/* Dark theme tokens — for Storybook preview only; not active in production (colorMode: light) */
-.dark.storybook-dark-preview {
-  --color-neutral-0: #1e1b2e;
-  --color-neutral-50: #252238;
-  --color-neutral-100: #2f2b42;
-  --color-neutral-900: #f3f4f6;
+/* On-brand preview tokens — Storybook only; site stays light via colorMode */
+.storybook-on-brand {
   --color-accent-500: #f97316;
   --color-accent-600: #ea580c;
 }
