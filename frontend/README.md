@@ -85,9 +85,9 @@ app/components/
 | `tone="brand"` на кнопках поверх `brand-purple-*` | Импорт `presets` вне `components/ui/` |
 | Layout использует `Skm*` | Новые `App*` компоненты |
 
-**Allowlist без обёртки (пока):** `UIcon`, `USlideover`.
+**Allowlist без обёртки (пока):** `UIcon`.
 
-ESLint-правило `skm-ui-kit/no-raw-nuxt-ui` запрещает `UButton` / `UInput` / `UTextarea` / `UFormField` / `UPopover` / `UModal` / `UCard` / `UContainer` / `UBreadcrumb` вне `app/components/ui/`.
+ESLint-правило `skm-ui-kit/no-raw-nuxt-ui` запрещает сырые `U*` (Button, Input, Badge, Tabs, Slideover, Alert, Table и др.) вне `app/components/ui/` — используйте `Skm*`.
 
 ### Токены
 

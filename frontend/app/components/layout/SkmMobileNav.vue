@@ -21,7 +21,7 @@ function close() {
 </script>
 
 <template>
-  <USlideover v-model:open="open" side="right" title="Меню">
+  <SkmSlideover v-model:open="open" side="right" title="Меню">
     <template #body>
       <nav class="flex flex-col gap-1">
         <template v-for="item in MAIN_NAV" :key="item.to">
@@ -112,6 +112,6 @@ function close() {
         </SkmButton>
       </div>
     </template>
-  </USlideover>
+  </SkmSlideover>
 </template>
 

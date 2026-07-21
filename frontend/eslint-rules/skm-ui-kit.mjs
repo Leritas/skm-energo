@@ -1,6 +1,6 @@
 /**
  * Forbid raw Nuxt UI components outside SKM wrappers.
- * Allowlist: primitives without Skm* wrappers yet (UIcon, USlideover, …).
+ * Allowlist: primitives without Skm* wrappers yet (UIcon, …).
  */
 
 const FORBIDDEN = new Set([
@@ -13,6 +13,14 @@ const FORBIDDEN = new Set([
   'UCard',
   'UContainer',
   'UBreadcrumb',
+  'UBadge',
+  'USkeleton',
+  'UEmpty',
+  'UTabs',
+  'UPagination',
+  'USlideover',
+  'UAlert',
+  'UTable',
 ])
 
 const SUGGEST = {
@@ -25,6 +33,14 @@ const SUGGEST = {
   UCard: 'SkmCard',
   UContainer: 'SkmContainer',
   UBreadcrumb: 'SkmBreadcrumbs',
+  UBadge: 'SkmBadge',
+  USkeleton: 'SkmSkeleton',
+  UEmpty: 'SkmEmpty',
+  UTabs: 'SkmTabs',
+  UPagination: 'SkmPagination',
+  USlideover: 'SkmSlideover',
+  UAlert: 'SkmAlert',
+  UTable: 'SkmTable',
 }
 
 function getTemplateVisitor(context, visitor) {
