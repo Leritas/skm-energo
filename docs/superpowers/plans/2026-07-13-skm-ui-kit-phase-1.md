@@ -1,6 +1,8 @@
 # SKM UI Kit Phase 1 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+**Status:** ✅ Completed — historical
+
+> **For agentic workers:** Plan executed. Historical record only.
 
 **Goal:** Внедрить `Skm*` дизайн-систему как единую точку использования компонентов через `@skm/components`: папочная структура `components/ui/*`, nested `index.ts`, rename `App* → Skm*` (ui + layout), первые обёртки форм, и Storybook Overview + per-component stories для UI Kit.
 

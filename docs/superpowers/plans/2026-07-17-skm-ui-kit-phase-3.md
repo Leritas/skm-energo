@@ -1,6 +1,8 @@
 # SKM UI Kit Phase 3 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+**Status:** ✅ Completed — historical
+
+> **For agentic workers:** Plan executed. Historical record only. Note: `USlideover` later wrapped as `SkmSlideover` in Waves A–C; allowlist now primarily `UIcon`.
 
 **Goal:** Закрепить guardrails дизайн-системы: ESLint запрещает прямые `U*` вне `components/ui/`, README документирует SKM UI Kit и правила импорта через `@skm/components`.
 

@@ -1,6 +1,8 @@
 # SKM UI Kit Phase 2 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+**Status:** ✅ Completed — historical
+
+> **For agentic workers:** Plan executed. Historical record only.
 
 **Goal:** Добавить overlay-обёртки `SkmPopover` и `SkmModal`, убрать прямые `UPopover` / `UModal` / `UButton` из layout shell, расширить `SkmButton` для icon/ghost-кнопок шапки.
 

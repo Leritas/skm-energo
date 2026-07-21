@@ -1,6 +1,8 @@
 # SKM UI Kit Waves A–C Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+**Status:** ✅ Completed — historical (2026-07-21)
+
+> **For agentic workers:** Plan executed. Do not re-run unless resurrecting work. Public UI Kit Waves A–C are done; future admin work → [../specs/2026-07-21-skm-admin-ui-kit.md](../specs/2026-07-21-skm-admin-ui-kit.md).
 
 **Goal:** Закрыть публичный domain UI Kit (каталог, новости, PDP, commerce/ЛК chrome) так, чтобы страницы собирались из `Skm*` без сырого `U*` (кроме allowlisted `UIcon`).
 
@@ -8,9 +10,9 @@
 
 **Tech Stack:** Nuxt 4, Vue 3, Nuxt UI v4 (только внутри `ui/`), Storybook, ESLint `skm-ui-kit/no-raw-nuxt-ui`, `@skm/components`.
 
-**Spec / roadmap:** [docs/superpowers/specs/2026-07-20-skm-ui-kit-roadmap.md](../specs/2026-07-20-skm-ui-kit-roadmap.md)
+**Spec / roadmap:** [docs/superpowers/specs/2026-07-20-skm-ui-kit-roadmap.md](../specs/2026-07-20-skm-ui-kit-roadmap.md) ✅
 
-**Out of scope:** Wave D / Admin kit
+**Out of scope:** Wave D / Admin kit → [2026-07-21-skm-admin-ui-kit.md](../specs/2026-07-21-skm-admin-ui-kit.md)
 
 ## Global Constraints
 
