@@ -77,6 +77,7 @@ function handleSearch() {
             aria-label="Поиск"
             @click="handleSearch"
           />
+          <SkmUserMenu />
         </div>
 
         <!-- Mobile (<768) -->
@@ -93,6 +94,7 @@ function handleSearch() {
             aria-label="Поиск"
             @click="handleSearch"
           />
+          <SkmUserMenu />
           <SkmButton
             variant="ghost"
             icon="i-lucide-menu"

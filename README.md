@@ -26,8 +26,10 @@
    │
    └──► backend/   NestJS REST API (порт 3001, prefix /api)
            │
-           └──► PostgreSQL 16 (порт 5432, Docker)
+           └──► PostgreSQL 16 (порт 5433→5432, Docker)
 ```
+
+Shared types: `skm-specs/` (`@skm/specs`) — permissions, auth DTO.
 
 ## Стек
 
@@ -121,7 +123,7 @@ npm run dev
 | 0 | Монорепа, Nuxt SSR, NestJS, PostgreSQL, docs | ✅ |
 | 1 | UI-каркас: layout, about, services, contacts | — |
 | 2 | Prisma schema, миграции, seed | — |
-| 3 | Auth (JWT, роли admin/client) | — |
+| 3 | Auth (JWT Bearer, RBAC `@skm/specs` + динамические роли) | — |
 | 4 | Админка: CRUD каталога, новости, медиа | — |
 | 5–10 | Каталог, корзина, заказы, ЛК, production | — |
 | 11 | Онлайн-оплата (v2) | — |

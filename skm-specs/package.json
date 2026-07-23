@@ -1,0 +1,27 @@
+{
+  "name": "@skm/specs",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/cjs/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/cjs/index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "default": "./dist/cjs/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.cjs.json && tsc -p tsconfig.esm.json && node ./scripts/write-dist-markers.mjs",
+    "prepare": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}
