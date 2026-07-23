@@ -7,7 +7,7 @@ REST API для e-commerce платформы SKM-Energo: каталог, зак
 Backend обслуживает:
 
 - **Frontend (Nuxt SSR)** — публичные данные каталога, корзина, auth
-- **Админку (`/admin`)** — CRUD контента, управление заказами (JWT admin)
+- **Админку (`/admin`)** — CRUD контента, управление заказами (JWT + permissions / `hasAccessToAdmin`)
 
 Frontend не обращается к БД напрямую — только через этот API.
 
@@ -48,8 +48,9 @@ npm run prisma:migrate    # создание/применение миграци
 npm run prisma:studio     # GUI для просмотра данных → http://localhost:5555
 ```
 
-> **Текущее состояние:** в `prisma/schema.prisma` — placeholder-модель `HealthCheck`.
-> Полная схема будет реализована на **этапе 2** по [docs/db-draft.sql](../docs/db-draft.sql).
+> **Текущее состояние:** auth-модели User/Role/UserRole/RefreshToken + HealthCheck.
+> Полная схема каталога — **этап 2** по [docs/db-draft.sql](../docs/db-draft.sql).
+> Auth design: [docs/superpowers/specs/2026-07-21-auth-roles-permissions-design.md](../docs/superpowers/specs/2026-07-21-auth-roles-permissions-design.md).
 
 ## Переменные окружения
 
@@ -61,9 +62,15 @@ cp .env.example .env
 |------------|----------|--------------|
 | `PORT` | Порт HTTP-сервера | `3001` |
 | `CORS_ORIGIN` | Allowed origin для CORS | `http://localhost:3000` |
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://skm:skm@localhost:5432/skm_energo?schema=public` |
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://skm:skm@localhost:5433/skm_energo?schema=public` |
+| `JWT_ACCESS_SECRET` | Secret for access JWT | (required) |
+| `JWT_REFRESH_SECRET` | Reserved for refresh signing (tokens are opaque hashed in DB) | (required) |
+| `JWT_ACCESS_TTL` | Access token TTL | `15m` |
+| `JWT_REFRESH_TTL` | Refresh token TTL | `7d` |
+| `SEED_ADMIN_EMAIL` | Seed admin email | `admin@skmenergo.ru` |
+| `SEED_ADMIN_PASSWORD` | Seed admin password | `ChangeMeAdmin1!` |
 
-PostgreSQL поднимается через `docker-compose up -d` из корня монорепы.
+PostgreSQL поднимается через `docker compose up -d` из корня монорепы (порт **5433** → контейнер 5432).
 
 ## API
 
@@ -73,6 +80,14 @@ Global prefix: **`/api`**
 |-------|-----|----------|
 | GET | `/api` | Hello (default NestJS controller) |
 | GET | `/api/health` | Health check → `{ status, timestamp }` |
+| POST | `/api/auth/register` | Public registration → role `user` |
+| POST | `/api/auth/login` | Login → tokens + user |
+| POST | `/api/auth/refresh` | Refresh tokens |
+| POST | `/api/auth/logout` | Revoke refresh (JWT) |
+| GET | `/api/auth/me` | Current user + permissions (JWT) |
+| POST | `/api/users` | Create staff user (`canCreateUsers`) |
+| GET/POST/PATCH/DELETE | `/api/roles` | Roles CRUD |
+| PUT | `/api/users/:id/roles` | Assign roles |
 | GET | `/api/docs` | Swagger UI |
 
 Пример health check:
@@ -153,7 +168,7 @@ npm run test:cov      # coverage
 См. [docs/roadmap.md](../docs/roadmap.md):
 
 - **Этап 2** — полная Prisma schema, миграции, seed
-- **Этап 3** — JWT auth, роли `admin` / `client`, guards
+- **Этап 3** — JWT auth, RBAC (`@skm/specs` + динамические роли), guards
 - **Этап 4+** — CRUD каталога, заказы, файлы, email
 
 Расширения схемы БД относительно [db-draft.sql](../docs/db-draft.sql) описаны в roadmap (Manufacturer, Cart, Lead, MediaFile, …).

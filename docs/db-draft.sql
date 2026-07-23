@@ -1,4 +1,6 @@
 -- 1. Таблица пользователей
+-- DEPRECATED: колонка Role (admin|client). Актуальная модель — Prisma User + Role + UserRole
+-- (см. docs/superpowers/specs/2026-07-21-auth-roles-permissions-design.md).
 CREATE TABLE "User" (
     ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY,
     Name VARCHAR(255) NOT NULL,

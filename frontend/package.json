@@ -16,6 +16,7 @@
   "dependencies": {
     "@nuxt/ui": "^4.9.0",
     "@pinia/nuxt": "^0.11.3",
+    "@skm/specs": "file:../skm-specs",
     "@vueuse/nuxt": "^14.3.0",
     "nuxt": "^4.4.8",
     "pinia": "^3.0.4",

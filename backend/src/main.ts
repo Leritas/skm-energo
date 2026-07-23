@@ -25,6 +25,7 @@ async function bootstrap() {
     .setTitle('SKM-Energo API')
     .setDescription('REST API for skm-energo.ru e-commerce platform')
     .setVersion('0.1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);
@@ -33,4 +34,4 @@ async function bootstrap() {
   await app.listen(port);
 }
 
-bootstrap();
+void bootstrap();
