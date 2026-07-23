@@ -12,9 +12,11 @@
 | | |
 |---|---|
 | Framework | Nuxt 4.4 |
-| UI | Vue 3.5, Tailwind CSS |
+| UI | Vue 3.5, Nuxt UI v4 (через SKM wrappers), Tailwind CSS v4 |
 | State | Pinia |
 | Utils | VueUse |
+| Storybook | 10.4 (standalone, `@storybook/vue3-vite`) |
+| Lint | ESLint 9 + `@nuxt/eslint` + guardrail `skm-ui-kit/no-raw-nuxt-ui` |
 | Язык | TypeScript |
 
 ## Команды
@@ -24,7 +26,10 @@ npm install          # установка зависимостей (+ nuxt prepa
 npm run dev          # dev-сервер → http://localhost:3000
 npm run build        # production-сборка
 npm run preview      # preview production-сборки
-npm run generate     # статическая генерация (не используется — SSR mode)
+npm run storybook    # Storybook → http://localhost:6006
+npm run build-storybook
+npm run lint         # ESLint (в т.ч. запрет сырых U* вне ui/)
+npm run lint:fix    # ESLint --fix
 ```
 
 ## Переменные окружения
@@ -36,79 +41,125 @@ cp .env.example .env
 | Переменная | Описание | Значение по умолчанию |
 |------------|----------|----------------------|
 | `NUXT_PUBLIC_API_BASE` | Base URL NestJS API | `http://localhost:3001/api` |
+| `NUXT_PUBLIC_SITE_URL` | Канонический URL сайта (sitemap) | `https://skmenergo.ru` |
 
-Доступ в коде: `useRuntimeConfig().public.apiBase`.
+## SKM UI Kit
 
-## Структура
+Дизайн-система проекта: тонкие `Skm*` обёртки над Nuxt UI + layout-примитивы. Spec: [docs/superpowers/specs/2026-07-13-skm-ui-kit-design.md](../docs/superpowers/specs/2026-07-13-skm-ui-kit-design.md).
+
+### Импорт
+
+```ts
+import { SkmButton, SkmInput, SkmModal } from '@skm/components'
+```
+
+Не импортируйте `*.vue` напрямую и не тяните `presets.ts` в pages/layout — только через wrappers в `app/components/ui/`.
+
+### Структура
+
+```
+app/components/
+├── index.ts                 # public API → @skm/components
+├── ui/                      # UI Kit (Storybook + wrappers)
+│   ├── presets.ts           # :ui пресеты (только для ui/)
+│   ├── SkmButton/
+│   ├── SkmInput/
+│   ├── SkmTextarea/
+│   ├── SkmFormField/
+│   ├── SkmPopover/
+│   ├── SkmModal/
+│   ├── SkmCard/
+│   ├── SkmBreadcrumbs/
+│   ├── SkmContainer/
+│   ├── SkmSection/
+│   └── SkmDesignSystem/     # Overview story
+└── layout/                  # shell сайта (SkmHeader, SkmFooter, …)
+```
+
+### Правила
+
+| ✅ Do | ❌ Don't |
+|------|---------|
+| `<SkmButton variant="primary">` | `<UButton>` в pages / layout / home |
+| `<SkmInput variant="onBrand">` | `class="!bg-white"` на сыром `UInput` |
+| `tone="brand"` на кнопках поверх `brand-purple-*` | Импорт `presets` вне `components/ui/` |
+| Layout использует `Skm*` | Новые `App*` компоненты |
+
+**Allowlist без обёртки (пока):** `UIcon`, `USlideover`.
+
+ESLint-правило `skm-ui-kit/no-raw-nuxt-ui` запрещает `UButton` / `UInput` / `UTextarea` / `UFormField` / `UPopover` / `UModal` / `UCard` / `UContainer` / `UBreadcrumb` вне `app/components/ui/`.
+
+### Токены
+
+White-first B2B. Акцент из логотипа (`public/logo.jpg`):
+
+| Token | Light | Роль |
+|-------|-------|------|
+| `accent-500` | `#E85D04` | Primary CTA, active nav |
+| `accent-300` | `#FDBA74` | Hover, focus |
+| `neutral-*` | gray scale | Фон, текст, borders |
+| `brand-purple-950` | `#2E1065` | Brand-поверхности (секции, onBrand) |
+
+Токены: `app/assets/css/main.css`, тема Nuxt UI: `app/app.config.ts` (`primary: accent`).
+
+## Структура приложения
 
 ```
 frontend/
 ├── app/
-│   ├── app.vue                 # Корневой компонент (layout + page)
-│   ├── layouts/
-│   │   └── default.vue         # Header + main + footer
-│   ├── pages/
-│   │   ├── index.vue           # Главная (SSR fetch /api/health)
-│   │   ├── catalog/
-│   │   │   └── index.vue       # Каталог (заглушка)
-│   │   └── admin/
-│   │       └── index.vue       # Админка (заглушка, layout: false)
-│   └── components/
-│       ├── AppHeader.vue
-│       └── AppFooter.vue
+│   ├── assets/css/main.css
+│   ├── app.config.ts
+│   ├── constants/
+│   ├── components/           # ui/ + layout/ + home/ → @skm/components
+│   ├── layouts/default.vue
+│   └── pages/
+├── eslint.config.mjs
+├── eslint-rules/skm-ui-kit.mjs
+├── .storybook/
 ├── public/
-│   ├── favicon.ico
-│   └── robots.txt
-├── nuxt.config.ts              # SSR, modules, runtimeConfig, SEO meta
-├── .env.example
-└── package.json
+└── nuxt.config.ts
 ```
 
 ## Маршруты
 
 | Путь | Описание | SSR |
 |------|----------|-----|
-| `/` | Главная | ✅ |
-| `/catalog` | Каталог (заглушка) | ✅ |
-| `/admin` | Админ-панель (заглушка) | — (client-only layout) |
-
-## SSR
-
-SSR включён явно в `nuxt.config.ts`:
-
-```ts
-ssr: true
-```
-
-Главная страница (`app/pages/index.vue`) при серверном рендеринге вызывает:
-
-```
-GET {NUXT_PUBLIC_API_BASE}/health
-```
-
-и отображает статус backend. Это проверка связи frontend ↔ API при каждом запросе.
+| `/` | Главная (hero, направления, about-teaser) | ✅ |
+| `/about` | О компании | ✅ |
+| `/services` | Услуги | ✅ |
+| `/contacts` | Контакты + форма (UI) | ✅ |
+| `/catalog` | Каталог (заглушка + дерево категорий) | ✅ |
+| `/news` | Новости (заглушка) | ✅ |
+| `/admin` | Админ-панель (заглушка) | — |
 
 ## Модули Nuxt
 
 | Модуль | Назначение |
 |--------|------------|
-| `@pinia/nuxt` | State management (корзина, auth — этапы 3–6) |
-| `@vueuse/nuxt` | Composables (useFetch, useStorage, …) |
-| `@nuxtjs/tailwindcss` | Utility-first CSS |
+| `@nuxt/eslint` | ESLint flat config |
+| `@nuxt/ui` | UI primitives (только внутри `components/ui/`) |
+| `@pinia/nuxt` | State management |
+| `@vueuse/nuxt` | Composables |
+| `@nuxtjs/sitemap` | `/sitemap.xml` |
 
 ## SEO
 
-Глобальные meta заданы в `nuxt.config.ts`:
+- Глобальные meta в `nuxt.config.ts` (`lang="ru"`, title, description)
+- `useSeoMeta()` на каждой публичной странице
+- `robots.txt` + ссылка на sitemap
+- `@nuxtjs/sitemap` — auto-discovery страниц из `app/pages`
 
-- `lang="ru"`
-- title: «СКМ-Энергосервис»
-- description: поставка высоковольтных компонентов
+## Storybook
 
-На страницах — `useSeoMeta()` (см. `catalog/index.vue`, `admin/index.vue`).
+```bash
+npm run storybook
+```
+
+Навигация: **SKM Design System** → Overview + per-component stories (`SkmButton`, `SkmInput`, `SkmPopover`, `SkmModal`, …).
+
+> Standalone Storybook 10 + `@storybook/vue3-vite` + `@nuxt/ui/vite` (без Nuxt runtime).
 
 ## Запуск (локально)
-
-Backend должен быть запущен на порту 3001 (см. [backend/README.md](../backend/README.md)).
 
 ```bash
 cp .env.example .env
@@ -116,16 +167,16 @@ npm install
 npm run dev
 ```
 
-Открыть http://localhost:3000 — на главной должен отображаться статус API `ok`.
+Открыть http://localhost:3000
 
 ## Node.js
 
-Nuxt 4 официально требует Node 22+. На Node 20 проект может работать с предупреждениями `EBADENGINE`. Рекомендуется обновить Node до 22 LTS.
+Nuxt 4 официально требует Node 22+. На Node 20 проект может работать; для ESLint добавлен полифилл `Object.groupBy` (`eslint-node20-polyfill.mjs`). Рекомендуется Node 22 LTS.
 
 ## Дальнейшая разработка
 
 См. [docs/roadmap.md](../docs/roadmap.md):
 
-- **Этап 1** — layout, страницы about/services/contacts, навигация
+- **Этап 2** — Prisma, seed, API каталога
 - **Этап 4** — полноценная админка `/admin`
 - **Этап 5** — публичный каталог `/catalog/[...slug]`, `/product/[slug]`
