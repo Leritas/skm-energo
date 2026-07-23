@@ -45,7 +45,13 @@ cp .env.example .env
 
 ## SKM UI Kit
 
-Дизайн-система проекта: тонкие `Skm*` обёртки над Nuxt UI + layout-примитивы. Spec: [docs/superpowers/specs/2026-07-13-skm-ui-kit-design.md](../docs/superpowers/specs/2026-07-13-skm-ui-kit-design.md).
+Дизайн-система проекта: тонкие `Skm*` обёртки над Nuxt UI + layout-примитивы + domain-карточки.
+
+| Doc | Статус |
+|-----|--------|
+| [Design spec (foundation)](../docs/superpowers/specs/2026-07-13-skm-ui-kit-design.md) | ✅ historical |
+| [Domain roadmap Waves A–C](../docs/superpowers/specs/2026-07-20-skm-ui-kit-roadmap.md) | ✅ historical |
+| [Admin UI Kit (future)](../docs/superpowers/specs/2026-07-21-skm-admin-ui-kit.md) | Draft — не начат |
 
 ### Импорт
 
@@ -85,9 +91,9 @@ app/components/
 | `tone="brand"` на кнопках поверх `brand-purple-*` | Импорт `presets` вне `components/ui/` |
 | Layout использует `Skm*` | Новые `App*` компоненты |
 
-**Allowlist без обёртки (пока):** `UIcon`, `USlideover`.
+**Allowlist без обёртки (пока):** `UIcon`.
 
-ESLint-правило `skm-ui-kit/no-raw-nuxt-ui` запрещает `UButton` / `UInput` / `UTextarea` / `UFormField` / `UPopover` / `UModal` / `UCard` / `UContainer` / `UBreadcrumb` вне `app/components/ui/`.
+ESLint-правило `skm-ui-kit/no-raw-nuxt-ui` запрещает сырые `U*` (Button, Input, Badge, Tabs, Slideover, Alert, Table и др.) вне `app/components/ui/` — используйте `Skm*`.
 
 ### Токены
 

@@ -1,8 +1,10 @@
 # SKM UI Kit — Design Spec
 
 **Date:** 2026-07-13  
-**Status:** Draft — approved  
+**Status:** ✅ Implemented — historical (закрыт 2026-07-21)  
 **Scope:** Обёртки Nuxt UI v4 + layout-примитивы с префиксом `Skm`\*, Storybook-демо
+
+> **История.** Foundation Phase 1–3 выполнены. Документ оставлен как архитектурный снимок; живой код — `frontend/app/components/ui/`. Domain-слой: [2026-07-20-skm-ui-kit-roadmap.md](./2026-07-20-skm-ui-kit-roadmap.md). Будущий admin kit: [2026-07-21-skm-admin-ui-kit.md](./2026-07-21-skm-admin-ui-kit.md).
 
 ---
 
