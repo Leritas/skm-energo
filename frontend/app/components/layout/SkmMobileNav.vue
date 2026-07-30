@@ -120,7 +120,7 @@ onMounted(async () => {
             {{ auth.user.email }}
           </p>
           <NuxtLink
-            to="/account"
+            to="/profile"
             class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-900 hover:bg-neutral-50"
             @click="close"
           >

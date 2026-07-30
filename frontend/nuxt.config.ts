@@ -53,7 +53,7 @@ export default defineNuxtConfig({
     },
   },
   sitemap: {
-    exclude: ['/admin/**', '/login', '/register', '/account/**'],
+    exclude: ['/admin/**', '/login', '/register', '/account/**', '/profile/**'],
   },
   devServer: {
     port: 3000,

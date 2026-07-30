@@ -21,7 +21,7 @@ async function handleSubmit() {
   try {
     await auth.login(email.value, password.value)
     const redirect = useRoute().query.redirect
-    await navigateTo(typeof redirect === 'string' ? redirect : '/account')
+    await navigateTo(typeof redirect === 'string' ? redirect : '/profile')
   }
   catch (e: unknown) {
     error.value = 'Неверный email или пароль'

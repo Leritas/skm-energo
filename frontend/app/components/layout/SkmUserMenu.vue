@@ -58,7 +58,7 @@ const menuLinkClass =
 
           <nav class="space-y-0.5 p-2">
             <NuxtLink
-              to="/account"
+              to="/profile"
               :class="menuLinkClass"
               @click="close"
             >

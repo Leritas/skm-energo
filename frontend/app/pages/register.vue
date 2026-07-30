@@ -21,7 +21,7 @@ async function handleSubmit() {
   loading.value = true
   try {
     await auth.register(name.value, email.value, password.value)
-    await navigateTo('/account')
+    await navigateTo('/profile')
   }
   catch (e: unknown) {
     error.value = 'Не удалось зарегистрироваться. Возможно, email уже занят.'
