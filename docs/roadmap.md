@@ -121,7 +121,7 @@
 - Регистрация / вход / refresh token (JWT Bearer)
 - Permissions — хардкод в `@skm/specs`; роли — динамические наборы в БД (M2M User↔Role)
 - `hasAbsoluteControl` обходит остальные проверки; иначе AND по `@RequirePermissions`
-- Guards: `/account/*` (сессия), `/admin/*` (`hasAccessToAdmin`)
+- Guards: `/profile/*` (сессия; `/account` → redirect), `/admin/*` (`hasAccessToAdmin`)
 - Спека: [superpowers/specs/2026-07-21-auth-roles-permissions-design.md](./superpowers/specs/2026-07-21-auth-roles-permissions-design.md)
 
 **Ориентир:** 3–4 дня
@@ -160,13 +160,13 @@
 
 ---
 
-### Этап 7 — Личный кабинет клиента
+### Этап 7 — Личный кабинет клиента (`/profile`)
 
-- `/account` — профиль, история заказов
-- Отзывы к товарам
-- Повтор заказа (опционально)
+- Nested `/profile/info`, `/profile/orders/{active,completed,purchased}`, `/profile/favorite`
+- P0: frontend shell + mocks; далее Profile/Orders/Reviews/Favorites API
+- Спека: [superpowers/specs/2026-07-30-personal-profile-design.md](./superpowers/specs/2026-07-30-personal-profile-design.md)
 
-**Ориентир:** 3–4 дня
+**Ориентир:** 3–4 дня (shell); API — по фазам P1–P4 в спеке
 
 ---
 
