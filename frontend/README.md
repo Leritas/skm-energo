@@ -138,7 +138,8 @@ frontend/
 | `/news` | Новости (заглушка) | ✅ |
 | `/login` | Вход | ✅ |
 | `/register` | Регистрация покупателя | ✅ |
-| `/account` | Личный кабинет (профиль, заказы demo) | ✅ |
+| `/profile/**` | Личный кабинет (см. profile design) | — |
+| `/account` | Redirect → `/profile` | ✅ |
 | `/admin` | Админ-панель (заглушка, `hasAccessToAdmin`) | — |
 
 ## Auth & профиль
@@ -146,7 +147,8 @@ frontend/
 | Doc | Описание |
 |-----|----------|
 | [Auth RBAC design](../docs/superpowers/specs/2026-07-21-auth-roles-permissions-design.md) | JWT, permissions, роли |
-| [Account & header profile](../docs/superpowers/specs/2026-07-23-account-profile-header.md) | `SkmUserMenu`, `/account` |
+| [Account & header](../docs/superpowers/specs/2026-07-23-account-profile-header.md) | `SkmUserMenu` |
+| [Personal profile roadmap](../docs/superpowers/specs/2026-07-30-personal-profile-design.md) | `/profile/*` shell + API phases |
 
 ### Компоненты
 
@@ -154,7 +156,7 @@ frontend/
 |-----------|-----|------------|
 | `SkmUserMenu` | Header (desktop + mobile) | Popover: login/register или кабинет/админ/выход |
 | `app/stores/auth.ts` | Pinia | Сессия, tokens в `localStorage` |
-| `app/middleware/auth.ts` | `/account` | Редирект на `/login` без сессии (client-only) |
+| `app/middleware/auth.ts` | `/profile/**` | Редирект на `/login` без сессии (client-only) |
 | `app/middleware/admin.ts` | `/admin` | Требует `hasAccessToAdmin` (client-only) |
 
 Иконка профиля в header видна на всех публичных страницах. После входа данные подтягиваются через `GET /api/auth/me`.
