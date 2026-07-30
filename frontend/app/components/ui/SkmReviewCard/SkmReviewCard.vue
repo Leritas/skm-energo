@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import { SkmButton } from '../SkmButton'
+import { SkmFormField } from '../SkmFormField'
+import { SkmTextarea } from '../SkmTextarea'
+
 const props = withDefaults(
   defineProps<{
     author?: string
@@ -84,7 +88,7 @@ function handleSubmit() {
             type="button"
             class="text-lg leading-none text-accent-600 transition-opacity hover:opacity-80"
             :aria-label="`${star} из 5`"
-            :aria-pressed="draftRating === star"
+            :aria-pressed="star <= draftRating"
             @click="setRating(star)"
           >
             {{ star <= draftRating ? '★' : '☆' }}

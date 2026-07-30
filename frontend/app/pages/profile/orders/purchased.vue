@@ -41,7 +41,7 @@ function onSubmit(itemId: string, payload: { rating: number; text: string }) {
     v-if="items.length === 0"
     class="text-sm text-neutral-500"
   >
-    Пока нет заказов
+    Пока нет купленных товаров
   </div>
   <ul
     v-else
