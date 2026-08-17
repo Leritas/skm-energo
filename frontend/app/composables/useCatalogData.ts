@@ -86,46 +86,19 @@ export async function useCatalogProduct(slug: MaybeRefOrGetter<string>) {
   );
 }
 
-async function loadSimilarBySlugs(
-  similarSlugs: string[],
-  limit: number,
-): Promise<CatalogProductListItem[]> {
-  const { api } = useApi();
-  const results = await Promise.allSettled(
-    similarSlugs.slice(0, limit).map((similarSlug) =>
-      api<CatalogProductDetail>(`/catalog/products/${similarSlug}`, {
-        auth: false,
-      }),
-    ),
-  );
-
-  return results.flatMap((result) =>
-    result.status === 'fulfilled' ? [result.value] : [],
-  );
-}
-
-export async function fetchSimilarProducts(
-  product: CatalogProductDetail,
+export async function useCatalogSimilarProducts(
+  slug: MaybeRefOrGetter<string>,
   limit = 3,
-): Promise<CatalogProductListItem[]> {
-  if (product.similarSlugs.length) {
-    const similar = await loadSimilarBySlugs(product.similarSlugs, limit);
-    if (similar.length) {
-      return similar;
-    }
-  }
-
+) {
   const { api } = useApi();
-  const categoryProducts = await api<CatalogProductListItem[]>(
-    `/catalog/products${buildCatalogQuery({ category: product.categorySlug })}`,
-    { auth: false },
-  );
 
-  return categoryProducts
-    .filter(
-      (item) =>
-        item.slug !== product.slug &&
-        item.manufacturerSlug !== product.manufacturerSlug,
-    )
-    .slice(0, limit);
+  return await useAsyncData(
+    () => `catalog-similar-${toValue(slug)}-${limit}`,
+    () =>
+      api<CatalogProductListItem[]>(
+        `/catalog/products/${toValue(slug)}/similar${buildCatalogQuery({ limit: String(limit) })}`,
+        { auth: false },
+      ),
+    { watch: [() => toValue(slug)] },
+  );
 }

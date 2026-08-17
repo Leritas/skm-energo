@@ -29,7 +29,6 @@ export interface CatalogProductDetailDto extends CatalogProductListItemDto {
   description: string;
   specs: Array<{ label: string; value: string }>;
   pdfHref: string | null;
-  similarSlugs: string[];
 }
 
 export interface CatalogManufacturerDto {
@@ -116,8 +115,41 @@ export class CatalogService {
       description: product.description,
       specs: this.parseSpecs(product.specs),
       pdfHref: product.pdfHref,
-      similarSlugs: product.similarSlugs,
     };
+  }
+
+  async listSimilarProducts(
+    slug: string,
+    limit = 3,
+  ): Promise<CatalogProductListItemDto[]> {
+    const product = await this.prisma.product.findUnique({
+      where: { slug },
+      select: {
+        slug: true,
+        categoryId: true,
+        manufacturerId: true,
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    const rows = await this.prisma.product.findMany({
+      where: {
+        categoryId: product.categoryId,
+        manufacturerId: { not: product.manufacturerId },
+        slug: { not: slug },
+      },
+      include: {
+        manufacturer: true,
+        category: true,
+      },
+      orderBy: { title: 'asc' },
+      take: limit,
+    });
+
+    return rows.map((row) => this.toListItem(row));
   }
 
   private async loadCategoryTree(): Promise<CatalogCategoryNode[]> {

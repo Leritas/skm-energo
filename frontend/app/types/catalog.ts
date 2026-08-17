@@ -24,7 +24,6 @@ export interface CatalogProductDetail extends CatalogProductListItem {
   description: string;
   specs: Array<{ label: string; value: string }>;
   pdfHref: string | null;
-  similarSlugs: string[];
 }
 
 export interface CatalogBreadcrumb {
