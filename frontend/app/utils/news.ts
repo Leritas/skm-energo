@@ -5,10 +5,5 @@ const newsDateFormatter = new Intl.DateTimeFormat('ru-RU', {
 });
 
 export function formatNewsDate(publishDate: string): string {
-  const [year, month, day] = publishDate.split('-').map(Number);
-  if (!year || !month || !day) {
-    return publishDate;
-  }
-
-  return newsDateFormatter.format(new Date(year, month - 1, day));
+  return newsDateFormatter.format(new Date(`${publishDate}T00:00:00`));
 }

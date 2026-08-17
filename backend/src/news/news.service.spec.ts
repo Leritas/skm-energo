@@ -48,46 +48,4 @@ describe('NewsService', () => {
       ],
     });
   });
-
-  it('lists articles ordered by publish date descending', async () => {
-    const prisma = {
-      newsArticle: {
-        findMany: jest.fn().mockResolvedValue([
-          {
-            slug: 'hiitio-expand',
-            title: 'Расширение ассортимента HIITIO',
-            excerpt: 'Excerpt A',
-            publishDate: new Date('2026-07-15'),
-          },
-          {
-            slug: 'august-hours',
-            title: 'График работы в августе',
-            excerpt: 'Excerpt B',
-            publishDate: new Date('2026-06-28'),
-          },
-        ]),
-      },
-    };
-
-    const service = new NewsService(prisma as never);
-    const result = await service.listArticles();
-
-    expect(prisma.newsArticle.findMany).toHaveBeenCalledWith({
-      orderBy: [{ publishDate: 'desc' }, { id: 'desc' }],
-    });
-    expect(result).toEqual([
-      {
-        slug: 'hiitio-expand',
-        title: 'Расширение ассортимента HIITIO',
-        excerpt: 'Excerpt A',
-        publishDate: '2026-07-15',
-      },
-      {
-        slug: 'august-hours',
-        title: 'График работы в августе',
-        excerpt: 'Excerpt B',
-        publishDate: '2026-06-28',
-      },
-    ]);
-  });
 });

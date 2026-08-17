@@ -95,21 +95,17 @@ async function seedCatalog() {
 
 async function seedNews() {
   for (const article of NEWS_SEED_ARTICLES) {
+    const data = {
+      title: article.title,
+      excerpt: article.excerpt,
+      body: article.body,
+      publishDate: new Date(article.publishDate),
+    };
+
     await prisma.newsArticle.upsert({
       where: { slug: article.slug },
-      update: {
-        title: article.title,
-        excerpt: article.excerpt,
-        body: article.body,
-        publishDate: new Date(article.publishDate),
-      },
-      create: {
-        slug: article.slug,
-        title: article.title,
-        excerpt: article.excerpt,
-        body: article.body,
-        publishDate: new Date(article.publishDate),
-      },
+      update: data,
+      create: { slug: article.slug, ...data },
     });
   }
 

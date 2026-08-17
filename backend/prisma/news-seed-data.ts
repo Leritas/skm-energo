@@ -1,12 +1,4 @@
-export interface NewsSeedArticle {
-  slug: string;
-  title: string;
-  excerpt: string;
-  body: string[];
-  publishDate: string;
-}
-
-export const NEWS_SEED_ARTICLES: NewsSeedArticle[] = [
+export const NEWS_SEED_ARTICLES = [
   {
     slug: 'hiitio-expand',
     title: 'Расширение ассортимента HIITIO',
