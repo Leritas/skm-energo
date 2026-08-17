@@ -36,7 +36,10 @@ export class CatalogCategoryResponseDto {
   @ApiProperty({ example: 'Предохранители, держатели и аксессуары' })
   label!: string;
 
-  @ApiPropertyOptional({ type: () => CatalogCategoryResponseDto, isArray: true })
+  @ApiPropertyOptional({
+    type: () => CatalogCategoryResponseDto,
+    isArray: true,
+  })
   children?: CatalogCategoryResponseDto[];
 }
 
