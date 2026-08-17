@@ -1,0 +1,5 @@
+interface:
+  display_name: 'Ship PR'
+  short_description: 'Create PR, merge to main, delete branch'
+policy:
+  allow_implicit_invocation: false

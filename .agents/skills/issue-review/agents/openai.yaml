@@ -1,0 +1,5 @@
+interface:
+  display_name: 'Issue Review'
+  short_description: 'Verify tickets against shipped code and sync GitHub'
+policy:
+  allow_implicit_invocation: false
