@@ -29,7 +29,10 @@ npm install
 cp .env.example .env
 npx prisma generate
 
-npm run start:dev      # dev с hot-reload → http://localhost:3001
+npm run dev:setup      # Postgres + migrate + seed + start:dev
+# или из корня монорепы: npm run dev:backend
+
+npm run start:dev      # только API (БД уже должна быть поднята)
 npm run start:debug    # dev + debugger
 npm run build          # компиляция TypeScript → dist/
 npm run start:prod     # production: node dist/main
@@ -45,6 +48,7 @@ npm run test:e2e       # e2e-тесты
 ```bash
 npm run prisma:generate   # генерация @prisma/client после изменения schema
 npm run prisma:migrate    # создание/применение миграций (этап 2)
+npm run prisma:seed       # seed (roles, admin, catalog)
 npm run prisma:studio     # GUI для просмотра данных → http://localhost:5555
 ```
 

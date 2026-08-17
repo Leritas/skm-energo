@@ -74,6 +74,14 @@ docker-compose up -d
 
 ### 2. Backend
 
+Одной командой из корня (PostgreSQL → migrate → seed → API):
+
+```bash
+npm run dev:backend
+```
+
+Или по шагам:
+
 ```bash
 cd backend
 cp .env.example .env

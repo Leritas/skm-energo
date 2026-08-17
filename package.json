@@ -3,6 +3,7 @@
   "private": true,
   "description": "Monorepo root — packages linked via file: deps (@skm/specs)",
   "scripts": {
-    "build:specs": "npm run build --prefix skm-specs"
+    "build:specs": "npm run build --prefix skm-specs",
+    "dev:backend": "bash scripts/dev-backend.sh"
   }
 }
