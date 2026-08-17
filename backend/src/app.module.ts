@@ -12,6 +12,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
 import { ProfileModule } from './profile/profile.module';
+import { CatalogModule } from './catalog/catalog.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ProfileModule } from './profile/profile.module';
     PermissionsModule,
     AuthModule,
     ProfileModule,
+    CatalogModule,
     UsersModule,
     RolesModule,
     HealthModule,

@@ -48,8 +48,7 @@ npm run prisma:migrate    # создание/применение миграци
 npm run prisma:studio     # GUI для просмотра данных → http://localhost:5555
 ```
 
-> **Текущее состояние:** auth + profile API ✅ (этап 3); User B2B fields on `User`.
-> Полная схема каталога — **этап 2** 🔄 ([#4](https://github.com/Leritas/skm-energo/issues/4)) по [docs/db-draft.sql](../docs/db-draft.sql).
+> **Текущее состояние:** auth + profile API ✅ (этап 3); catalog read API + seed ✅ ([#4](https://github.com/Leritas/skm-energo/issues/4)).
 > Auth: [docs/superpowers/specs/2026-07-21-auth-roles-permissions-design.md](../docs/superpowers/specs/2026-07-21-auth-roles-permissions-design.md) ✅
 
 ## Переменные окружения
@@ -90,6 +89,9 @@ Global prefix: **`/api`**
 | POST | `/api/users` | Create staff user (`canCreateUsers`) |
 | GET/POST/PATCH/DELETE | `/api/roles` | Roles CRUD |
 | PUT | `/api/users/:id/roles` | Assign roles |
+| GET | `/api/catalog/categories` | Category tree (`?manufacturer=` hides empty branches) |
+| GET | `/api/catalog/products` | Product list (`?category=`, `?manufacturer=`) |
+| GET | `/api/catalog/products/:slug` | Product detail (SKU, specs, PDF) |
 | GET | `/api/docs` | Swagger UI |
 
 Пример health check:
@@ -104,13 +106,16 @@ curl http://localhost:3001/api/health
 ```
 backend/
 ├── prisma/
-│   └── schema.prisma           # Prisma schema (placeholder)
+│   ├── schema.prisma           # Auth + catalog models
+│   ├── seed.ts                 # Roles, admin user, catalog seed
+│   └── catalog-seed-data.ts    # Stage 1b mock catalog data
 ├── src/
 │   ├── main.ts                 # Bootstrap: CORS, Swagger, ValidationPipe, prefix /api
 │   ├── app.module.ts           # Root module
 │   ├── app.controller.ts       # GET /api
 │   ├── app.service.ts
 │   ├── auth/                   # register, login, refresh, logout, me
+│   ├── catalog/                # public read API: categories, products
 │   ├── profile/                # PATCH profile, change-password
 │   ├── users/                  # staff users CRUD
 │   ├── roles/                  # roles + permissions
@@ -139,10 +144,11 @@ backend/
 
 Подключение к PostgreSQL через `DATABASE_URL`. `PrismaService` — global provider, доступен во всех модулях через DI.
 
-На этапе 0 Prisma **не подключается при старте** (lazy) — API работает без миграций. После этапа 2:
+На этапе 2 добавлены модели каталога и seed. После изменения schema:
 
 ```bash
 npm run prisma:migrate
+npx prisma db seed
 ```
 
 ## Запуск (локально)
@@ -173,7 +179,7 @@ npm run test:cov      # coverage
 
 См. [docs/roadmap.md](../docs/roadmap.md):
 
-- **Этап 2** 🔄 — полная Prisma schema, миграции, seed, catalog/news read API ([#4](https://github.com/Leritas/skm-energo/issues/4))
+- **Этап 2** ✅ — Prisma catalog schema, seed, catalog read API ([#4](https://github.com/Leritas/skm-energo/issues/4)); news read API — [#7](https://github.com/Leritas/skm-energo/issues/7)
 - **Этап 3** ✅ — JWT auth, RBAC (`@skm/specs` + динамические роли), profile API
 - **Этап 4+** — CRUD каталога, заказы, файлы, email
 

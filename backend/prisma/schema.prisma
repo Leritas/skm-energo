@@ -1,4 +1,4 @@
-// Auth models (stage 3). Catalog models come in roadmap stage 2.
+// Auth models (stage 3). Catalog models (stage 2 / #4).
 // See docs/superpowers/specs/2026-07-21-auth-roles-permissions-design.md
 
 generator client {
@@ -55,4 +55,38 @@ model RefreshToken {
   expiresAt DateTime
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Manufacturer {
+  id       Int       @id @default(autoincrement())
+  slug     String    @unique
+  name     String
+  products Product[]
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  slug        String     @unique
+  name        String
+  description String?
+  parentId    Int?
+  parent      Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryTree")
+  products    Product[]
+}
+
+model Product {
+  id             Int          @id @default(autoincrement())
+  slug           String       @unique
+  title          String
+  sku            String       @unique
+  description    String
+  specs          Json
+  pdfHref        String?
+  badges         String[]
+  similarSlugs   String[]
+  manufacturerId Int
+  manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
+  categoryId     Int
+  category       Category     @relation(fields: [categoryId], references: [id])
 }
