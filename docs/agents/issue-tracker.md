@@ -33,6 +33,19 @@ Create a GitHub issue.
 
 Run `gh issue view <number> --comments`.
 
+## When a skill says "verify ticket completion"
+
+Used by `/issue-review`. For each issue number:
+
+1. Fetch the issue body and acceptance criteria (`gh issue view <number> --comments`).
+2. Verify criteria against the codebase on the agreed base branch (default `main`).
+3. Post a structured verification comment (`gh issue comment <number> --body "..."`).
+4. Close completed issues (`gh issue close <number> --comment "..."`) unless the skill run is `--dry-run`, the verdict is Partial, or verification base is not `main`.
+
+Used by `/ship-pr` for PR create/merge/delete-branch operations.
+
+See `.agents/skills/issue-review/SKILL.md` and `.agents/skills/ship-pr/SKILL.md`.
+
 ## Wayfinding operations
 
 Used by `/wayfinder`. The **map** is a single issue with **child** issues as tickets.
