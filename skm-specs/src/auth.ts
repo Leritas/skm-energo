@@ -10,8 +10,25 @@ export interface AuthUserDto {
   id: number;
   email: string;
   name: string;
+  phone: string | null;
+  company: string | null;
+  inn: string | null;
+  position: string | null;
   roles: AuthRoleDto[];
   permissions: Permission[];
+}
+
+export interface UpdateProfileRequest {
+  name: string;
+  phone?: string | null;
+  company?: string | null;
+  inn?: string | null;
+  position?: string | null;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
 }
 
 export interface AuthTokens {

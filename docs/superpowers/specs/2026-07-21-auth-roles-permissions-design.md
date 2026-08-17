@@ -1,7 +1,7 @@
 # Auth, Roles & Permissions — Design Spec
 
 **Date:** 2026-07-21  
-**Status:** Approved for implementation  
+**Status:** ✅ Implemented (2026-08-17)  
 **Scope:** JWT Bearer auth, hardcoded permissions in `@skm/specs`, dynamic roles in DB, Nest guards + minimal Nuxt client (no polished roles admin UI)
 
 ---
@@ -96,6 +96,16 @@ Access TTL ~15m, refresh ~7d.
 4. Else authenticated-only (or public)
 
 Frontend mirrors catalog checks via `@skm/specs` + `/auth/me` for route middleware (`auth`, `admin`).
+
+---
+
+## Implemented behaviors (post-PBR)
+
+| Behavior | Choice |
+|----------|--------|
+| Change password | Revokes **all** refresh tokens for User; client logs out → re-login |
+| Profile B2B fields | Stored on `User` (phone, company, inn, position); exposed via `/auth/me` and `PATCH /profile` (Stage 7 P1) |
+| Route middleware | **Client-only** — tokens in `localStorage`; SSR cannot guard `/profile` / `/admin` (see deferred [#20](https://github.com/Leritas/skm-energo/issues/20)) |
 
 ---
 

@@ -1,7 +1,36 @@
 <script setup lang="ts">
-import { CATALOG_TREE } from '~/constants/navigation'
+import { MANUFACTURERS } from '~/constants/catalog-mocks'
+import { buildCatalogUrl, getVisibleCategoryTree } from '~/utils/catalog'
 
 const open = ref(false)
+const route = useRoute()
+
+const manufacturerSlug = computed(() => {
+  const value = route.query.manufacturer
+  if (typeof value !== 'string' || !value) {
+    return null
+  }
+  return MANUFACTURERS.some((item) => item.slug === value) ? value : null
+})
+
+const visibleCategories = computed(() =>
+  getVisibleCategoryTree(manufacturerSlug.value),
+)
+
+function isManufacturerActive(slug: string) {
+  return manufacturerSlug.value === slug
+}
+
+function manufacturerUrl(slug: string) {
+  return buildCatalogUrl(
+    null,
+    isManufacturerActive(slug) ? null : slug,
+  )
+}
+
+function closeMenu() {
+  open.value = false
+}
 </script>
 
 <template>
@@ -20,26 +49,60 @@ const open = ref(false)
     </button>
 
     <template #content>
-      <div class="w-80 py-1">
-        <div
-          v-for="item in CATALOG_TREE"
-          :key="item.label"
-          class="border-b border-brand-purple-200 last:border-0"
-        >
+      <div class="w-[22rem] py-3">
+        <div class="border-b border-neutral-100 px-4 pb-3">
+          <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            Производители
+          </p>
+          <div class="flex flex-wrap gap-2">
+            <NuxtLink
+              v-for="manufacturer in MANUFACTURERS"
+              :key="manufacturer.slug"
+              :to="manufacturerUrl(manufacturer.slug)"
+              class="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"
+              @click="closeMenu"
+            >
+              <SkmBadge
+                :label="manufacturer.label"
+                :tone="isManufacturerActive(manufacturer.slug) ? 'accent' : 'neutral'"
+                size="sm"
+              />
+            </NuxtLink>
+          </div>
+        </div>
+
+        <div class="max-h-80 overflow-y-auto px-2 pt-3">
           <NuxtLink
-            :to="item.to ?? '/catalog'"
-            class="block px-4 py-2.5 text-sm font-semibold text-neutral-900 transition-colors hover:bg-brand-purple-50 hover:text-accent-600"
-            @click="open = false"
+            to="/catalog"
+            class="block rounded-md px-3 py-2 text-sm font-semibold text-neutral-900 hover:bg-brand-purple-50 hover:text-accent-600"
+            @click="closeMenu"
           >
-            {{ item.label }}
+            Весь каталог
           </NuxtLink>
-          <ul v-if="item.children?.length" class="space-y-0.5 px-4 pb-3">
-            <li v-for="child in item.children" :key="child.label">
-              <span class="block py-1 text-xs leading-snug text-neutral-600">
-                {{ child.label }}
-              </span>
-            </li>
-          </ul>
+          <div
+            v-for="category in visibleCategories"
+            :key="category.slug"
+            class="border-b border-neutral-100 py-1 last:border-0"
+          >
+            <NuxtLink
+              :to="buildCatalogUrl(category.slug, manufacturerSlug)"
+              class="block rounded-md px-3 py-2 text-sm font-semibold text-neutral-900 transition-colors hover:bg-brand-purple-50 hover:text-accent-600"
+              @click="closeMenu"
+            >
+              {{ category.label }}
+            </NuxtLink>
+            <ul v-if="category.children?.length" class="space-y-0.5 px-3 pb-2">
+              <li v-for="child in category.children" :key="child.slug">
+                <NuxtLink
+                  :to="buildCatalogUrl(child.slug, manufacturerSlug)"
+                  class="block rounded-md py-1 pl-3 text-xs leading-snug text-neutral-600 transition-colors hover:text-accent-600"
+                  @click="closeMenu"
+                >
+                  {{ child.label }}
+                </NuxtLink>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </template>

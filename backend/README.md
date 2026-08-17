@@ -48,9 +48,9 @@ npm run prisma:migrate    # создание/применение миграци
 npm run prisma:studio     # GUI для просмотра данных → http://localhost:5555
 ```
 
-> **Текущее состояние:** auth-модели User/Role/UserRole/RefreshToken + HealthCheck.
-> Полная схема каталога — **этап 2** по [docs/db-draft.sql](../docs/db-draft.sql).
-> Auth design: [docs/superpowers/specs/2026-07-21-auth-roles-permissions-design.md](../docs/superpowers/specs/2026-07-21-auth-roles-permissions-design.md).
+> **Текущее состояние:** auth + profile API ✅ (этап 3); User B2B fields on `User`.
+> Полная схема каталога — **этап 2** 🔄 ([#4](https://github.com/Leritas/skm-energo/issues/4)) по [docs/db-draft.sql](../docs/db-draft.sql).
+> Auth: [docs/superpowers/specs/2026-07-21-auth-roles-permissions-design.md](../docs/superpowers/specs/2026-07-21-auth-roles-permissions-design.md) ✅
 
 ## Переменные окружения
 
@@ -85,6 +85,8 @@ Global prefix: **`/api`**
 | POST | `/api/auth/refresh` | Refresh tokens |
 | POST | `/api/auth/logout` | Revoke refresh (JWT) |
 | GET | `/api/auth/me` | Current user + permissions (JWT) |
+| PATCH | `/api/profile` | Update B2B profile fields (JWT) |
+| POST | `/api/profile/change-password` | Change password; revokes refresh tokens (JWT) |
 | POST | `/api/users` | Create staff user (`canCreateUsers`) |
 | GET/POST/PATCH/DELETE | `/api/roles` | Roles CRUD |
 | PUT | `/api/users/:id/roles` | Assign roles |
@@ -108,6 +110,10 @@ backend/
 │   ├── app.module.ts           # Root module
 │   ├── app.controller.ts       # GET /api
 │   ├── app.service.ts
+│   ├── auth/                   # register, login, refresh, logout, me
+│   ├── profile/                # PATCH profile, change-password
+│   ├── users/                  # staff users CRUD
+│   ├── roles/                  # roles + permissions
 │   ├── health/
 │   │   ├── health.module.ts
 │   │   └── health.controller.ts  # GET /api/health
@@ -167,8 +173,8 @@ npm run test:cov      # coverage
 
 См. [docs/roadmap.md](../docs/roadmap.md):
 
-- **Этап 2** — полная Prisma schema, миграции, seed
-- **Этап 3** — JWT auth, RBAC (`@skm/specs` + динамические роли), guards
+- **Этап 2** 🔄 — полная Prisma schema, миграции, seed, catalog/news read API ([#4](https://github.com/Leritas/skm-energo/issues/4))
+- **Этап 3** ✅ — JWT auth, RBAC (`@skm/specs` + динамические роли), profile API
 - **Этап 4+** — CRUD каталога, заказы, файлы, email
 
 Расширения схемы БД относительно [db-draft.sql](../docs/db-draft.sql) описаны в roadmap (Manufacturer, Cart, Lead, MediaFile, …).

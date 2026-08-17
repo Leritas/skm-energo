@@ -22,7 +22,7 @@ function handleClose() {
     <template #body>
       <div v-if="submitted" class="py-4 text-center">
         <p class="text-neutral-600">
-          Функция будет доступна на этапе 8 roadmap.
+          Спасибо! Мы свяжемся с вами в ближайшее время.
         </p>
         <SkmButton class="mt-4" variant="secondary" @click="handleClose">
           Закрыть

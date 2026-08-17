@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import type { CatalogItem } from '~/constants/navigation'
+import type { CatalogCategory } from '~/constants/catalog-categories'
+import { buildCatalogUrl } from '~/utils/catalog'
 
 defineProps<{
-  items: CatalogItem[]
+  items: CatalogCategory[]
+  manufacturerSlug?: string | null
+  activeCategorySlug?: string | null
 }>()
 </script>
 
@@ -10,12 +13,17 @@ defineProps<{
   <nav aria-label="Категории каталога" class="space-y-1">
     <div
       v-for="item in items"
-      :key="item.label"
+      :key="item.slug"
       class="py-1"
     >
       <NuxtLink
-        :to="item.to ?? '/catalog'"
-        class="block rounded-md px-3 py-2 text-sm font-semibold text-neutral-900 hover:bg-neutral-50 hover:text-accent-600"
+        :to="buildCatalogUrl(item.slug, manufacturerSlug)"
+        class="block rounded-md px-3 py-2 text-sm font-semibold transition-colors hover:bg-neutral-50 hover:text-accent-600"
+        :class="
+          activeCategorySlug === item.slug
+            ? 'bg-neutral-50 text-accent-600'
+            : 'text-neutral-900'
+        "
       >
         {{ item.label }}
       </NuxtLink>
@@ -25,11 +33,16 @@ defineProps<{
       >
         <li
           v-for="child in item.children"
-          :key="child.label"
+          :key="child.slug"
         >
           <NuxtLink
-            :to="child.to ?? item.to ?? '/catalog'"
-            class="block rounded-md px-3 py-1.5 text-sm text-neutral-600 hover:bg-neutral-50 hover:text-accent-600"
+            :to="buildCatalogUrl(child.slug, manufacturerSlug)"
+            class="block rounded-md px-3 py-1.5 text-sm transition-colors hover:bg-neutral-50 hover:text-accent-600"
+            :class="
+              activeCategorySlug === child.slug
+                ? 'text-accent-600'
+                : 'text-neutral-600'
+            "
           >
             {{ child.label }}
           </NuxtLink>

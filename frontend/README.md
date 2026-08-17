@@ -134,11 +134,12 @@ frontend/
 | `/about` | О компании | ✅ |
 | `/services` | Услуги | ✅ |
 | `/contacts` | Контакты + форма (UI) | ✅ |
-| `/catalog` | Каталог (заглушка + дерево категорий) | ✅ |
-| `/news` | Новости (заглушка) | ✅ |
+| `/catalog/**` | Category-first каталог на mock-данных (Stage 1b ✅; live API — #6) | ✅ |
+| `/product/[slug]` | Карточка товара на mock (Stage 1b ✅; live API — #6) | ✅ |
+| `/news/**` | Список + detail на mock (Stage 1b ✅; live API — #7) | ✅ |
 | `/login` | Вход | ✅ |
 | `/register` | Регистрация покупателя | ✅ |
-| `/profile/**` | Личный кабинет (см. profile design) | — |
+| `/profile/**` | Личный кабинет — P0 shell ✅, P1 info API ✅; orders/favorites mocks | ✅ partial |
 | `/account` | Redirect → `/profile` | ✅ |
 | `/admin` | Админ-панель (заглушка, `hasAccessToAdmin`) | — |
 
@@ -156,7 +157,7 @@ frontend/
 |-----------|-----|------------|
 | `SkmUserMenu` | Header (desktop + mobile) | Popover: login/register или кабинет/админ/выход |
 | `app/stores/auth.ts` | Pinia | Сессия, tokens в `localStorage` |
-| `app/middleware/auth.ts` | `/profile/**` | Редирект на `/login` без сессии (client-only) |
+| `app/middleware/auth.ts` | `/profile/**` | Редирект на `/login` без сессии (**client-only** — см. auth spec, #20) |
 | `app/middleware/admin.ts` | `/admin` | Требует `hasAccessToAdmin` (client-only) |
 
 Иконка профиля в header видна на всех публичных страницах. После входа данные подтягиваются через `GET /api/auth/me`.
@@ -206,6 +207,7 @@ Nuxt 4 официально требует Node 22+. На Node 20 проект �
 
 См. [docs/roadmap.md](../docs/roadmap.md):
 
-- **Этап 2** — Prisma, seed, API каталога
+- **Этап 2** 🔄 — Prisma, seed, catalog/news read API ([#4](https://github.com/Leritas/skm-energo/issues/4), [#7](https://github.com/Leritas/skm-energo/issues/7))
+- **Этап 3** ✅ — Auth, RBAC, login/register, profile middleware
+- **Этап 5 (delta)** — wire catalog/news/search to API ([#6](https://github.com/Leritas/skm-energo/issues/6), [#8](https://github.com/Leritas/skm-energo/issues/8), [#9](https://github.com/Leritas/skm-energo/issues/9))
 - **Этап 4** — полноценная админка `/admin`
-- **Этап 5** — публичный каталог `/catalog/[...slug]`, `/product/[slug]`

@@ -30,8 +30,8 @@ function onSubmit(itemId: string, payload: { rating: number; text: string }) {
   }
 
   toast.add({
-    title: 'Отзыв сохранён локально',
-    color: 'neutral',
+    title: 'Спасибо! Отзыв сохранён',
+    color: 'success',
   })
 }
 </script>

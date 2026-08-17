@@ -1,10 +1,12 @@
 # Personal Profile P0 (Shell) Implementation Plan
 
+> **Status (2026-08-17):** P0 shell ✅ delivered. P1 profile API ✅ delivered separately (see profile design spec). Remaining polish: #21 on GitHub.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace `/account` stub with nested `/profile/*` frontend shell (info, orders×3, favorite) on mocks, plus `SkmReviewCard` editMode.
 
-**Architecture:** Nuxt nested pages: `profile.vue` shell (sidebar/tabs nav) → child pages; `orders.vue` secondary tabs → active/completed/purchased. Auth middleware on parent. Mocks in `constants/profile-mocks.ts`. No backend changes.
+**Architecture:** Nuxt nested pages: `profile.vue` shell (sidebar/tabs nav) → child pages; `orders.vue` secondary tabs → active/completed/purchased. Auth middleware on parent. Mocks in `constants/profile-mocks.ts`. **Note:** `/profile/info` now uses live P1 API — plan constraints below reflect original P0 scope.
 
 **Tech Stack:** Nuxt 4, Vue 3, Pinia auth store, Skm UI kit (`SkmFormField`, `SkmInput`, `SkmTextarea`, `SkmButton`, `SkmCard`, `SkmOrderCard`, `SkmReviewCard`)
 
@@ -14,9 +16,9 @@
 
 - No avatars / photo upload
 - Email field read-only; no email-change UI
-- P0: mocks + toast only — no PATCH/API for profile/orders/favorites/reviews
+- P0: orders/favorites/reviews on mocks (info form upgraded to P1 API)
 - Use `Skm*` only in pages/layout (no raw `U*` except allowlisted `UIcon`)
-- Auth middleware stays client-only (`import.meta.server` early return)
+- Auth middleware stays client-only (`import.meta.server` early return) — see auth spec / #20
 - Redirect `/account` → `/profile`; header links → `/profile`
 
 ---

@@ -11,7 +11,7 @@
 | **Компания** | ООО «СКМ-Энергосервис» |
 | **Домен** | skm-energo.ru / skm-energoservice.ru |
 | **Продукция** | Предохранители, разъединители, контакторы, графитовые щётки и др. |
-| **Текущий этап** | 0 — фундамент монорепы (см. [roadmap](docs/roadmap.md)) |
+| **Текущий этап** | 2 — база данных и Prisma (см. [roadmap](docs/roadmap.md)) |
 
 Контент со старого сайта (~747 страниц) **не мигрируется** — используется только как референс. Данные добавляются через админ-панель.
 
@@ -121,11 +121,12 @@ npm run dev
 | Этап | Содержание | Статус |
 |------|------------|--------|
 | 0 | Монорепа, Nuxt SSR, NestJS, PostgreSQL, docs | ✅ |
-| 1 | UI-каркас: layout, about, services, contacts | — |
-| 2 | Prisma schema, миграции, seed | — |
-| 3 | Auth (JWT Bearer, RBAC `@skm/specs` + динамические роли) | — |
+| 1 | Design System (1a) + public shell, category catalog (1b) | ✅ |
+| 2 | Prisma schema, миграции, seed | **текущий** |
+| 3 | Auth (JWT Bearer, RBAC `@skm/specs` + динамические роли) | ✅ |
 | 4 | Админка: CRUD каталога, новости, медиа | — |
-| 5–10 | Каталог, корзина, заказы, ЛК, production | — |
+| 5–7 | Live catalog, корзина, profile P2–P4 | частично (см. GitHub) |
+| 8–10 | Формы, поставщики, production | — |
 | 11 | Онлайн-оплата (v2) | — |
 
 Подробнее — [docs/roadmap.md](docs/roadmap.md).

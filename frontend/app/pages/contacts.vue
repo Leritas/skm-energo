@@ -69,7 +69,7 @@ function handleSubmit() {
             v-if="submitted"
             class="mt-6 rounded-lg bg-brand-purple-900 p-4 text-sm text-brand-purple-100"
           >
-            Функция отправки будет доступна на этапе 8 roadmap.
+            Спасибо! Мы получили ваше сообщение и свяжемся с вами в ближайшее время.
           </div>
           <form
             v-else
