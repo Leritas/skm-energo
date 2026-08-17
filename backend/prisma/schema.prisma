@@ -20,6 +20,10 @@ model User {
   email         String         @unique
   name          String
   passwordHash  String
+  phone         String?
+  company       String?
+  inn           String?
+  position      String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   roles         UserRole[]

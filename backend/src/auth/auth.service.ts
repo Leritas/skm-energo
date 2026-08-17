@@ -155,6 +155,10 @@ export class AuthService {
       id: user.id,
       email: user.email,
       name: user.name,
+      phone: user.phone,
+      company: user.company,
+      inn: user.inn,
+      position: user.position,
       roles,
       permissions,
     };
