@@ -25,18 +25,7 @@ if (productError.value) {
   });
 }
 
-const { data: similarProducts } = await useAsyncData(
-  () =>
-    `catalog-similar-${slug.value}-${product.value?.categorySlug ?? ''}-${product.value?.similarSlugs.join(',') ?? ''}`,
-  () => {
-    const item = product.value;
-    if (!item) {
-      return [];
-    }
-    return fetchSimilarProducts(item);
-  },
-  { watch: [() => product.value?.slug, () => product.value?.similarSlugs] },
-);
+const { data: similarProducts } = await useCatalogSimilarProducts(slug);
 
 function manufacturerLabel(manufacturerSlug: string) {
   return getManufacturerLabel(manufacturerSlug, manufacturers.value);

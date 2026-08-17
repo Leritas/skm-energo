@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class CatalogFilterQueryDto {
   @ApiPropertyOptional({
@@ -17,6 +18,21 @@ export class CatalogFilterQueryDto {
   @IsOptional()
   @IsString()
   manufacturer?: string;
+}
+
+export class CatalogSimilarQueryDto {
+  @ApiPropertyOptional({
+    description: 'Maximum number of similar products to return',
+    default: 3,
+    minimum: 1,
+    maximum: 12,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(12)
+  limit?: number;
 }
 
 export class CatalogCategoryQueryDto {
@@ -88,7 +104,4 @@ export class CatalogProductDetailResponseDto extends CatalogProductListItemRespo
 
   @ApiPropertyOptional({ example: '/files/nh00-160a.pdf', nullable: true })
   pdfHref!: string | null;
-
-  @ApiProperty({ example: ['fuse-link-6kv'], isArray: true, type: String })
-  similarSlugs!: string[];
 }

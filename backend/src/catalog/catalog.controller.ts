@@ -13,6 +13,7 @@ import {
   CatalogManufacturerResponseDto,
   CatalogProductDetailResponseDto,
   CatalogProductListItemResponseDto,
+  CatalogSimilarQueryDto,
 } from './dto/catalog.dto';
 
 @ApiTags('catalog')
@@ -42,6 +43,17 @@ export class CatalogController {
       query.category ?? null,
       query.manufacturer ?? null,
     );
+  }
+
+  @Public()
+  @Get('products/:slug/similar')
+  @ApiOkResponse({ type: CatalogProductListItemResponseDto, isArray: true })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  listSimilarProducts(
+    @Param('slug') slug: string,
+    @Query() query: CatalogSimilarQueryDto,
+  ) {
+    return this.catalogService.listSimilarProducts(slug, query.limit ?? 3);
   }
 
   @Public()
