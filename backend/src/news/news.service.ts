@@ -18,6 +18,7 @@ export class NewsService {
 
   async listArticles(): Promise<NewsListItemDto[]> {
     const rows = await this.prisma.newsArticle.findMany({
+      where: { published: true },
       orderBy: [{ publishDate: 'desc' }, { id: 'desc' }],
     });
 
@@ -25,8 +26,8 @@ export class NewsService {
   }
 
   async getArticleBySlug(slug: string): Promise<NewsDetailDto> {
-    const article = await this.prisma.newsArticle.findUnique({
-      where: { slug },
+    const article = await this.prisma.newsArticle.findFirst({
+      where: { slug, published: true },
     });
 
     if (!article) {

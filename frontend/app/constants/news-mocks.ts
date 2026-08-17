@@ -1,9 +1,10 @@
+/** Storybook / local demos only — public `/news` routes use the live API. */
 export interface NewsArticle {
-  slug: string
-  title: string
-  dateLabel: string
-  excerpt: string
-  body: string[]
+  slug: string;
+  title: string;
+  dateLabel: string;
+  excerpt: string;
+  body: string[];
 }
 
 export const NEWS_ARTICLES: NewsArticle[] = [
@@ -33,14 +34,15 @@ export const NEWS_ARTICLES: NewsArticle[] = [
     slug: 'august-hours',
     title: 'График работы в августе',
     dateLabel: '28 июня 2026',
-    excerpt: 'Офис и склад работают по летнему расписанию. Заявки принимаем онлайн.',
+    excerpt:
+      'Офис и склад работают по летнему расписанию. Заявки принимаем онлайн.',
     body: [
       'В августе офис СКМ-Энергосервис работает по сокращённому летнему графику.',
       'Заявки на подбор и поставку принимаются через форму обратной связи и по телефону в рабочие часы.',
     ],
   },
-]
+];
 
 export function getNewsArticle(slug: string): NewsArticle | undefined {
-  return NEWS_ARTICLES.find((item) => item.slug === slug)
+  return NEWS_ARTICLES.find((item) => item.slug === slug);
 }

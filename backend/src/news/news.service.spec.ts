@@ -2,10 +2,10 @@ import { NotFoundException } from '@nestjs/common';
 import { NewsService } from './news.service';
 
 describe('NewsService', () => {
-  it('throws when article slug is missing', async () => {
+  it('throws when published article slug is missing', async () => {
     const prisma = {
       newsArticle: {
-        findUnique: jest.fn().mockResolvedValue(null),
+        findFirst: jest.fn().mockResolvedValue(null),
       },
     };
 
@@ -14,12 +14,15 @@ describe('NewsService', () => {
     await expect(service.getArticleBySlug('missing')).rejects.toBeInstanceOf(
       NotFoundException,
     );
+    expect(prisma.newsArticle.findFirst).toHaveBeenCalledWith({
+      where: { slug: 'missing', published: true },
+    });
   });
 
   it('returns article detail with body paragraphs', async () => {
     const prisma = {
       newsArticle: {
-        findUnique: jest.fn().mockResolvedValue({
+        findFirst: jest.fn().mockResolvedValue({
           slug: 'hiitio-expand',
           title: 'Расширение ассортимента HIITIO',
           excerpt:
@@ -29,6 +32,7 @@ describe('NewsService', () => {
             'Для всех позиций доступны актуальные datasheet.',
           ],
           publishDate: new Date('2026-07-15'),
+          published: true,
         }),
       },
     };

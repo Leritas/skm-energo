@@ -100,6 +100,7 @@ async function seedNews() {
       excerpt: article.excerpt,
       body: article.body,
       publishDate: new Date(article.publishDate),
+      published: true,
     };
 
     await prisma.newsArticle.upsert({

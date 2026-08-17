@@ -2,7 +2,14 @@
 import { formatNewsDate } from '~/utils/news';
 import { SITE } from '~/constants/site';
 
-const { data: articles } = await useNewsArticles();
+const { data: articles, error: articlesError } = await useNewsArticles();
+
+if (articlesError.value) {
+  throw createError({
+    statusCode: 500,
+    statusMessage: 'Не удалось загрузить новости',
+  });
+}
 
 useSeoMeta({
   title: `Новости — ${SITE.name}`,
@@ -24,7 +31,14 @@ const breadcrumbs = [{ label: 'Главная', to: '/' }, { label: 'Новос�
         </template>
       </SkmPageHeader>
 
-      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <SkmEmpty
+        v-if="!articles?.length"
+        title="Новостей пока нет"
+        description="Следите за обновлениями — скоро здесь появятся материалы."
+        class="mt-4"
+      />
+
+      <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <SkmNewsCard
           v-for="item in articles ?? []"
           :key="item.slug"

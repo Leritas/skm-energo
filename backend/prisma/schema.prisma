@@ -98,4 +98,5 @@ model NewsArticle {
   excerpt     String
   body        String[]
   publishDate DateTime @db.Date
+  published   Boolean  @default(true)
 }
