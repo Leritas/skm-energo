@@ -1,8 +1,96 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { ALL_PERMISSIONS, Permission } from '@skm/specs';
+import {
+  CATALOG_SEED_CATEGORIES,
+  CATALOG_SEED_MANUFACTURERS,
+  CATALOG_SEED_PRODUCTS,
+  type CatalogSeedCategory,
+} from './catalog-seed-data';
 
 const prisma = new PrismaClient();
+
+async function seedCatalogCategories(
+  categories: CatalogSeedCategory[],
+  parentId: number | null = null,
+) {
+  for (const category of categories) {
+    const row = await prisma.category.upsert({
+      where: { slug: category.slug },
+      update: { name: category.name, parentId },
+      create: {
+        slug: category.slug,
+        name: category.name,
+        parentId,
+      },
+    });
+
+    if (category.children?.length) {
+      await seedCatalogCategories(category.children, row.id);
+    }
+  }
+}
+
+async function seedCatalog() {
+  for (const manufacturer of CATALOG_SEED_MANUFACTURERS) {
+    await prisma.manufacturer.upsert({
+      where: { slug: manufacturer.slug },
+      update: { name: manufacturer.name },
+      create: manufacturer,
+    });
+  }
+
+  await seedCatalogCategories(CATALOG_SEED_CATEGORIES);
+
+  const manufacturers = await prisma.manufacturer.findMany();
+  const categories = await prisma.category.findMany();
+  const manufacturerBySlug = new Map(
+    manufacturers.map((item) => [item.slug, item.id]),
+  );
+  const categoryBySlug = new Map(categories.map((item) => [item.slug, item.id]));
+
+  for (const product of CATALOG_SEED_PRODUCTS) {
+    const manufacturerId = manufacturerBySlug.get(product.manufacturerSlug);
+    const categoryId = categoryBySlug.get(product.categorySlug);
+
+    if (manufacturerId === undefined || categoryId === undefined) {
+      throw new Error(
+        `Missing manufacturer/category for product ${product.slug}`,
+      );
+    }
+
+    await prisma.product.upsert({
+      where: { slug: product.slug },
+      update: {
+        title: product.title,
+        sku: product.sku,
+        description: product.description,
+        specs: product.specs,
+        pdfHref: product.pdfHref ?? null,
+        badges: product.badges ?? [],
+        similarSlugs: product.similarSlugs ?? [],
+        manufacturerId,
+        categoryId,
+      },
+      create: {
+        slug: product.slug,
+        title: product.title,
+        sku: product.sku,
+        description: product.description,
+        specs: product.specs,
+        pdfHref: product.pdfHref ?? null,
+        badges: product.badges ?? [],
+        similarSlugs: product.similarSlugs ?? [],
+        manufacturerId,
+        categoryId,
+      },
+    });
+  }
+
+  console.log(
+    `Seeded catalog: ${CATALOG_SEED_MANUFACTURERS.length} manufacturers, ${categories.length} categories, ${CATALOG_SEED_PRODUCTS.length} products`,
+  );
+}
 
 async function main() {
   const userRole = await prisma.role.upsert({
@@ -87,7 +175,8 @@ async function main() {
     },
   });
 
-  // Ensure default user role exists for FK/reference (logged for seed clarity)
+  await seedCatalog();
+
   console.log(`Seeded roles: user(#${userRole.id}), moderator, admin(#${adminRole.id})`);
   console.log(`Seeded admin user: ${email}`);
 }

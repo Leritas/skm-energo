@@ -1,53 +1,78 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref } from 'vue';
 import {
-  getCategoryBreadcrumbs,
-  getManufacturerLabel,
-  getProductBySlug,
-  getSimilarProducts,
-} from '~/utils/catalog'
-import { SITE } from '~/constants/site'
+  productBadgeLabel,
+  productBadgeTone,
+  toProductCardBadges,
+} from '~/components/ui/SkmProductCard/badgeDisplay';
+import { getCategoryBreadcrumbs, getManufacturerLabel } from '~/utils/catalog';
+import { SITE } from '~/constants/site';
 
-const route = useRoute()
-const slug = computed(() => String(route.params.slug ?? ''))
+const route = useRoute();
+const slug = computed(() => String(route.params.slug ?? ''));
 
-const product = computed(() => getProductBySlug(slug.value))
+const { data: product, error: productError } = await useCatalogProduct(slug);
+const { data: manufacturers } = await useCatalogManufacturers();
+const { data: allCategories } = await useCatalogAllCategories();
 
-if (!product.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Товар не найден' })
+if (productError.value) {
+  throw createError({
+    statusCode: productError.value.statusCode === 404 ? 404 : 500,
+    statusMessage:
+      productError.value.statusCode === 404
+        ? 'Товар не найден'
+        : 'Не удалось загрузить товар',
+  });
 }
 
-const similarProducts = computed(() =>
-  product.value ? getSimilarProducts(product.value) : [],
-)
+const { data: similarProducts } = await useAsyncData(
+  () =>
+    `catalog-similar-${slug.value}-${product.value?.categorySlug ?? ''}-${product.value?.similarSlugs.join(',') ?? ''}`,
+  () => {
+    const item = product.value;
+    if (!item) {
+      return [];
+    }
+    return fetchSimilarProducts(item);
+  },
+  { watch: [() => product.value?.slug, () => product.value?.similarSlugs] },
+);
+
+function manufacturerLabel(manufacturerSlug: string) {
+  return getManufacturerLabel(manufacturerSlug, manufacturers.value);
+}
 
 useSeoMeta({
   title: () => `${product.value!.title} — ${SITE.name}`,
   description: () => product.value!.description,
-})
+});
 
 const breadcrumbs = computed(() => {
-  const item = product.value!
+  const item = product.value!;
   return [
-    ...getCategoryBreadcrumbs(item.categorySlug, null),
+    ...getCategoryBreadcrumbs(
+      item.categorySlug,
+      null,
+      allCategories.value ?? [],
+    ),
     { label: item.title },
-  ]
-})
+  ];
+});
 
-const activeTab = ref('desc')
+const activeTab = ref('desc');
 const tabItems = [
   { label: 'Описание', value: 'desc', content: '' },
   { label: 'Характеристики', value: 'specs', content: '' },
   { label: 'PDF', value: 'pdf', content: '' },
-]
+];
 
 const pdfFilename = computed(() => {
-  const href = product.value?.pdfHref
+  const href = product.value?.pdfHref;
   if (!href) {
-    return undefined
+    return undefined;
   }
-  return href.split('/').pop() ?? 'datasheet.pdf'
-})
+  return href.split('/').pop() ?? 'datasheet.pdf';
+});
 </script>
 
 <template>
@@ -55,7 +80,7 @@ const pdfFilename = computed(() => {
     <SkmContainer>
       <SkmPageHeader
         :title="product!.title"
-        :description="`${getManufacturerLabel(product!.manufacturerSlug)} · арт. ${product!.sku}`"
+        :description="`${manufacturerLabel(product!.manufacturerSlug)} · арт. ${product!.sku}`"
       >
         <template #breadcrumbs>
           <SkmBreadcrumbs :items="breadcrumbs" />
@@ -63,18 +88,15 @@ const pdfFilename = computed(() => {
       </SkmPageHeader>
 
       <div class="grid gap-10 lg:grid-cols-2">
-        <SkmProductGallery
-          :images="[]"
-          :alt="product!.title"
-        />
+        <SkmProductGallery :images="[]" :alt="product!.title" />
 
         <div>
           <div v-if="product!.badges?.length" class="mb-4 flex flex-wrap gap-2">
             <SkmBadge
-              v-for="badge in product!.badges"
+              v-for="badge in toProductCardBadges(product!.badges)"
               :key="badge"
-              :label="badge === 'pdf' ? 'PDF' : badge === 'new' ? 'Новинка' : 'Под заказ'"
-              tone="neutral"
+              :label="productBadgeLabel(badge)"
+              :tone="productBadgeTone(badge)"
               size="sm"
             />
           </div>
@@ -116,7 +138,7 @@ const pdfFilename = computed(() => {
         </div>
       </div>
 
-      <div v-if="similarProducts.length" class="mt-16">
+      <div v-if="similarProducts?.length" class="mt-16">
         <h2 class="text-xl font-semibold text-neutral-900">
           Похожие товары других производителей
         </h2>
@@ -126,9 +148,9 @@ const pdfFilename = computed(() => {
             :key="item.slug"
             :title="item.title"
             :to="`/product/${item.slug}`"
-            :manufacturer="getManufacturerLabel(item.manufacturerSlug)"
+            :manufacturer="manufacturerLabel(item.manufacturerSlug)"
             :sku="item.sku"
-            :badges="item.badges ? [...item.badges] : undefined"
+            :badges="toProductCardBadges(item.badges)"
           />
         </div>
       </div>

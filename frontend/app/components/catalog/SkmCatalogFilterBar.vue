@@ -1,33 +1,34 @@
 <script setup lang="ts">
-import { MANUFACTURERS } from '~/constants/catalog-mocks'
-import { SkmSearchBox } from '@skm/components'
+import type { CatalogManufacturer } from '~/types/catalog';
+import { SkmSearchBox } from '@skm/components';
 
 const props = withDefaults(
   defineProps<{
-    query?: string
-    activeManufacturerSlug?: string | null
+    manufacturers: CatalogManufacturer[];
+    query?: string;
+    activeManufacturerSlug?: string | null;
   }>(),
   {
     query: '',
     activeManufacturerSlug: null,
   },
-)
+);
 
 const emit = defineEmits<{
-  'update:query': [value: string]
-  'toggle-manufacturer': [slug: string | null]
-  submit: [value: string]
-}>()
+  'update:query': [value: string];
+  'toggle-manufacturer': [slug: string | null];
+  submit: [value: string];
+}>();
 
 function onQueryUpdate(value: string) {
-  emit('update:query', value)
+  emit('update:query', value);
 }
 
 function toggleManufacturer(slug: string) {
   emit(
     'toggle-manufacturer',
     props.activeManufacturerSlug === slug ? null : slug,
-  )
+  );
 }
 </script>
 
@@ -41,7 +42,7 @@ function toggleManufacturer(slug: string) {
     />
     <div class="flex flex-wrap gap-2">
       <button
-        v-for="manufacturer in MANUFACTURERS"
+        v-for="manufacturer in manufacturers"
         :key="manufacturer.slug"
         type="button"
         class="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"
@@ -49,7 +50,9 @@ function toggleManufacturer(slug: string) {
       >
         <SkmBadge
           :label="manufacturer.label"
-          :tone="activeManufacturerSlug === manufacturer.slug ? 'accent' : 'neutral'"
+          :tone="
+            activeManufacturerSlug === manufacturer.slug ? 'accent' : 'neutral'
+          "
           size="sm"
         />
       </button>

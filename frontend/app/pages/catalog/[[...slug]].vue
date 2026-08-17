@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { getManufacturerLabel } from '~/utils/catalog'
-import { SITE } from '~/constants/site'
+import { computed, ref, watch } from 'vue';
+import { toProductCardBadges } from '~/components/ui/SkmProductCard/badgeDisplay';
+import { SITE } from '~/constants/site';
 
 const {
   categorySlug,
@@ -11,73 +11,73 @@ const {
   products,
   breadcrumbs,
   setManufacturer,
-} = useCatalog()
+  manufacturerLabel,
+  manufacturers,
+} = await useCatalog();
 
 if (!isValidCategory.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Категория не найдена' })
+  throw createError({ statusCode: 404, statusMessage: 'Категория не найдена' });
 }
 
-const query = ref('')
-const page = ref(1)
-const itemsPerPage = 8
+const query = ref('');
+const page = ref(1);
+const itemsPerPage = 8;
 
 const pageTitle = computed(() => {
   if (!categorySlug.value) {
-    return 'Каталог продукции'
+    return 'Каталог продукции';
   }
-  const trail = breadcrumbs.value
-  return trail[trail.length - 1]?.label ?? 'Каталог'
-})
+  const trail = breadcrumbs.value;
+  return trail[trail.length - 1]?.label ?? 'Каталог';
+});
 
 const pageDescription = computed(() => {
   if (manufacturerSlug.value) {
-    return `Оборудование ${getManufacturerLabel(manufacturerSlug.value)} в каталоге ${SITE.name}.`
+    return `Оборудование ${manufacturerLabel(manufacturerSlug.value)} в каталоге ${SITE.name}.`;
   }
   if (categorySlug.value) {
-    return `Продукция раздела «${pageTitle.value}». Поставка под заказ, техническая документация.`
+    return `Продукция раздела «${pageTitle.value}». Поставка под заказ, техническая документация.`;
   }
-  return 'Каталог электрооборудования по категориям и производителям.'
-})
+  return 'Каталог электрооборудования по категориям и производителям.';
+});
 
 useSeoMeta({
   title: `${pageTitle.value} — ${SITE.name}`,
   description: pageDescription.value,
-})
+});
 
 const filteredProducts = computed(() => {
-  const q = query.value.trim().toLowerCase()
+  const q = query.value.trim().toLowerCase();
+  const items = products.value ?? [];
   if (!q) {
-    return products.value
+    return items;
   }
-  return products.value.filter(
+  return items.filter(
     (product) =>
-      product.title.toLowerCase().includes(q)
-      || getManufacturerLabel(product.manufacturerSlug).toLowerCase().includes(q)
-      || product.sku.toLowerCase().includes(q),
-  )
-})
+      product.title.toLowerCase().includes(q) ||
+      manufacturerLabel(product.manufacturerSlug).toLowerCase().includes(q) ||
+      product.sku.toLowerCase().includes(q),
+  );
+});
 
 const pagedProducts = computed(() => {
-  const start = (page.value - 1) * itemsPerPage
-  return filteredProducts.value.slice(start, start + itemsPerPage)
-})
+  const start = (page.value - 1) * itemsPerPage;
+  return filteredProducts.value.slice(start, start + itemsPerPage);
+});
 
 watch([query, manufacturerSlug, categorySlug], () => {
-  page.value = 1
-})
+  page.value = 1;
+});
 
 function handleManufacturerToggle(slug: string | null) {
-  setManufacturer(slug)
+  setManufacturer(slug);
 }
 </script>
 
 <template>
   <SkmSection>
     <SkmContainer>
-      <SkmPageHeader
-        :title="pageTitle"
-        :description="pageDescription"
-      >
+      <SkmPageHeader :title="pageTitle" :description="pageDescription">
         <template #breadcrumbs>
           <SkmBreadcrumbs :items="breadcrumbs" />
         </template>
@@ -85,19 +85,22 @@ function handleManufacturerToggle(slug: string | null) {
 
       <div class="grid gap-10 lg:grid-cols-[240px_1fr]">
         <aside class="hidden lg:block">
-          <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-900">
+          <h2
+            class="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-900"
+          >
             Категории
           </h2>
-          <CatalogSidebar
-            :items="visibleCategories"
+          <SkmCatalogSidebar
+            :items="visibleCategories ?? []"
             :manufacturer-slug="manufacturerSlug"
             :active-category-slug="categorySlug"
           />
         </aside>
 
         <div>
-          <CatalogFilterBar
+          <SkmCatalogFilterBar
             v-model:query="query"
+            :manufacturers="manufacturers ?? []"
             :active-manufacturer-slug="manufacturerSlug"
             @toggle-manufacturer="handleManufacturerToggle"
           />
@@ -108,7 +111,7 @@ function handleManufacturerToggle(slug: string | null) {
           >
             <span>Фильтр:</span>
             <SkmBadge
-              :label="getManufacturerLabel(manufacturerSlug)"
+              :label="manufacturerLabel(manufacturerSlug)"
               tone="accent"
               size="sm"
             />
@@ -121,7 +124,9 @@ function handleManufacturerToggle(slug: string | null) {
             </button>
           </div>
 
-          <h2 class="mt-8 text-sm font-semibold uppercase tracking-wide text-neutral-900">
+          <h2
+            class="mt-8 text-sm font-semibold uppercase tracking-wide text-neutral-900"
+          >
             Товары
           </h2>
 
@@ -139,9 +144,9 @@ function handleManufacturerToggle(slug: string | null) {
                 :key="product.slug"
                 :title="product.title"
                 :to="`/product/${product.slug}`"
-                :manufacturer="getManufacturerLabel(product.manufacturerSlug)"
+                :manufacturer="manufacturerLabel(product.manufacturerSlug)"
                 :sku="product.sku"
-                :badges="product.badges ? [...product.badges] : undefined"
+                :badges="toProductCardBadges(product.badges)"
               />
             </div>
             <div

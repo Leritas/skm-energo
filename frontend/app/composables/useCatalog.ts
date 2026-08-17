@@ -1,50 +1,49 @@
 import {
   buildCatalogUrl,
   getCategoryBreadcrumbs,
-  getFilteredProducts,
-  getManufacturerBySlug,
-  getVisibleCategoryTree,
+  getManufacturerLabel,
+  parseManufacturerQuery,
   resolveCategoryFromPath,
-} from '~/utils/catalog'
+} from '~/utils/catalog';
 
-export function useCatalog() {
-  const route = useRoute()
+export async function useCatalog() {
+  const route = useRoute();
+  const { data: manufacturers } = await useCatalogManufacturers();
+  const { data: allCategories } = await useCatalogAllCategories();
 
   const categoryPath = computed(() => {
-    const slug = route.params.slug
+    const slug = route.params.slug;
     if (!slug) {
-      return [] as string[]
+      return [] as string[];
     }
-    return Array.isArray(slug) ? slug : [slug]
-  })
+    return Array.isArray(slug) ? slug : [slug];
+  });
 
-  const categorySlug = computed(() =>
-    resolveCategoryFromPath(categoryPath.value).categorySlug,
-  )
+  const categoryResolution = computed(() =>
+    resolveCategoryFromPath(categoryPath.value, allCategories.value ?? []),
+  );
 
-  const isValidCategory = computed(() =>
-    resolveCategoryFromPath(categoryPath.value).isValid,
-  )
+  const categorySlug = computed(() => categoryResolution.value.categorySlug);
+  const isValidCategory = computed(() => categoryResolution.value.isValid);
 
-  const manufacturerSlug = computed(() => {
-    const value = route.query.manufacturer
-    if (typeof value !== 'string' || !value) {
-      return null
-    }
-    return getManufacturerBySlug(value) ? value : null
-  })
+  const manufacturerSlug = computed(() =>
+    parseManufacturerQuery(route.query.manufacturer, manufacturers.value),
+  );
 
-  const visibleCategories = computed(() =>
-    getVisibleCategoryTree(manufacturerSlug.value),
-  )
-
-  const products = computed(() =>
-    getFilteredProducts(categorySlug.value, manufacturerSlug.value),
-  )
+  const { data: visibleCategories } =
+    await useCatalogCategories(manufacturerSlug);
+  const { data: products } = await useCatalogProducts(
+    categorySlug,
+    manufacturerSlug,
+  );
 
   const breadcrumbs = computed(() =>
-    getCategoryBreadcrumbs(categorySlug.value, manufacturerSlug.value),
-  )
+    getCategoryBreadcrumbs(
+      categorySlug.value,
+      manufacturerSlug.value,
+      allCategories.value ?? [],
+    ),
+  );
 
   function catalogUrl(
     nextCategorySlug?: string | null,
@@ -53,17 +52,20 @@ export function useCatalog() {
     const manufacturer =
       nextManufacturerSlug === undefined
         ? manufacturerSlug.value
-        : nextManufacturerSlug
-    return buildCatalogUrl(nextCategorySlug, manufacturer)
+        : nextManufacturerSlug;
+    return buildCatalogUrl(nextCategorySlug, manufacturer);
   }
 
   async function setManufacturer(nextManufacturerSlug: string | null) {
-    await navigateTo(
-      buildCatalogUrl(categorySlug.value, nextManufacturerSlug),
-    )
+    await navigateTo(buildCatalogUrl(categorySlug.value, nextManufacturerSlug));
+  }
+
+  function manufacturerLabel(slug: string) {
+    return getManufacturerLabel(slug, manufacturers.value);
   }
 
   return {
+    manufacturers,
     categoryPath,
     categorySlug,
     isValidCategory,
@@ -73,5 +75,6 @@ export function useCatalog() {
     breadcrumbs,
     catalogUrl,
     setManufacturer,
-  }
+    manufacturerLabel,
+  };
 }

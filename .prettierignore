@@ -1,0 +1,8 @@
+node_modules
+**/node_modules
+**/dist
+**/.output
+**/.nuxt
+**/coverage
+**/package-lock.json
+**/.cache

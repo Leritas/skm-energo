@@ -1,9 +1,10 @@
-import type { CatalogManufacturer, ProductBadge } from '~/types/catalog';
+export interface CatalogSeedCategory {
+  slug: string;
+  name: string;
+  children?: CatalogSeedCategory[];
+}
 
-export type Manufacturer = CatalogManufacturer;
-export type { ProductBadge };
-
-export interface MockProduct {
+export interface CatalogSeedProduct {
   slug: string;
   title: string;
   manufacturerSlug: string;
@@ -12,18 +13,72 @@ export interface MockProduct {
   description: string;
   specs: Array<{ label: string; value: string }>;
   pdfHref?: string;
-  badges?: ProductBadge[];
+  badges?: string[];
   similarSlugs?: string[];
 }
 
-export const MANUFACTURERS: Manufacturer[] = [
-  { slug: 'mersen', label: 'MERSEN' },
-  { slug: 'casram', label: 'CASRAM' },
-  { slug: 'lampar', label: 'Lampar' },
-  { slug: 'hiitio', label: 'HIITIO' },
+export const CATALOG_SEED_MANUFACTURERS = [
+  { slug: 'mersen', name: 'MERSEN' },
+  { slug: 'casram', name: 'CASRAM' },
+  { slug: 'lampar', name: 'Lampar' },
+  { slug: 'hiitio', name: 'HIITIO' },
+] as const;
+
+export const CATALOG_SEED_CATEGORIES: CatalogSeedCategory[] = [
+  {
+    slug: 'predohraniteli',
+    name: 'Предохранители, держатели и аксессуары',
+    children: [
+      {
+        slug: 'nizkovoltnye-predohraniteli',
+        name: 'Низковольтные предохранители',
+      },
+      {
+        slug: 'plavkie-vn',
+        name: 'Плавкие предохранители высокого напряжения',
+      },
+    ],
+  },
+  {
+    slug: 'zashchita-perenapryazheniya',
+    name: 'Устройства защиты от перенапряжения',
+  },
+  {
+    slug: 'nizkovoltnye-rubilniki',
+    name: 'Низковольтные рубильники',
+  },
+  {
+    slug: 'vysokovoltnye-razediniteli',
+    name: 'Высоковольтные разъединители и контакторы',
+  },
+  {
+    slug: 'kontaktory-i-puskateli',
+    name: 'Контакторы и пускатели',
+  },
+  {
+    slug: 'kommutacionnye-apparaty',
+    name: 'Коммутационные аппараты',
+  },
+  {
+    slug: 'shiny-i-soediniteli',
+    name: 'Шины и соединители',
+  },
+  {
+    slug: 'aksessuary',
+    name: 'Аксессуары для электрооборудования',
+  },
+  {
+    slug: 'ibp-i-elektropitanie',
+    name: 'ИБП и системы электропитания',
+    children: [
+      { slug: 'akkumulyatory', name: 'Аккумуляторные батареи' },
+      { slug: 'ibp', name: 'Источники бесперебойного питания' },
+      { slug: 'solnechnye-invertory', name: 'Солнечные инверторы' },
+    ],
+  },
 ];
 
-export const MOCK_PRODUCTS: MockProduct[] = [
+export const CATALOG_SEED_PRODUCTS: CatalogSeedProduct[] = [
   {
     slug: 'nh00-160a',
     title: 'Предохранитель NH00 160A',
@@ -136,8 +191,7 @@ export const MOCK_PRODUCTS: MockProduct[] = [
     manufacturerSlug: 'mersen',
     categorySlug: 'vysokovoltnye-razediniteli',
     sku: 'DS-12',
-    description:
-      'Высоковольтный разъединитель для распределительных устройств.',
+    description: 'Высоковольтный разъединитель для распределительных устройств.',
     specs: [{ label: 'Напряжение', value: '12 kV' }],
     badges: ['onRequest'],
   },
@@ -197,8 +251,7 @@ export const MOCK_PRODUCTS: MockProduct[] = [
     manufacturerSlug: 'casram',
     categorySlug: 'aksessuary',
     sku: 'CAS-AK-01',
-    description:
-      'Набор креплений и контактных элементов для держателей CASRAM.',
+    description: 'Набор креплений и контактных элементов для держателей CASRAM.',
     specs: [{ label: 'Совместимость', value: 'CASRAM NH' }],
   },
   {

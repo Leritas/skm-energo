@@ -3,6 +3,15 @@
   "private": true,
   "description": "Monorepo root — packages linked via file: deps (@skm/specs)",
   "scripts": {
-    "build:specs": "npm run build --prefix skm-specs"
+    "build:specs": "npm run build --prefix skm-specs",
+    "dev:backend": "bash scripts/dev-backend.sh",
+    "prepare": "husky",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2",
+    "prettier": "^3.4.2"
   }
 }

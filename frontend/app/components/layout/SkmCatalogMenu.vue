@@ -1,35 +1,27 @@
 <script setup lang="ts">
-import { MANUFACTURERS } from '~/constants/catalog-mocks'
-import { buildCatalogUrl, getVisibleCategoryTree } from '~/utils/catalog'
+import { buildCatalogUrl, parseManufacturerQuery } from '~/utils/catalog';
 
-const open = ref(false)
-const route = useRoute()
+const open = ref(false);
+const route = useRoute();
+const { data: manufacturers } = await useCatalogManufacturers();
 
-const manufacturerSlug = computed(() => {
-  const value = route.query.manufacturer
-  if (typeof value !== 'string' || !value) {
-    return null
-  }
-  return MANUFACTURERS.some((item) => item.slug === value) ? value : null
-})
+const manufacturerSlug = computed(() =>
+  parseManufacturerQuery(route.query.manufacturer, manufacturers.value),
+);
 
-const visibleCategories = computed(() =>
-  getVisibleCategoryTree(manufacturerSlug.value),
-)
+const { data: visibleCategories } =
+  await useCatalogCategories(manufacturerSlug);
 
 function isManufacturerActive(slug: string) {
-  return manufacturerSlug.value === slug
+  return manufacturerSlug.value === slug;
 }
 
 function manufacturerUrl(slug: string) {
-  return buildCatalogUrl(
-    null,
-    isManufacturerActive(slug) ? null : slug,
-  )
+  return buildCatalogUrl(null, isManufacturerActive(slug) ? null : slug);
 }
 
 function closeMenu() {
-  open.value = false
+  open.value = false;
 }
 </script>
 
@@ -51,12 +43,14 @@ function closeMenu() {
     <template #content>
       <div class="w-[22rem] py-3">
         <div class="border-b border-neutral-100 px-4 pb-3">
-          <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          <p
+            class="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500"
+          >
             Производители
           </p>
           <div class="flex flex-wrap gap-2">
             <NuxtLink
-              v-for="manufacturer in MANUFACTURERS"
+              v-for="manufacturer in manufacturers ?? []"
               :key="manufacturer.slug"
               :to="manufacturerUrl(manufacturer.slug)"
               class="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"
@@ -64,7 +58,9 @@ function closeMenu() {
             >
               <SkmBadge
                 :label="manufacturer.label"
-                :tone="isManufacturerActive(manufacturer.slug) ? 'accent' : 'neutral'"
+                :tone="
+                  isManufacturerActive(manufacturer.slug) ? 'accent' : 'neutral'
+                "
                 size="sm"
               />
             </NuxtLink>
@@ -80,7 +76,7 @@ function closeMenu() {
             Весь каталог
           </NuxtLink>
           <div
-            v-for="category in visibleCategories"
+            v-for="category in visibleCategories ?? []"
             :key="category.slug"
             class="border-b border-neutral-100 py-1 last:border-0"
           >

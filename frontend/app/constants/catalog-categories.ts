@@ -1,17 +1,18 @@
-export interface CatalogCategory {
-  slug: string
-  label: string
-  children?: CatalogCategory[]
-}
+import type { CatalogCategory } from '~/types/catalog';
 
-/** Normalized category tree (ref: legacy site line names). Rebuild planned for Stage 2+. */
 export const CATALOG_CATEGORIES: CatalogCategory[] = [
   {
     slug: 'predohraniteli',
     label: 'Предохранители, держатели и аксессуары',
     children: [
-      { slug: 'nizkovoltnye-predohraniteli', label: 'Низковольтные предохранители' },
-      { slug: 'plavkie-vn', label: 'Плавкие предохранители высокого напряжения' },
+      {
+        slug: 'nizkovoltnye-predohraniteli',
+        label: 'Низковольтные предохранители',
+      },
+      {
+        slug: 'plavkie-vn',
+        label: 'Плавкие предохранители высокого напряжения',
+      },
     ],
   },
   {
@@ -51,4 +52,4 @@ export const CATALOG_CATEGORIES: CatalogCategory[] = [
       { slug: 'solnechnye-invertory', label: 'Солнечные инверторы' },
     ],
   },
-]
+];
