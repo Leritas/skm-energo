@@ -127,13 +127,18 @@
 
 ---
 
-### Этап 3 — Аутентификация и роли (RBAC)
+### Этап 3 — Аутентификация и роли (RBAC) ✅
 
-- Регистрация / вход / refresh token (JWT Bearer)
-- Permissions — хардкод в `@skm/specs`; роли — динамические наборы в БД (M2M User↔Role)
-- `hasAbsoluteControl` обходит остальные проверки; иначе AND по `@RequirePermissions`
-- Guards: `/profile/*` (сессия; `/account` → redirect), `/admin/*` (`hasAccessToAdmin`)
+- [x] Регистрация / вход / refresh token (JWT Bearer)
+- [x] Permissions — хардкод в `@skm/specs`; роли — динамические наборы в БД (M2M User↔Role)
+- [x] `hasAbsoluteControl` обходит остальные проверки; иначе AND по `@RequirePermissions`
+- [x] Guards: `/profile/*` (сессия; `/account` → redirect), `/admin/*` (`hasAccessToAdmin`)
+- [x] Users & Roles API; seed roles user/moderator/admin
+- [x] Frontend: Pinia auth store, middleware `auth` / `admin`, login/register
 - Спека: [superpowers/specs/2026-07-21-auth-roles-permissions-design.md](./superpowers/specs/2026-07-21-auth-roles-permissions-design.md)
+- Plan: [superpowers/plans/2026-07-21-auth-roles-permissions.md](./superpowers/plans/2026-07-21-auth-roles-permissions.md) ✅
+
+**Known limitation:** auth middleware client-only (SSR flash on hard refresh) — deferred [#20](https://github.com/Leritas/skm-energo/issues/20).
 
 **Ориентир:** 3–4 дня
 
@@ -173,11 +178,26 @@
 
 ### Этап 7 — Личный кабинет клиента (`/profile`)
 
-- Nested `/profile/info`, `/profile/orders/{active,completed,purchased}`, `/profile/favorite`
-- P0: frontend shell + mocks; далее Profile/Orders/Reviews/Favorites API
-- Спека: [superpowers/specs/2026-07-30-personal-profile-design.md](./superpowers/specs/2026-07-30-personal-profile-design.md)
+#### P0 — Shell ✅
 
-**Ориентир:** 3–4 дня (shell); API — по фазам P1–P4 в спеке
+- Nested `/profile/info`, `/profile/orders/{active,completed,purchased}`, `/profile/favorite`
+- Layout, mocks, `SkmReviewCard` editMode, redirects `/account` → `/profile`
+
+#### P1 — Profile API ✅
+
+- User B2B fields (phone, company, inn, position); `PATCH /profile`; change password
+- `/profile/info` on live API (change password revokes refresh tokens → re-login)
+
+#### P2–P4 — ⏳
+
+- **P2** Orders from API — blocked by этап 6 (корзина/заказы)
+- **P3** Reviews API — after P2
+- **P4** Favorites API — after live catalog (этап 5 / #6)
+
+- Спека: [superpowers/specs/2026-07-30-personal-profile-design.md](./superpowers/specs/2026-07-30-personal-profile-design.md)
+- GitHub: [#16](https://github.com/Leritas/skm-energo/issues/16)
+
+**Ориентир:** P0–P1 done; P2–P4 по фазам в спеке
 
 ---
 

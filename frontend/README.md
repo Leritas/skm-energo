@@ -138,7 +138,7 @@ frontend/
 | `/news` | Новости (заглушка) | ✅ |
 | `/login` | Вход | ✅ |
 | `/register` | Регистрация покупателя | ✅ |
-| `/profile/**` | Личный кабинет (см. profile design) | — |
+| `/profile/**` | Личный кабинет — P0 shell ✅, P1 info API ✅; orders/favorites mocks | ✅ partial |
 | `/account` | Redirect → `/profile` | ✅ |
 | `/admin` | Админ-панель (заглушка, `hasAccessToAdmin`) | — |
 
@@ -156,7 +156,7 @@ frontend/
 |-----------|-----|------------|
 | `SkmUserMenu` | Header (desktop + mobile) | Popover: login/register или кабинет/админ/выход |
 | `app/stores/auth.ts` | Pinia | Сессия, tokens в `localStorage` |
-| `app/middleware/auth.ts` | `/profile/**` | Редирект на `/login` без сессии (client-only) |
+| `app/middleware/auth.ts` | `/profile/**` | Редирект на `/login` без сессии (**client-only** — см. auth spec, #20) |
 | `app/middleware/admin.ts` | `/admin` | Требует `hasAccessToAdmin` (client-only) |
 
 Иконка профиля в header видна на всех публичных страницах. После входа данные подтягиваются через `GET /api/auth/me`.

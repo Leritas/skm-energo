@@ -1,8 +1,8 @@
 # Personal Profile — Design & Roadmap
 
 **Date:** 2026-07-30  
-**Status:** P0 shell implemented (2026-07-30)  
-**Scope:** Nested `/profile/*` кабинет (frontend shell first); backend/business logic as later phases
+**Status:** P0 ✅ + P1 ✅ (2026-08-17); P2–P4 planned  
+**Scope:** Nested `/profile/*` кабинет; P0 shell + P1 profile API done; orders/reviews/favorites on mocks until P2–P4
 
 ---
 
@@ -68,9 +68,9 @@ Header `SkmUserMenu` / mobile nav: «Личный кабинет» → `/profile
 
 ### `/profile/info`
 
-1. **Контактные / B2B** — email (read-only + hint «логин»), имя, телефон, компания, ИНН, должность; «Сохранить» → toast mock.  
-2. **Смена пароля** — текущий / новый / повтор; «Изменить пароль» → toast mock.  
-Prefill name/email из auth store.
+1. **Контактные / B2B** — email (read-only + hint «логин»), имя, телефон, компания, ИНН, должность; «Сохранить» → **live API** (`PATCH /profile`).  
+2. **Смена пароля** — текущий / новый / повтор; «Изменить пароль» → **live API**; все refresh tokens revoked → re-login.  
+Prefill name/email и B2B fields из auth store / `/auth/me`.
 
 ### `/profile/orders/*`
 
@@ -107,15 +107,15 @@ Storybook: read + editMode stories.
 
 ## Roadmap phases
 
-| Phase | Scope | Depends on |
-|-------|--------|------------|
-| **P0 — Shell** | Routes, layout, mock pages, ReviewCard editMode, redirects, header links | Auth middleware (done) |
-| **P1 — Profile API** | Prisma fields (phone, company, inn, position); PATCH profile; change password | Auth User |
-| **P2 — Orders API** | Real orders → active/completed; purchased = unique products from completed | Product roadmap stage 6 |
-| **P3 — Reviews API** | User review on purchased product; wire editMode submit | P2 |
-| **P4 — Favorites API** | Persist favorites; catalog heart toggle | Catalog stage 5 |
-| **P5 — later** | Favorite news (optional) | When needed |
-| **P6 — end** | Secure email change (verify old/new; not in info form) | Stable auth |
+| Phase | Scope | Status |
+|-------|--------|--------|
+| **P0 — Shell** | Routes, layout, mock pages, ReviewCard editMode, redirects, header links | ✅ |
+| **P1 — Profile API** | User B2B fields; PATCH profile; change password | ✅ |
+| **P2 — Orders API** | Real orders → active/completed; purchased = unique products from completed | ⏳ blocked by Stage 6 |
+| **P3 — Reviews API** | User review on purchased product; wire editMode submit | ⏳ after P2 |
+| **P4 — Favorites API** | Persist favorites; catalog heart toggle | ⏳ after live catalog |
+| **P5 — later** | Favorite news (optional) | — |
+| **P6 — end** | Secure email change (verify old/new; not in info form) | — |
 
 ### Out of scope (all phases unless noted)
 

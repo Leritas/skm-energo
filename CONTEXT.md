@@ -47,3 +47,25 @@ _Avoid_: Vendor, supplier (in code)
 **Similar product**:
 A product from another manufacturer shown on PDP as a cross-brand alternative. Separate card, not a shared listing.
 _Avoid_: Analogue, cross-sell
+
+## Auth & profile
+
+**User**:
+An authenticated account (email + password). B2B profile fields (phone, company, inn, position) live on User, not a separate Profile entity.
+_Avoid_: Client, account (in domain docs)
+
+**Role**:
+A named set of Permissions stored in PostgreSQL; User may have multiple Roles; effective permissions = union.
+_Avoid_: Group, profile type
+
+**Permission**:
+A hardcoded capability string in `@skm/specs` (e.g. `hasAccessToAdmin`). Checked via `@RequirePermissions` on API; `hasAbsoluteControl` bypasses other checks.
+_Avoid_: Scope, grant (without qualifier)
+
+**Guest**:
+Unauthenticated visitor; not a DB Role — absence of JWT.
+_Avoid_: Anonymous user role
+
+**Profile (UI)**:
+The authenticated `/profile/*` area: info, orders, favorites. Distinct from User management in admin.
+_Avoid_: Account area, ЛК as code identifier
