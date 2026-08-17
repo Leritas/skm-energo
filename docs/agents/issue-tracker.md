@@ -4,6 +4,19 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 
 ## Conventions
 
+### Tech-debt tickets (TD series)
+
+Non-critical cleanup and code-quality work uses a **TD prefix in the title**, not a separate label:
+
+- **Title format:** `TD<N> — <short description>` (e.g. `TD1 — Remove legacy similarSlugs and dead catalog mocks`)
+- **Numbering:** increment globally across the repo — `TD1`, `TD2`, `TD3`, … Assign the next free number when creating a TD ticket (`gh issue list --search "TD" --state all`).
+- **Scope:** refactors, dead-code removal, schema cleanup, test/doc hygiene — work that does not ship user-facing features on its own.
+- **Triage:** do **not** use `roadmap:parent`. No dedicated TD label — the title prefix is the marker. Pick up between roadmap stages.
+
+Roadmap epics (`#11`, `#14`, …) track staged product delivery; TD tickets are orthogonal and can land anytime.
+
+### General
+
 - **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
 - **Read an issue**: `gh issue view <number> --comments`, filtering comments by `jq` and also fetching labels.
 - **List issues**: `gh issue list --state open --json number,title,body,labels,comments --jq '[.[] | {number, title, body, labels: [.labels[].name], comments: [.comments[].body]}]'` with appropriate `--label` and `--state` filters.

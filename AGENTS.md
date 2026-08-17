@@ -2,7 +2,7 @@
 
 ### Issue tracker
 
-Issues live in GitHub Issues for `Leritas/skm-energo`. See `docs/agents/issue-tracker.md`.
+Issues live in GitHub Issues for `Leritas/skm-energo`. See `docs/agents/issue-tracker.md`. Tech-debt cleanup tickets use the `TD1`, `TD2`, … title prefix (see **Tech-debt tickets** in that doc).
 
 ### Triage labels
 
