@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { MANUFACTURERS } from '~/constants/catalog-mocks'
+import type { CatalogManufacturer } from '~/types/catalog'
 import { SkmSearchBox } from '@skm/components'
 
 const props = withDefaults(
   defineProps<{
+    manufacturers: CatalogManufacturer[]
     query?: string
     activeManufacturerSlug?: string | null
   }>(),
@@ -41,7 +42,7 @@ function toggleManufacturer(slug: string) {
     />
     <div class="flex flex-wrap gap-2">
       <button
-        v-for="manufacturer in MANUFACTURERS"
+        v-for="manufacturer in manufacturers"
         :key="manufacturer.slug"
         type="button"
         class="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"

@@ -1,9 +1,10 @@
-export interface Manufacturer {
-  slug: string
-  label: string
-}
+import type {
+  CatalogManufacturer,
+  ProductBadge,
+} from '~/types/catalog'
 
-export type ProductBadge = 'pdf' | 'new' | 'onRequest'
+export type Manufacturer = CatalogManufacturer
+export type { ProductBadge }
 
 export interface MockProduct {
   slug: string
@@ -18,6 +19,7 @@ export interface MockProduct {
   similarSlugs?: string[]
 }
 
+/** Storybook / isolated demos only — public routes use catalog read API. */
 export const MANUFACTURERS: Manufacturer[] = [
   { slug: 'mersen', label: 'MERSEN' },
   { slug: 'casram', label: 'CASRAM' },

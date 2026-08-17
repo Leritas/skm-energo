@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { getManufacturerLabel } from '~/utils/catalog'
 import { SITE } from '~/constants/site'
 
 const {
@@ -11,7 +10,9 @@ const {
   products,
   breadcrumbs,
   setManufacturer,
-} = useCatalog()
+  manufacturerLabel,
+  manufacturers,
+} = await useCatalog()
 
 if (!isValidCategory.value) {
   throw createError({ statusCode: 404, statusMessage: 'Категория не найдена' })
@@ -31,7 +32,7 @@ const pageTitle = computed(() => {
 
 const pageDescription = computed(() => {
   if (manufacturerSlug.value) {
-    return `Оборудование ${getManufacturerLabel(manufacturerSlug.value)} в каталоге ${SITE.name}.`
+    return `Оборудование ${manufacturerLabel(manufacturerSlug.value)} в каталоге ${SITE.name}.`
   }
   if (categorySlug.value) {
     return `Продукция раздела «${pageTitle.value}». Поставка под заказ, техническая документация.`
@@ -52,7 +53,7 @@ const filteredProducts = computed(() => {
   return products.value.filter(
     (product) =>
       product.title.toLowerCase().includes(q)
-      || getManufacturerLabel(product.manufacturerSlug).toLowerCase().includes(q)
+      || manufacturerLabel(product.manufacturerSlug).toLowerCase().includes(q)
       || product.sku.toLowerCase().includes(q),
   )
 })
@@ -98,6 +99,7 @@ function handleManufacturerToggle(slug: string | null) {
         <div>
           <CatalogFilterBar
             v-model:query="query"
+            :manufacturers="manufacturers ?? []"
             :active-manufacturer-slug="manufacturerSlug"
             @toggle-manufacturer="handleManufacturerToggle"
           />
@@ -108,7 +110,7 @@ function handleManufacturerToggle(slug: string | null) {
           >
             <span>Фильтр:</span>
             <SkmBadge
-              :label="getManufacturerLabel(manufacturerSlug)"
+              :label="manufacturerLabel(manufacturerSlug)"
               tone="accent"
               size="sm"
             />
@@ -139,9 +141,9 @@ function handleManufacturerToggle(slug: string | null) {
                 :key="product.slug"
                 :title="product.title"
                 :to="`/product/${product.slug}`"
-                :manufacturer="getManufacturerLabel(product.manufacturerSlug)"
+                :manufacturer="manufacturerLabel(product.manufacturerSlug)"
                 :sku="product.sku"
-                :badges="product.badges ? [...product.badges] : undefined"
+                :badges="product.badges?.length ? [...product.badges] : undefined"
               />
             </div>
             <div

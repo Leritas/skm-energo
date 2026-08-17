@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CatalogCategory } from '~/constants/catalog-categories'
+import type { CatalogCategory } from '~/types/catalog'
 import { buildCatalogUrl } from '~/utils/catalog'
 
 defineProps<{

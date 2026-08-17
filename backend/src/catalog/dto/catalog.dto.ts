@@ -40,6 +40,14 @@ export class CatalogCategoryResponseDto {
   children?: CatalogCategoryResponseDto[];
 }
 
+export class CatalogManufacturerResponseDto {
+  @ApiProperty({ example: 'mersen' })
+  slug!: string;
+
+  @ApiProperty({ example: 'MERSEN' })
+  label!: string;
+}
+
 export class CatalogProductListItemResponseDto {
   @ApiProperty({ example: 'nh00-160a' })
   slug!: string;

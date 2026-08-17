@@ -1,10 +1,8 @@
-export interface CatalogCategory {
-  slug: string
-  label: string
-  children?: CatalogCategory[]
-}
+import type { CatalogCategory } from '~/types/catalog'
 
-/** Normalized category tree (ref: legacy site line names). Rebuild planned for Stage 2+. */
+export type { CatalogCategory }
+
+/** Normalized category tree (ref: legacy site line names). Storybook / demos only. */
 export const CATALOG_CATEGORIES: CatalogCategory[] = [
   {
     slug: 'predohraniteli',

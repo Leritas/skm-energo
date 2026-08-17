@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { Permission } from '@skm/specs'
-import { MANUFACTURERS } from '~/constants/catalog-mocks'
 import { MAIN_NAV } from '~/constants/navigation'
 import { SITE } from '~/constants/site'
-import { buildCatalogUrl, getVisibleCategoryTree } from '~/utils/catalog'
+import { buildCatalogUrl } from '~/utils/catalog'
 
 const open = defineModel<boolean>('open', { default: false })
 
@@ -17,9 +16,8 @@ const { hasPermission } = usePermissions()
 const expandedCatalog = ref(false)
 const activeManufacturerSlug = ref<string | null>(null)
 
-const visibleCategories = computed(() =>
-  getVisibleCategoryTree(activeManufacturerSlug.value),
-)
+const { data: manufacturers } = useCatalogManufacturers()
+const { data: visibleCategories } = useCatalogCategories(activeManufacturerSlug)
 
 function toggleCatalog() {
   expandedCatalog.value = !expandedCatalog.value
@@ -89,7 +87,7 @@ onMounted(async () => {
 
               <div class="flex flex-wrap gap-2 px-3">
                 <button
-                  v-for="manufacturer in MANUFACTURERS"
+                  v-for="manufacturer in manufacturers ?? []"
                   :key="manufacturer.slug"
                   type="button"
                   @click="toggleManufacturer(manufacturer.slug)"
@@ -103,7 +101,7 @@ onMounted(async () => {
               </div>
 
               <div
-                v-for="category in visibleCategories"
+                v-for="category in visibleCategories ?? []"
                 :key="category.slug"
                 class="py-1"
               >

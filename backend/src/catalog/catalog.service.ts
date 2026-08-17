@@ -32,6 +32,11 @@ export interface CatalogProductDetailDto extends CatalogProductListItemDto {
   similarSlugs: string[];
 }
 
+export interface CatalogManufacturerDto {
+  slug: string;
+  label: string;
+}
+
 @Injectable()
 export class CatalogService {
   constructor(private readonly prisma: PrismaService) {}
@@ -47,6 +52,17 @@ export class CatalogService {
     ]);
 
     return filterVisibleCategoryTree(categories, products, manufacturerSlug);
+  }
+
+  async listManufacturers(): Promise<CatalogManufacturerDto[]> {
+    const rows = await this.prisma.manufacturer.findMany({
+      orderBy: { name: 'asc' },
+    });
+
+    return rows.map((row) => ({
+      slug: row.slug,
+      label: row.name,
+    }));
   }
 
   async listProducts(

@@ -1,25 +1,41 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import type { CatalogProductDetail } from '~/types/catalog'
 import {
   getCategoryBreadcrumbs,
   getManufacturerLabel,
-  getProductBySlug,
-  getSimilarProducts,
+  mapProductBadges,
 } from '~/utils/catalog'
 import { SITE } from '~/constants/site'
 
 const route = useRoute()
 const slug = computed(() => String(route.params.slug ?? ''))
 
-const product = computed(() => getProductBySlug(slug.value))
+const { data: productData, error: productError } = await useCatalogProduct(slug)
+const { data: manufacturers } = useCatalogManufacturers()
+const { data: allCategories } = await useCatalogAllCategories()
 
-if (!product.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Товар не найден' })
+if (productError.value) {
+  const statusCode = (productError.value as { statusCode?: number }).statusCode
+  throw createError({
+    statusCode: statusCode === 404 ? 404 : 500,
+    statusMessage:
+      statusCode === 404 ? 'Товар не найден' : 'Не удалось загрузить товар',
+  })
 }
 
-const similarProducts = computed(() =>
-  product.value ? getSimilarProducts(product.value) : [],
+const product = computed(() => productData.value as CatalogProductDetail)
+
+const { data: similarProducts } = await useAsyncData(
+  () =>
+    `catalog-similar-${slug.value}-${product.value?.similarSlugs.join(',') ?? ''}`,
+  () => fetchSimilarProducts(product.value?.similarSlugs ?? []),
+  { watch: [() => product.value?.similarSlugs] },
 )
+
+function manufacturerLabel(manufacturerSlug: string) {
+  return getManufacturerLabel(manufacturerSlug, manufacturers.value)
+}
 
 useSeoMeta({
   title: () => `${product.value!.title} — ${SITE.name}`,
@@ -29,7 +45,11 @@ useSeoMeta({
 const breadcrumbs = computed(() => {
   const item = product.value!
   return [
-    ...getCategoryBreadcrumbs(item.categorySlug, null),
+    ...getCategoryBreadcrumbs(
+      item.categorySlug,
+      null,
+      allCategories.value ?? [],
+    ),
     { label: item.title },
   ]
 })
@@ -55,7 +75,7 @@ const pdfFilename = computed(() => {
     <SkmContainer>
       <SkmPageHeader
         :title="product!.title"
-        :description="`${getManufacturerLabel(product!.manufacturerSlug)} · арт. ${product!.sku}`"
+        :description="`${manufacturerLabel(product!.manufacturerSlug)} · арт. ${product!.sku}`"
       >
         <template #breadcrumbs>
           <SkmBreadcrumbs :items="breadcrumbs" />
@@ -116,7 +136,7 @@ const pdfFilename = computed(() => {
         </div>
       </div>
 
-      <div v-if="similarProducts.length" class="mt-16">
+      <div v-if="similarProducts?.length" class="mt-16">
         <h2 class="text-xl font-semibold text-neutral-900">
           Похожие товары других производителей
         </h2>
@@ -126,9 +146,9 @@ const pdfFilename = computed(() => {
             :key="item.slug"
             :title="item.title"
             :to="`/product/${item.slug}`"
-            :manufacturer="getManufacturerLabel(item.manufacturerSlug)"
+            :manufacturer="manufacturerLabel(item.manufacturerSlug)"
             :sku="item.sku"
-            :badges="item.badges ? [...item.badges] : undefined"
+            :badges="mapProductBadges(item.badges)"
           />
         </div>
       </div>

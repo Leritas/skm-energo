@@ -10,6 +10,7 @@ import {
   CatalogCategoryQueryDto,
   CatalogCategoryResponseDto,
   CatalogFilterQueryDto,
+  CatalogManufacturerResponseDto,
   CatalogProductDetailResponseDto,
   CatalogProductListItemResponseDto,
 } from './dto/catalog.dto';
@@ -18,6 +19,13 @@ import {
 @Controller('catalog')
 export class CatalogController {
   constructor(private readonly catalogService: CatalogService) {}
+
+  @Public()
+  @Get('manufacturers')
+  @ApiOkResponse({ type: CatalogManufacturerResponseDto, isArray: true })
+  listManufacturers() {
+    return this.catalogService.listManufacturers();
+  }
 
   @Public()
   @Get('categories')

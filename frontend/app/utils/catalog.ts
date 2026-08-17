@@ -1,17 +1,12 @@
-import { CATALOG_CATEGORIES, type CatalogCategory } from '~/constants/catalog-categories'
-import {
-  MANUFACTURERS,
-  MOCK_PRODUCTS,
-  type Manufacturer,
-  type MockProduct,
-} from '~/constants/catalog-mocks'
+import type {
+  CatalogBreadcrumb,
+  CatalogCategory,
+  CatalogManufacturer,
+  CatalogProductDetail,
+  CatalogProductListItem,
+} from '~/types/catalog'
 
-export interface CatalogBreadcrumb {
-  label: string
-  to?: string
-}
-
-function findCategoryPath(
+export function findCategoryPath(
   categories: CatalogCategory[],
   targetSlug: string,
   trail: CatalogCategory[] = [],
@@ -31,105 +26,37 @@ function findCategoryPath(
   return null
 }
 
-export function getManufacturerBySlug(slug: string): Manufacturer | undefined {
-  return MANUFACTURERS.find((item) => item.slug === slug)
-}
-
-export function getManufacturerLabel(slug: string): string {
-  return getManufacturerBySlug(slug)?.label ?? slug
-}
-
-export function getProductBySlug(slug: string): MockProduct | undefined {
-  return MOCK_PRODUCTS.find((item) => item.slug === slug)
-}
-
-export function getDescendantSlugs(categorySlug: string): string[] {
-  const path = findCategoryPath(CATALOG_CATEGORIES, categorySlug)
-  if (!path) {
-    return [categorySlug]
+export function resolveCategoryFromPath(
+  pathSegments: string[],
+  categories: CatalogCategory[],
+): {
+  categorySlug: string | null
+  isValid: boolean
+} {
+  if (!pathSegments.length) {
+    return { categorySlug: null, isValid: true }
   }
 
-  const node = path[path.length - 1]
-  const slugs: string[] = [node.slug]
+  const categorySlug = pathSegments[pathSegments.length - 1]
+  const isValid = findCategoryPath(categories, categorySlug) !== null
+  return { categorySlug, isValid }
+}
 
-  function collect(children: CatalogCategory[] | undefined) {
-    if (!children) {
-      return
-    }
-    for (const child of children) {
-      slugs.push(child.slug)
-      collect(child.children)
-    }
+export function parseManufacturerQuery(
+  value: unknown,
+  manufacturers: CatalogManufacturer[] | null | undefined,
+): string | null {
+  if (typeof value !== 'string' || !value) {
+    return null
   }
-
-  collect(node.children)
-  return slugs
+  return manufacturers?.some((item) => item.slug === value) ? value : null
 }
 
-function productMatchesManufacturer(
-  product: MockProduct,
-  manufacturerSlug: string | null,
-): boolean {
-  return !manufacturerSlug || product.manufacturerSlug === manufacturerSlug
-}
-
-function productMatchesCategory(
-  product: MockProduct,
-  categorySlug: string | null,
-): boolean {
-  if (!categorySlug) {
-    return true
-  }
-  return getDescendantSlugs(categorySlug).includes(product.categorySlug)
-}
-
-export function getFilteredProducts(
-  categorySlug: string | null,
-  manufacturerSlug: string | null,
-): MockProduct[] {
-  return MOCK_PRODUCTS.filter(
-    (product) =>
-      productMatchesManufacturer(product, manufacturerSlug)
-      && productMatchesCategory(product, categorySlug),
-  )
-}
-
-function categoryHasProducts(
-  category: CatalogCategory,
-  manufacturerSlug: string | null,
-): boolean {
-  const slugs = getDescendantSlugs(category.slug)
-  return MOCK_PRODUCTS.some(
-    (product) =>
-      slugs.includes(product.categorySlug)
-      && productMatchesManufacturer(product, manufacturerSlug),
-  )
-}
-
-export function getVisibleCategoryTree(
-  manufacturerSlug: string | null,
-): CatalogCategory[] {
-  function filterTree(categories: CatalogCategory[]): CatalogCategory[] {
-    return categories
-      .map((category) => {
-        const children = category.children
-          ? filterTree(category.children)
-          : undefined
-        const hasProducts = categoryHasProducts(category, manufacturerSlug)
-
-        if (!hasProducts && !children?.length) {
-          return null
-        }
-
-        return {
-          ...category,
-          children: children?.length ? children : undefined,
-        }
-      })
-      .filter((item): item is CatalogCategory => item !== null)
-  }
-
-  return filterTree(CATALOG_CATEGORIES)
+export function getManufacturerLabel(
+  slug: string,
+  manufacturers: CatalogManufacturer[] | null | undefined,
+): string {
+  return manufacturers?.find((item) => item.slug === slug)?.label ?? slug
 }
 
 export function buildCatalogUrl(
@@ -146,6 +73,7 @@ export function buildCatalogUrl(
 export function getCategoryBreadcrumbs(
   categorySlug: string | null,
   manufacturerSlug: string | null,
+  categories: CatalogCategory[],
 ): CatalogBreadcrumb[] {
   const items: CatalogBreadcrumb[] = [
     { label: 'Главная', to: '/' },
@@ -156,7 +84,7 @@ export function getCategoryBreadcrumbs(
     return items
   }
 
-  const path = findCategoryPath(CATALOG_CATEGORIES, categorySlug)
+  const path = findCategoryPath(categories, categorySlug)
   if (!path) {
     return items
   }
@@ -172,33 +100,22 @@ export function getCategoryBreadcrumbs(
   return items
 }
 
-export function getSimilarProducts(product: MockProduct, limit = 3): MockProduct[] {
-  if (product.similarSlugs?.length) {
-    return product.similarSlugs
-      .map((slug) => getProductBySlug(slug))
-      .filter((item): item is MockProduct => item !== undefined)
-      .slice(0, limit)
+export function mapProductBadges(
+  badges: string[] | undefined,
+): Array<'pdf' | 'new' | 'onRequest'> | undefined {
+  if (!badges?.length) {
+    return undefined
   }
-
-  return MOCK_PRODUCTS.filter(
-    (item) =>
-      item.slug !== product.slug
-      && item.categorySlug === product.categorySlug
-      && item.manufacturerSlug !== product.manufacturerSlug,
-  ).slice(0, limit)
+  return badges.filter(
+    (badge): badge is 'pdf' | 'new' | 'onRequest' =>
+      badge === 'pdf' || badge === 'new' || badge === 'onRequest',
+  )
 }
 
-export function resolveCategoryFromPath(pathSegments: string[]): {
-  categorySlug: string | null
-  isValid: boolean
-} {
-  if (!pathSegments.length) {
-    return { categorySlug: null, isValid: true }
-  }
-
-  const categorySlug = pathSegments[pathSegments.length - 1]
-  const isValid = findCategoryPath(CATALOG_CATEGORIES, categorySlug) !== null
-  return { categorySlug, isValid }
+export type {
+  CatalogBreadcrumb,
+  CatalogCategory,
+  CatalogManufacturer,
+  CatalogProductDetail,
+  CatalogProductListItem,
 }
-
-export { CATALOG_CATEGORIES, MANUFACTURERS, MOCK_PRODUCTS }

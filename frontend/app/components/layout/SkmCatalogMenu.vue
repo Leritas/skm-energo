@@ -1,21 +1,15 @@
 <script setup lang="ts">
-import { MANUFACTURERS } from '~/constants/catalog-mocks'
-import { buildCatalogUrl, getVisibleCategoryTree } from '~/utils/catalog'
+import { buildCatalogUrl, parseManufacturerQuery } from '~/utils/catalog'
 
 const open = ref(false)
 const route = useRoute()
+const { data: manufacturers } = useCatalogManufacturers()
 
-const manufacturerSlug = computed(() => {
-  const value = route.query.manufacturer
-  if (typeof value !== 'string' || !value) {
-    return null
-  }
-  return MANUFACTURERS.some((item) => item.slug === value) ? value : null
-})
-
-const visibleCategories = computed(() =>
-  getVisibleCategoryTree(manufacturerSlug.value),
+const manufacturerSlug = computed(() =>
+  parseManufacturerQuery(route.query.manufacturer, manufacturers.value),
 )
+
+const { data: visibleCategories } = useCatalogCategories(manufacturerSlug)
 
 function isManufacturerActive(slug: string) {
   return manufacturerSlug.value === slug
@@ -56,7 +50,7 @@ function closeMenu() {
           </p>
           <div class="flex flex-wrap gap-2">
             <NuxtLink
-              v-for="manufacturer in MANUFACTURERS"
+              v-for="manufacturer in manufacturers ?? []"
               :key="manufacturer.slug"
               :to="manufacturerUrl(manufacturer.slug)"
               class="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"
@@ -80,7 +74,7 @@ function closeMenu() {
             Весь каталог
           </NuxtLink>
           <div
-            v-for="category in visibleCategories"
+            v-for="category in visibleCategories ?? []"
             :key="category.slug"
             class="border-b border-neutral-100 py-1 last:border-0"
           >

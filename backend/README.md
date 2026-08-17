@@ -93,6 +93,7 @@ Global prefix: **`/api`**
 | POST | `/api/users` | Create staff user (`canCreateUsers`) |
 | GET/POST/PATCH/DELETE | `/api/roles` | Roles CRUD |
 | PUT | `/api/users/:id/roles` | Assign roles |
+| GET | `/api/catalog/manufacturers` | Manufacturer list for catalog filters |
 | GET | `/api/catalog/categories` | Category tree (`?manufacturer=` hides empty branches) |
 | GET | `/api/catalog/products` | Product list (`?category=`, `?manufacturer=`) |
 | GET | `/api/catalog/products/:slug` | Product detail (SKU, specs, PDF) |
