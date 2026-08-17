@@ -6,6 +6,7 @@ function createPrismaMock(overrides: {
     findUnique?: jest.Mock;
     findMany?: jest.Mock;
   };
+  $queryRaw?: jest.Mock;
 }) {
   return {
     product: {
@@ -15,6 +16,7 @@ function createPrismaMock(overrides: {
     },
     manufacturer: { findUnique: jest.fn() },
     category: { findUnique: jest.fn() },
+    $queryRaw: overrides.$queryRaw ?? jest.fn(),
   };
 }
 
@@ -149,5 +151,49 @@ describe('CatalogService', () => {
     expect(prisma.product.findMany).toHaveBeenCalledWith(
       expect.objectContaining({ take: 2 }),
     );
+  });
+
+  it('returns an empty list for blank search queries', async () => {
+    const prisma = createPrismaMock({});
+
+    const service = new CatalogService(prisma as never);
+    const result = await service.searchProducts('   ');
+
+    expect(result).toEqual([]);
+    expect(prisma.$queryRaw).not.toHaveBeenCalled();
+  });
+
+  it('searches products by title, sku, and manufacturer name', async () => {
+    const prisma = createPrismaMock({
+      $queryRaw: jest.fn().mockResolvedValue([
+        {
+          slug: 'nh00-160a',
+          title: 'Предохранитель NH00 160A',
+          sku: 'NH00-160',
+          badges: ['pdf'],
+          manufacturerSlug: 'mersen',
+          categorySlug: 'nizkovoltnye-predohraniteli',
+        },
+      ]),
+    });
+    prisma.manufacturer.findUnique.mockResolvedValue({ slug: 'mersen' });
+
+    const service = new CatalogService(prisma as never);
+    const result = await service.searchProducts('NH00', null, 'mersen', 10);
+
+    expect(prisma.$queryRaw).toHaveBeenCalledTimes(1);
+    expect(prisma.manufacturer.findUnique).toHaveBeenCalledWith({
+      where: { slug: 'mersen' },
+    });
+    expect(result).toEqual([
+      {
+        slug: 'nh00-160a',
+        title: 'Предохранитель NH00 160A',
+        sku: 'NH00-160',
+        badges: ['pdf'],
+        manufacturerSlug: 'mersen',
+        categorySlug: 'nizkovoltnye-predohraniteli',
+      },
+    ]);
   });
 });

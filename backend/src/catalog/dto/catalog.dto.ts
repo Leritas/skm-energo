@@ -20,6 +20,44 @@ export class CatalogFilterQueryDto {
   manufacturer?: string;
 }
 
+export class CatalogSearchQueryDto {
+  @ApiProperty({
+    description: 'Search query matched against title, SKU, and manufacturer name',
+    example: 'NH00',
+  })
+  @IsString()
+  q!: string;
+
+  @ApiPropertyOptional({
+    description: 'Category slug to scope search',
+    example: 'nizkovoltnye-predohraniteli',
+  })
+  @IsOptional()
+  @IsString()
+  category?: string;
+
+  @ApiPropertyOptional({
+    description: 'Manufacturer slug to scope search',
+    example: 'mersen',
+  })
+  @IsOptional()
+  @IsString()
+  manufacturer?: string;
+
+  @ApiPropertyOptional({
+    description: 'Maximum number of search results',
+    default: 50,
+    minimum: 1,
+    maximum: 100,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number;
+}
+
 export class CatalogSimilarQueryDto {
   @ApiPropertyOptional({
     description: 'Maximum number of similar products to return',

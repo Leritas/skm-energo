@@ -13,6 +13,7 @@ import {
   CatalogManufacturerResponseDto,
   CatalogProductDetailResponseDto,
   CatalogProductListItemResponseDto,
+  CatalogSearchQueryDto,
   CatalogSimilarQueryDto,
 } from './dto/catalog.dto';
 
@@ -33,6 +34,18 @@ export class CatalogController {
   @ApiOkResponse({ type: CatalogCategoryResponseDto, isArray: true })
   getCategories(@Query() query: CatalogCategoryQueryDto) {
     return this.catalogService.getCategoryTree(query.manufacturer ?? null);
+  }
+
+  @Public()
+  @Get('search')
+  @ApiOkResponse({ type: CatalogProductListItemResponseDto, isArray: true })
+  searchProducts(@Query() query: CatalogSearchQueryDto) {
+    return this.catalogService.searchProducts(
+      query.q,
+      query.category ?? null,
+      query.manufacturer ?? null,
+      query.limit ?? 50,
+    );
   }
 
   @Public()
