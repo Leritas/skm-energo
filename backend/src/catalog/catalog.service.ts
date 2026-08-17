@@ -2,10 +2,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   filterProductsByCatalogFilter,
   filterVisibleCategoryTree,
+  getDescendantCategorySlugs,
   type CatalogCategoryNode,
   type CatalogProductRef,
 } from './catalog-tree';
@@ -116,6 +118,87 @@ export class CatalogService {
       specs: this.parseSpecs(product.specs),
       pdfHref: product.pdfHref,
     };
+  }
+
+  async searchProducts(
+    query: string,
+    categorySlug: string | null,
+    manufacturerSlug: string | null,
+    limit = 50,
+  ): Promise<CatalogProductListItemDto[]> {
+    const term = query.trim();
+    if (!term) {
+      return [];
+    }
+
+    await this.assertManufacturerExists(manufacturerSlug);
+    if (categorySlug) {
+      await this.assertCategoryExists(categorySlug);
+    }
+
+    let categorySlugs: string[] | null = null;
+    if (categorySlug) {
+      const categories = await this.loadCategoryTree();
+      categorySlugs = getDescendantCategorySlugs(categories, categorySlug);
+    }
+
+    const pattern = `%${term}%`;
+    const categoryFilter = categorySlugs
+      ? Prisma.sql`AND c.slug IN (${Prisma.join(categorySlugs)})`
+      : Prisma.empty;
+    const manufacturerFilter = manufacturerSlug
+      ? Prisma.sql`AND m.slug = ${manufacturerSlug}`
+      : Prisma.empty;
+
+    const rows = await this.prisma.$queryRaw<
+      Array<{
+        slug: string;
+        title: string;
+        sku: string;
+        badges: string[];
+        manufacturerSlug: string;
+        categorySlug: string;
+      }>
+    >(Prisma.sql`
+      SELECT
+        p.slug,
+        p.title,
+        p.sku,
+        p.badges,
+        m.slug AS "manufacturerSlug",
+        c.slug AS "categorySlug"
+      FROM "Product" p
+      INNER JOIN "Manufacturer" m ON p."manufacturerId" = m.id
+      INNER JOIN "Category" c ON p."categoryId" = c.id
+      WHERE (
+        p.title ILIKE ${pattern}
+        OR p.sku ILIKE ${pattern}
+        OR m.name ILIKE ${pattern}
+        OR p.title % ${term}
+        OR p.sku % ${term}
+        OR m.name % ${term}
+      )
+      ${categoryFilter}
+      ${manufacturerFilter}
+      ORDER BY GREATEST(
+        similarity(p.title, ${term}),
+        similarity(p.sku, ${term}),
+        similarity(m.name, ${term})
+      ) DESC,
+      p.title ASC
+      LIMIT ${limit}
+    `);
+
+    return rows.map((row) =>
+      this.toListItem({
+        slug: row.slug,
+        title: row.title,
+        sku: row.sku,
+        badges: row.badges,
+        manufacturer: { slug: row.manufacturerSlug },
+        category: { slug: row.categorySlug },
+      }),
+    );
   }
 
   async listSimilarProducts(

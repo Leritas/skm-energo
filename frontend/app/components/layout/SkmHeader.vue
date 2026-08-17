@@ -1,19 +1,10 @@
 <script setup lang="ts">
-import { MAIN_NAV } from '~/constants/navigation'
-import { SITE } from '~/constants/site'
+import { MAIN_NAV } from '~/constants/navigation';
+import { SITE } from '~/constants/site';
 
-const mobileNavOpen = ref(false)
-const callModalOpen = ref(false)
-
-const toast = useToast()
-
-function handleSearch() {
-  toast.add({
-    title: 'Поиск',
-    description: 'Используйте поиск в каталоге или свяжитесь с менеджером.',
-    color: 'neutral',
-  })
-}
+const mobileNavOpen = ref(false);
+const callModalOpen = ref(false);
+const searchModalOpen = ref(false);
 </script>
 
 <template>
@@ -28,7 +19,7 @@ function handleSearch() {
             src="/logo.jpg"
             alt="СКМ-Энергосервис"
             class="h-9 w-auto md:h-10 lg:h-12"
-          >
+          />
         </NuxtLink>
 
         <!-- Desktop nav (768+) -->
@@ -75,7 +66,7 @@ function handleSearch() {
             variant="ghost"
             icon="i-lucide-search"
             aria-label="Поиск"
-            @click="handleSearch"
+            @click="searchModalOpen = true"
           />
           <SkmUserMenu />
         </div>
@@ -92,7 +83,7 @@ function handleSearch() {
             variant="ghost"
             icon="i-lucide-search"
             aria-label="Поиск"
-            @click="handleSearch"
+            @click="searchModalOpen = true"
           />
           <SkmUserMenu />
           <SkmButton
@@ -105,7 +96,11 @@ function handleSearch() {
       </div>
     </SkmContainer>
 
-    <SkmMobileNav v-model:open="mobileNavOpen" @call-order="callModalOpen = true" />
+    <SkmMobileNav
+      v-model:open="mobileNavOpen"
+      @call-order="callModalOpen = true"
+    />
     <SkmCallOrderModal v-model:open="callModalOpen" />
+    <SkmSearchModal v-model:open="searchModalOpen" />
   </header>
 </template>

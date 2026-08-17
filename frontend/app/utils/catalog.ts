@@ -57,15 +57,30 @@ export function getManufacturerLabel(
   return manufacturers?.find((item) => item.slug === slug)?.label ?? slug;
 }
 
+export function parseSearchQuery(value: unknown): string {
+  if (typeof value !== 'string') {
+    return '';
+  }
+  return value.trim();
+}
+
 export function buildCatalogUrl(
   categorySlug?: string | null,
   manufacturerSlug?: string | null,
+  searchQuery?: string | null,
 ): string {
   const path = categorySlug ? `/catalog/${categorySlug}` : '/catalog';
-  if (!manufacturerSlug) {
-    return path;
+  const params = new URLSearchParams();
+
+  if (manufacturerSlug) {
+    params.set('manufacturer', manufacturerSlug);
   }
-  return `${path}?manufacturer=${manufacturerSlug}`;
+  if (searchQuery?.trim()) {
+    params.set('q', searchQuery.trim());
+  }
+
+  const query = params.toString();
+  return query ? `${path}?${query}` : path;
 }
 
 export function getCategoryBreadcrumbs(

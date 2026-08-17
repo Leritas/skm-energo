@@ -3,6 +3,7 @@ import {
   getCategoryBreadcrumbs,
   getManufacturerLabel,
   parseManufacturerQuery,
+  parseSearchQuery,
   resolveCategoryFromPath,
 } from '~/utils/catalog';
 
@@ -30,6 +31,8 @@ export async function useCatalog() {
     parseManufacturerQuery(route.query.manufacturer, manufacturers.value),
   );
 
+  const searchQuery = computed(() => parseSearchQuery(route.query.q));
+
   const { data: visibleCategories } =
     await useCatalogCategories(manufacturerSlug);
   const { data: products } = await useCatalogProducts(
@@ -48,16 +51,25 @@ export async function useCatalog() {
   function catalogUrl(
     nextCategorySlug?: string | null,
     nextManufacturerSlug?: string | null,
+    nextSearchQuery?: string | null,
   ) {
     const manufacturer =
       nextManufacturerSlug === undefined
         ? manufacturerSlug.value
         : nextManufacturerSlug;
-    return buildCatalogUrl(nextCategorySlug, manufacturer);
+    const search =
+      nextSearchQuery === undefined ? searchQuery.value : nextSearchQuery;
+    return buildCatalogUrl(nextCategorySlug, manufacturer, search);
   }
 
   async function setManufacturer(nextManufacturerSlug: string | null) {
-    await navigateTo(buildCatalogUrl(categorySlug.value, nextManufacturerSlug));
+    await navigateTo(
+      buildCatalogUrl(
+        categorySlug.value,
+        nextManufacturerSlug,
+        searchQuery.value,
+      ),
+    );
   }
 
   function manufacturerLabel(slug: string) {
@@ -70,6 +82,7 @@ export async function useCatalog() {
     categorySlug,
     isValidCategory,
     manufacturerSlug,
+    searchQuery,
     visibleCategories,
     products,
     breadcrumbs,

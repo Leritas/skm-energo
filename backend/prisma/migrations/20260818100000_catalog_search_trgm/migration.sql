@@ -1,0 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+CREATE INDEX "Product_title_trgm_idx" ON "Product" USING GIN (title gin_trgm_ops);
+CREATE INDEX "Product_sku_trgm_idx" ON "Product" USING GIN (sku gin_trgm_ops);
+CREATE INDEX "Manufacturer_name_trgm_idx" ON "Manufacturer" USING GIN (name gin_trgm_ops);

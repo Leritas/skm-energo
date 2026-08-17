@@ -86,6 +86,43 @@ export async function useCatalogProduct(slug: MaybeRefOrGetter<string>) {
   );
 }
 
+export async function useCatalogSearch(
+  searchQuery: MaybeRefOrGetter<string>,
+  categorySlug: MaybeRefOrGetter<string | null>,
+  manufacturerSlug: MaybeRefOrGetter<string | null>,
+) {
+  const { api } = useApi();
+
+  return await useAsyncData(
+    () => {
+      const q = toValue(searchQuery).trim();
+      return `catalog-search-${q}-${toValue(categorySlug) ?? 'all'}-${toValue(manufacturerSlug) ?? 'all'}`;
+    },
+    () => {
+      const q = toValue(searchQuery).trim();
+      if (!q) {
+        return Promise.resolve([] as CatalogProductListItem[]);
+      }
+
+      return api<CatalogProductListItem[]>(
+        `/catalog/search${buildCatalogQuery({
+          q,
+          category: toValue(categorySlug) ?? undefined,
+          manufacturer: toValue(manufacturerSlug) ?? undefined,
+        })}`,
+        { auth: false },
+      );
+    },
+    {
+      watch: [
+        () => toValue(searchQuery),
+        () => toValue(categorySlug),
+        () => toValue(manufacturerSlug),
+      ],
+    },
+  );
+}
+
 export async function useCatalogSimilarProducts(
   slug: MaybeRefOrGetter<string>,
   limit = 3,
