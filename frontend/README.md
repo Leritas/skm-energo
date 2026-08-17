@@ -9,15 +9,15 @@
 
 ## Стек
 
-| | |
-|---|---|
-| Framework | Nuxt 4.4 |
-| UI | Vue 3.5, Nuxt UI v4 (через SKM wrappers), Tailwind CSS v4 |
-| State | Pinia |
-| Utils | VueUse |
-| Storybook | 10.4 (standalone, `@storybook/vue3-vite`) |
-| Lint | ESLint 9 + `@nuxt/eslint` + guardrail `skm-ui-kit/no-raw-nuxt-ui` |
-| Язык | TypeScript |
+|           |                                                                   |
+| --------- | ----------------------------------------------------------------- |
+| Framework | Nuxt 4.4                                                          |
+| UI        | Vue 3.5, Nuxt UI v4 (через SKM wrappers), Tailwind CSS v4         |
+| State     | Pinia                                                             |
+| Utils     | VueUse                                                            |
+| Storybook | 10.4 (standalone, `@storybook/vue3-vite`)                         |
+| Lint      | ESLint 9 + `@nuxt/eslint` + guardrail `skm-ui-kit/no-raw-nuxt-ui` |
+| Язык      | TypeScript                                                        |
 
 ## Команды
 
@@ -38,25 +38,25 @@ npm run lint:fix    # ESLint --fix
 cp .env.example .env
 ```
 
-| Переменная | Описание | Значение по умолчанию |
-|------------|----------|----------------------|
-| `NUXT_PUBLIC_API_BASE` | Base URL NestJS API | `http://localhost:3001/api` |
-| `NUXT_PUBLIC_SITE_URL` | Канонический URL сайта (sitemap) | `https://skmenergo.ru` |
+| Переменная             | Описание                         | Значение по умолчанию       |
+| ---------------------- | -------------------------------- | --------------------------- |
+| `NUXT_PUBLIC_API_BASE` | Base URL NestJS API              | `http://localhost:3001/api` |
+| `NUXT_PUBLIC_SITE_URL` | Канонический URL сайта (sitemap) | `https://skmenergo.ru`      |
 
 ## SKM UI Kit
 
 Дизайн-система проекта: тонкие `Skm*` обёртки над Nuxt UI + layout-примитивы + domain-карточки.
 
-| Doc | Статус |
-|-----|--------|
-| [Design spec (foundation)](../docs/superpowers/specs/2026-07-13-skm-ui-kit-design.md) | ✅ historical |
-| [Domain roadmap Waves A–C](../docs/superpowers/specs/2026-07-20-skm-ui-kit-roadmap.md) | ✅ historical |
-| [Admin UI Kit (future)](../docs/superpowers/specs/2026-07-21-skm-admin-ui-kit.md) | Draft — не начат |
+| Doc                                                                                    | Статус           |
+| -------------------------------------------------------------------------------------- | ---------------- |
+| [Design spec (foundation)](../docs/superpowers/specs/2026-07-13-skm-ui-kit-design.md)  | ✅ historical    |
+| [Domain roadmap Waves A–C](../docs/superpowers/specs/2026-07-20-skm-ui-kit-roadmap.md) | ✅ historical    |
+| [Admin UI Kit (future)](../docs/superpowers/specs/2026-07-21-skm-admin-ui-kit.md)      | Draft — не начат |
 
 ### Импорт
 
 ```ts
-import { SkmButton, SkmInput, SkmModal } from '@skm/components'
+import { SkmButton, SkmInput, SkmModal } from '@skm/components';
 ```
 
 Не импортируйте `*.vue` напрямую и не тяните `presets.ts` в pages/layout — только через wrappers в `app/components/ui/`.
@@ -84,12 +84,12 @@ app/components/
 
 ### Правила
 
-| ✅ Do | ❌ Don't |
-|------|---------|
-| `<SkmButton variant="primary">` | `<UButton>` в pages / layout / home |
-| `<SkmInput variant="onBrand">` | `class="!bg-white"` на сыром `UInput` |
+| ✅ Do                                             | ❌ Don't                              |
+| ------------------------------------------------- | ------------------------------------- |
+| `<SkmButton variant="primary">`                   | `<UButton>` в pages / layout / home   |
+| `<SkmInput variant="onBrand">`                    | `class="!bg-white"` на сыром `UInput` |
 | `tone="brand"` на кнопках поверх `brand-purple-*` | Импорт `presets` вне `components/ui/` |
-| Layout использует `Skm*` | Новые `App*` компоненты |
+| Layout использует `Skm*`                          | Новые `App*` компоненты               |
 
 **Allowlist без обёртки (пока):** `UIcon`.
 
@@ -99,12 +99,12 @@ ESLint-правило `skm-ui-kit/no-raw-nuxt-ui` запрещает сырые 
 
 White-first B2B. Акцент из логотипа (`public/logo.jpg`):
 
-| Token | Light | Роль |
-|-------|-------|------|
-| `accent-500` | `#E85D04` | Primary CTA, active nav |
-| `accent-300` | `#FDBA74` | Hover, focus |
-| `neutral-*` | gray scale | Фон, текст, borders |
-| `brand-purple-950` | `#2E1065` | Brand-поверхности (секции, onBrand) |
+| Token              | Light      | Роль                                |
+| ------------------ | ---------- | ----------------------------------- |
+| `accent-500`       | `#E85D04`  | Primary CTA, active nav             |
+| `accent-300`       | `#FDBA74`  | Hover, focus                        |
+| `neutral-*`        | gray scale | Фон, текст, borders                 |
+| `brand-purple-950` | `#2E1065`  | Brand-поверхности (секции, onBrand) |
 
 Токены: `app/assets/css/main.css`, тема Nuxt UI: `app/app.config.ts` (`primary: accent`).
 
@@ -128,49 +128,49 @@ frontend/
 
 ## Маршруты
 
-| Путь | Описание | SSR |
-|------|----------|-----|
-| `/` | Главная (hero, направления, about-teaser) | ✅ |
-| `/about` | О компании | ✅ |
-| `/services` | Услуги | ✅ |
-| `/contacts` | Контакты + форма (UI) | ✅ |
-| `/catalog/**` | Category-first каталог на mock-данных (Stage 1b ✅; live API — #6) | ✅ |
-| `/product/[slug]` | Карточка товара на mock (Stage 1b ✅; live API — #6) | ✅ |
-| `/news/**` | Список + detail на mock (Stage 1b ✅; live API — #7) | ✅ |
-| `/login` | Вход | ✅ |
-| `/register` | Регистрация покупателя | ✅ |
-| `/profile/**` | Личный кабинет — P0 shell ✅, P1 info API ✅; orders/favorites mocks | ✅ partial |
-| `/account` | Redirect → `/profile` | ✅ |
-| `/admin` | Админ-панель (заглушка, `hasAccessToAdmin`) | — |
+| Путь              | Описание                                                             | SSR        |
+| ----------------- | -------------------------------------------------------------------- | ---------- |
+| `/`               | Главная (hero, направления, about-teaser)                            | ✅         |
+| `/about`          | О компании                                                           | ✅         |
+| `/services`       | Услуги                                                               | ✅         |
+| `/contacts`       | Контакты + форма (UI)                                                | ✅         |
+| `/catalog/**`     | Category-first каталог (live catalog API, #6 ✅)                     | ✅         |
+| `/product/[slug]` | Карточка товара (live catalog API, #6 ✅)                            | ✅         |
+| `/news/**`        | Список + detail на mock (Stage 1b ✅; live API — #7)                 | ✅         |
+| `/login`          | Вход                                                                 | ✅         |
+| `/register`       | Регистрация покупателя                                               | ✅         |
+| `/profile/**`     | Личный кабинет — P0 shell ✅, P1 info API ✅; orders/favorites mocks | ✅ partial |
+| `/account`        | Redirect → `/profile`                                                | ✅         |
+| `/admin`          | Админ-панель (заглушка, `hasAccessToAdmin`)                          | —          |
 
 ## Auth & профиль
 
-| Doc | Описание |
-|-----|----------|
-| [Auth RBAC design](../docs/superpowers/specs/2026-07-21-auth-roles-permissions-design.md) | JWT, permissions, роли |
-| [Account & header](../docs/superpowers/specs/2026-07-23-account-profile-header.md) | `SkmUserMenu` |
+| Doc                                                                                         | Описание                        |
+| ------------------------------------------------------------------------------------------- | ------------------------------- |
+| [Auth RBAC design](../docs/superpowers/specs/2026-07-21-auth-roles-permissions-design.md)   | JWT, permissions, роли          |
+| [Account & header](../docs/superpowers/specs/2026-07-23-account-profile-header.md)          | `SkmUserMenu`                   |
 | [Personal profile roadmap](../docs/superpowers/specs/2026-07-30-personal-profile-design.md) | `/profile/*` shell + API phases |
 
 ### Компоненты
 
-| Компонент | Где | Назначение |
-|-----------|-----|------------|
-| `SkmUserMenu` | Header (desktop + mobile) | Popover: login/register или кабинет/админ/выход |
-| `app/stores/auth.ts` | Pinia | Сессия, tokens в `localStorage` |
-| `app/middleware/auth.ts` | `/profile/**` | Редирект на `/login` без сессии (**client-only** — см. auth spec, #20) |
-| `app/middleware/admin.ts` | `/admin` | Требует `hasAccessToAdmin` (client-only) |
+| Компонент                 | Где                       | Назначение                                                             |
+| ------------------------- | ------------------------- | ---------------------------------------------------------------------- |
+| `SkmUserMenu`             | Header (desktop + mobile) | Popover: login/register или кабинет/админ/выход                        |
+| `app/stores/auth.ts`      | Pinia                     | Сессия, tokens в `localStorage`                                        |
+| `app/middleware/auth.ts`  | `/profile/**`             | Редирект на `/login` без сессии (**client-only** — см. auth spec, #20) |
+| `app/middleware/admin.ts` | `/admin`                  | Требует `hasAccessToAdmin` (client-only)                               |
 
 Иконка профиля в header видна на всех публичных страницах. После входа данные подтягиваются через `GET /api/auth/me`.
 
 ## Модули Nuxt
 
-| Модуль | Назначение |
-|--------|------------|
-| `@nuxt/eslint` | ESLint flat config |
-| `@nuxt/ui` | UI primitives (только внутри `components/ui/`) |
-| `@pinia/nuxt` | State management |
-| `@vueuse/nuxt` | Composables |
-| `@nuxtjs/sitemap` | `/sitemap.xml` |
+| Модуль            | Назначение                                     |
+| ----------------- | ---------------------------------------------- |
+| `@nuxt/eslint`    | ESLint flat config                             |
+| `@nuxt/ui`        | UI primitives (только внутри `components/ui/`) |
+| `@pinia/nuxt`     | State management                               |
+| `@vueuse/nuxt`    | Composables                                    |
+| `@nuxtjs/sitemap` | `/sitemap.xml`                                 |
 
 ## SEO
 

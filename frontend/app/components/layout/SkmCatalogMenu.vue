@@ -1,29 +1,27 @@
 <script setup lang="ts">
-import { buildCatalogUrl, parseManufacturerQuery } from '~/utils/catalog'
+import { buildCatalogUrl, parseManufacturerQuery } from '~/utils/catalog';
 
-const open = ref(false)
-const route = useRoute()
-const { data: manufacturers } = useCatalogManufacturers()
+const open = ref(false);
+const route = useRoute();
+const { data: manufacturers } = await useCatalogManufacturers();
 
 const manufacturerSlug = computed(() =>
   parseManufacturerQuery(route.query.manufacturer, manufacturers.value),
-)
+);
 
-const { data: visibleCategories } = useCatalogCategories(manufacturerSlug)
+const { data: visibleCategories } =
+  await useCatalogCategories(manufacturerSlug);
 
 function isManufacturerActive(slug: string) {
-  return manufacturerSlug.value === slug
+  return manufacturerSlug.value === slug;
 }
 
 function manufacturerUrl(slug: string) {
-  return buildCatalogUrl(
-    null,
-    isManufacturerActive(slug) ? null : slug,
-  )
+  return buildCatalogUrl(null, isManufacturerActive(slug) ? null : slug);
 }
 
 function closeMenu() {
-  open.value = false
+  open.value = false;
 }
 </script>
 
@@ -45,7 +43,9 @@ function closeMenu() {
     <template #content>
       <div class="w-[22rem] py-3">
         <div class="border-b border-neutral-100 px-4 pb-3">
-          <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          <p
+            class="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500"
+          >
             Производители
           </p>
           <div class="flex flex-wrap gap-2">
@@ -58,7 +58,9 @@ function closeMenu() {
             >
               <SkmBadge
                 :label="manufacturer.label"
-                :tone="isManufacturerActive(manufacturer.slug) ? 'accent' : 'neutral'"
+                :tone="
+                  isManufacturerActive(manufacturer.slug) ? 'accent' : 'neutral'
+                "
                 size="sm"
               />
             </NuxtLink>

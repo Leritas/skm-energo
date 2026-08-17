@@ -18,10 +18,10 @@ function buildCatalogQuery(
   return query ? `?${query}` : '';
 }
 
-export function useCatalogManufacturers() {
+export async function useCatalogManufacturers() {
   const { api } = useApi();
 
-  return useAsyncData('catalog-manufacturers', () =>
+  return await useAsyncData('catalog-manufacturers', () =>
     api<CatalogManufacturer[]>('/catalog/manufacturers', { auth: false }),
   );
 }
@@ -34,12 +34,12 @@ export async function useCatalogAllCategories() {
   );
 }
 
-export function useCatalogCategories(
+export async function useCatalogCategories(
   manufacturerSlug: MaybeRefOrGetter<string | null>,
 ) {
   const { api } = useApi();
 
-  return useAsyncData(
+  return await useAsyncData(
     () => `catalog-categories-${toValue(manufacturerSlug) ?? 'all'}`,
     () =>
       api<CatalogCategory[]>(
@@ -50,13 +50,13 @@ export function useCatalogCategories(
   );
 }
 
-export function useCatalogProducts(
+export async function useCatalogProducts(
   categorySlug: MaybeRefOrGetter<string | null>,
   manufacturerSlug: MaybeRefOrGetter<string | null>,
 ) {
   const { api } = useApi();
 
-  return useAsyncData(
+  return await useAsyncData(
     () =>
       `catalog-products-${toValue(categorySlug) ?? 'all'}-${toValue(manufacturerSlug) ?? 'all'}`,
     () =>
@@ -86,14 +86,10 @@ export async function useCatalogProduct(slug: MaybeRefOrGetter<string>) {
   );
 }
 
-export async function fetchSimilarProducts(
+async function loadSimilarBySlugs(
   similarSlugs: string[],
-  limit = 3,
+  limit: number,
 ): Promise<CatalogProductListItem[]> {
-  if (!similarSlugs.length) {
-    return [];
-  }
-
   const { api } = useApi();
   const results = await Promise.allSettled(
     similarSlugs.slice(0, limit).map((similarSlug) =>
@@ -106,4 +102,30 @@ export async function fetchSimilarProducts(
   return results.flatMap((result) =>
     result.status === 'fulfilled' ? [result.value] : [],
   );
+}
+
+export async function fetchSimilarProducts(
+  product: CatalogProductDetail,
+  limit = 3,
+): Promise<CatalogProductListItem[]> {
+  if (product.similarSlugs.length) {
+    const similar = await loadSimilarBySlugs(product.similarSlugs, limit);
+    if (similar.length) {
+      return similar;
+    }
+  }
+
+  const { api } = useApi();
+  const categoryProducts = await api<CatalogProductListItem[]>(
+    `/catalog/products${buildCatalogQuery({ category: product.categorySlug })}`,
+    { auth: false },
+  );
+
+  return categoryProducts
+    .filter(
+      (item) =>
+        item.slug !== product.slug &&
+        item.manufacturerSlug !== product.manufacturerSlug,
+    )
+    .slice(0, limit);
 }

@@ -13,14 +13,14 @@ Frontend не обращается к БД напрямую — только ч�
 
 ## Стек
 
-| | |
-|---|---|
-| Framework | NestJS 11 |
-| ORM | Prisma 6 |
-| БД | PostgreSQL 16 |
+|            |                                    |
+| ---------- | ---------------------------------- |
+| Framework  | NestJS 11                          |
+| ORM        | Prisma 6                           |
+| БД         | PostgreSQL 16                      |
 | Validation | class-validator, class-transformer |
-| Docs | Swagger (OpenAPI) |
-| Config | @nestjs/config (.env) |
+| Docs       | Swagger (OpenAPI)                  |
+| Config     | @nestjs/config (.env)              |
 
 ## Команды
 
@@ -61,43 +61,43 @@ npm run prisma:studio     # GUI для просмотра данных → http:
 cp .env.example .env
 ```
 
-| Переменная | Описание | По умолчанию |
-|------------|----------|--------------|
-| `PORT` | Порт HTTP-сервера | `3001` |
-| `CORS_ORIGIN` | Allowed origin для CORS | `http://localhost:3000` |
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://skm:skm@localhost:5433/skm_energo?schema=public` |
-| `JWT_ACCESS_SECRET` | Secret for access JWT | (required) |
-| `JWT_REFRESH_SECRET` | Reserved for refresh signing (tokens are opaque hashed in DB) | (required) |
-| `JWT_ACCESS_TTL` | Access token TTL | `15m` |
-| `JWT_REFRESH_TTL` | Refresh token TTL | `7d` |
-| `SEED_ADMIN_EMAIL` | Seed admin email | `admin@skmenergo.ru` |
-| `SEED_ADMIN_PASSWORD` | Seed admin password | `ChangeMeAdmin1!` |
+| Переменная            | Описание                                                      | По умолчанию                                                   |
+| --------------------- | ------------------------------------------------------------- | -------------------------------------------------------------- |
+| `PORT`                | Порт HTTP-сервера                                             | `3001`                                                         |
+| `CORS_ORIGIN`         | Allowed origin для CORS                                       | `http://localhost:3000`                                        |
+| `DATABASE_URL`        | PostgreSQL connection string                                  | `postgresql://skm:skm@localhost:5433/skm_energo?schema=public` |
+| `JWT_ACCESS_SECRET`   | Secret for access JWT                                         | (required)                                                     |
+| `JWT_REFRESH_SECRET`  | Reserved for refresh signing (tokens are opaque hashed in DB) | (required)                                                     |
+| `JWT_ACCESS_TTL`      | Access token TTL                                              | `15m`                                                          |
+| `JWT_REFRESH_TTL`     | Refresh token TTL                                             | `7d`                                                           |
+| `SEED_ADMIN_EMAIL`    | Seed admin email                                              | `admin@skmenergo.ru`                                           |
+| `SEED_ADMIN_PASSWORD` | Seed admin password                                           | `ChangeMeAdmin1!`                                              |
 
-PostgreSQL поднимается через `docker compose up -d` из корня монорепы (порт **5433** → контейнер 5432).
+PostgreSQL поднимается через `docker-compose up -d` из корня монорепы (порт **5433** → контейнер 5432).
 
 ## API
 
 Global prefix: **`/api`**
 
-| Метод | URL | Описание |
-|-------|-----|----------|
-| GET | `/api` | Hello (default NestJS controller) |
-| GET | `/api/health` | Health check → `{ status, timestamp }` |
-| POST | `/api/auth/register` | Public registration → role `user` |
-| POST | `/api/auth/login` | Login → tokens + user |
-| POST | `/api/auth/refresh` | Refresh tokens |
-| POST | `/api/auth/logout` | Revoke refresh (JWT) |
-| GET | `/api/auth/me` | Current user + permissions (JWT) |
-| PATCH | `/api/profile` | Update B2B profile fields (JWT) |
-| POST | `/api/profile/change-password` | Change password; revokes refresh tokens (JWT) |
-| POST | `/api/users` | Create staff user (`canCreateUsers`) |
-| GET/POST/PATCH/DELETE | `/api/roles` | Roles CRUD |
-| PUT | `/api/users/:id/roles` | Assign roles |
-| GET | `/api/catalog/manufacturers` | Manufacturer list for catalog filters |
-| GET | `/api/catalog/categories` | Category tree (`?manufacturer=` hides empty branches) |
-| GET | `/api/catalog/products` | Product list (`?category=`, `?manufacturer=`) |
-| GET | `/api/catalog/products/:slug` | Product detail (SKU, specs, PDF) |
-| GET | `/api/docs` | Swagger UI |
+| Метод                 | URL                            | Описание                                              |
+| --------------------- | ------------------------------ | ----------------------------------------------------- |
+| GET                   | `/api`                         | Hello (default NestJS controller)                     |
+| GET                   | `/api/health`                  | Health check → `{ status, timestamp }`                |
+| POST                  | `/api/auth/register`           | Public registration → role `user`                     |
+| POST                  | `/api/auth/login`              | Login → tokens + user                                 |
+| POST                  | `/api/auth/refresh`            | Refresh tokens                                        |
+| POST                  | `/api/auth/logout`             | Revoke refresh (JWT)                                  |
+| GET                   | `/api/auth/me`                 | Current user + permissions (JWT)                      |
+| PATCH                 | `/api/profile`                 | Update B2B profile fields (JWT)                       |
+| POST                  | `/api/profile/change-password` | Change password; revokes refresh tokens (JWT)         |
+| POST                  | `/api/users`                   | Create staff user (`canCreateUsers`)                  |
+| GET/POST/PATCH/DELETE | `/api/roles`                   | Roles CRUD                                            |
+| PUT                   | `/api/users/:id/roles`         | Assign roles                                          |
+| GET                   | `/api/catalog/manufacturers`   | Manufacturer list for catalog filters                 |
+| GET                   | `/api/catalog/categories`      | Category tree (`?manufacturer=` hides empty branches) |
+| GET                   | `/api/catalog/products`        | Product list (`?category=`, `?manufacturer=`)         |
+| GET                   | `/api/catalog/products/:slug`  | Product detail (SKU, specs, PDF)                      |
+| GET                   | `/api/docs`                    | Swagger UI                                            |
 
 Пример health check:
 

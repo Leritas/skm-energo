@@ -8,7 +8,7 @@ import {
 
 export async function useCatalog() {
   const route = useRoute();
-  const { data: manufacturers } = useCatalogManufacturers();
+  const { data: manufacturers } = await useCatalogManufacturers();
   const { data: allCategories } = await useCatalogAllCategories();
 
   const categoryPath = computed(() => {
@@ -30,8 +30,12 @@ export async function useCatalog() {
     parseManufacturerQuery(route.query.manufacturer, manufacturers.value),
   );
 
-  const { data: visibleCategories } = useCatalogCategories(manufacturerSlug);
-  const { data: products } = useCatalogProducts(categorySlug, manufacturerSlug);
+  const { data: visibleCategories } =
+    await useCatalogCategories(manufacturerSlug);
+  const { data: products } = await useCatalogProducts(
+    categorySlug,
+    manufacturerSlug,
+  );
 
   const breadcrumbs = computed(() =>
     getCategoryBreadcrumbs(

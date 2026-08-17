@@ -1,58 +1,59 @@
 <script setup lang="ts">
-import { Permission } from '@skm/specs'
-import { MAIN_NAV } from '~/constants/navigation'
-import { SITE } from '~/constants/site'
-import { buildCatalogUrl } from '~/utils/catalog'
+import { Permission } from '@skm/specs';
+import { MAIN_NAV } from '~/constants/navigation';
+import { SITE } from '~/constants/site';
+import { buildCatalogUrl } from '~/utils/catalog';
 
-const open = defineModel<boolean>('open', { default: false })
+const open = defineModel<boolean>('open', { default: false });
 
 const emit = defineEmits<{
-  callOrder: []
-}>()
+  callOrder: [];
+}>();
 
-const auth = useAuthStore()
-const { hasPermission } = usePermissions()
+const auth = useAuthStore();
+const { hasPermission } = usePermissions();
 
-const expandedCatalog = ref(false)
-const activeManufacturerSlug = ref<string | null>(null)
+const expandedCatalog = ref(false);
+const activeManufacturerSlug = ref<string | null>(null);
 
-const { data: manufacturers } = useCatalogManufacturers()
-const { data: visibleCategories } = useCatalogCategories(activeManufacturerSlug)
+const { data: manufacturers } = await useCatalogManufacturers();
+const { data: visibleCategories } = await useCatalogCategories(
+  activeManufacturerSlug,
+);
 
 function toggleCatalog() {
-  expandedCatalog.value = !expandedCatalog.value
+  expandedCatalog.value = !expandedCatalog.value;
 }
 
 function toggleManufacturer(slug: string) {
   activeManufacturerSlug.value =
-    activeManufacturerSlug.value === slug ? null : slug
+    activeManufacturerSlug.value === slug ? null : slug;
 }
 
 function close() {
-  open.value = false
-  expandedCatalog.value = false
-  activeManufacturerSlug.value = null
+  open.value = false;
+  expandedCatalog.value = false;
+  activeManufacturerSlug.value = null;
 }
 
 async function handleLogout() {
-  close()
-  await auth.logout()
-  await navigateTo('/')
+  close();
+  await auth.logout();
+  await navigateTo('/');
 }
 
 onMounted(async () => {
   if (!auth.hydrated) {
-    auth.hydrate()
+    auth.hydrate();
   }
   if (auth.accessToken && !auth.user) {
     try {
-      await auth.fetchMe()
-    }
-    catch {
-      auth.clearSession()
+      await auth.fetchMe();
+    } catch {
+      auth.clearSession();
     }
   }
-})
+});
 </script>
 
 <template>
@@ -94,7 +95,11 @@ onMounted(async () => {
                 >
                   <SkmBadge
                     :label="manufacturer.label"
-                    :tone="activeManufacturerSlug === manufacturer.slug ? 'accent' : 'neutral'"
+                    :tone="
+                      activeManufacturerSlug === manufacturer.slug
+                        ? 'accent'
+                        : 'neutral'
+                    "
                     size="sm"
                   />
                 </button>
@@ -142,7 +147,9 @@ onMounted(async () => {
       </nav>
 
       <div class="mt-8 space-y-3 border-t border-neutral-100 pt-6">
-        <p class="px-3 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+        <p
+          class="px-3 text-xs font-semibold uppercase tracking-wide text-neutral-500"
+        >
           Аккаунт
         </p>
         <template v-if="auth.isAuthenticated && auth.user">
@@ -157,7 +164,10 @@ onMounted(async () => {
             class="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-900 hover:bg-neutral-50"
             @click="close"
           >
-            <UIcon name="i-lucide-layout-dashboard" class="size-4 text-accent-500" />
+            <UIcon
+              name="i-lucide-layout-dashboard"
+              class="size-4 text-accent-500"
+            />
             Личный кабинет
           </NuxtLink>
           <NuxtLink
@@ -216,8 +226,8 @@ onMounted(async () => {
           class="w-full justify-center"
           @click="
             () => {
-              close()
-              emit('callOrder')
+              close();
+              emit('callOrder');
             }
           "
         >

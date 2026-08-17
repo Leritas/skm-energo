@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
+import { toProductCardBadges } from '~/components/ui/SkmProductCard/badgeDisplay';
 import { SITE } from '~/constants/site';
 
 const {
@@ -89,7 +90,7 @@ function handleManufacturerToggle(slug: string | null) {
           >
             Категории
           </h2>
-          <CatalogSidebar
+          <SkmCatalogSidebar
             :items="visibleCategories ?? []"
             :manufacturer-slug="manufacturerSlug"
             :active-category-slug="categorySlug"
@@ -97,7 +98,7 @@ function handleManufacturerToggle(slug: string | null) {
         </aside>
 
         <div>
-          <CatalogFilterBar
+          <SkmCatalogFilterBar
             v-model:query="query"
             :manufacturers="manufacturers ?? []"
             :active-manufacturer-slug="manufacturerSlug"
@@ -145,9 +146,7 @@ function handleManufacturerToggle(slug: string | null) {
                 :to="`/product/${product.slug}`"
                 :manufacturer="manufacturerLabel(product.manufacturerSlug)"
                 :sku="product.sku"
-                :badges="
-                  product.badges?.length ? [...product.badges] : undefined
-                "
+                :badges="toProductCardBadges(product.badges)"
               />
             </div>
             <div

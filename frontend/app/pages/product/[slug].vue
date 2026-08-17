@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import {
+  productBadgeLabel,
+  productBadgeTone,
+  toProductCardBadges,
+} from '~/components/ui/SkmProductCard/badgeDisplay';
 import { getCategoryBreadcrumbs, getManufacturerLabel } from '~/utils/catalog';
 import { SITE } from '~/constants/site';
 
@@ -7,7 +12,7 @@ const route = useRoute();
 const slug = computed(() => String(route.params.slug ?? ''));
 
 const { data: product, error: productError } = await useCatalogProduct(slug);
-const { data: manufacturers } = useCatalogManufacturers();
+const { data: manufacturers } = await useCatalogManufacturers();
 const { data: allCategories } = await useCatalogAllCategories();
 
 if (productError.value) {
@@ -22,9 +27,15 @@ if (productError.value) {
 
 const { data: similarProducts } = await useAsyncData(
   () =>
-    `catalog-similar-${slug.value}-${product.value?.similarSlugs.join(',') ?? ''}`,
-  () => fetchSimilarProducts(product.value?.similarSlugs ?? []),
-  { watch: [() => product.value?.similarSlugs] },
+    `catalog-similar-${slug.value}-${product.value?.categorySlug ?? ''}-${product.value?.similarSlugs.join(',') ?? ''}`,
+  () => {
+    const item = product.value;
+    if (!item) {
+      return [];
+    }
+    return fetchSimilarProducts(item);
+  },
+  { watch: [() => product.value?.slug, () => product.value?.similarSlugs] },
 );
 
 function manufacturerLabel(manufacturerSlug: string) {
@@ -82,16 +93,10 @@ const pdfFilename = computed(() => {
         <div>
           <div v-if="product!.badges?.length" class="mb-4 flex flex-wrap gap-2">
             <SkmBadge
-              v-for="badge in product!.badges"
+              v-for="badge in toProductCardBadges(product!.badges)"
               :key="badge"
-              :label="
-                badge === 'pdf'
-                  ? 'PDF'
-                  : badge === 'new'
-                    ? 'Новинка'
-                    : 'Под заказ'
-              "
-              tone="neutral"
+              :label="productBadgeLabel(badge)"
+              :tone="productBadgeTone(badge)"
               size="sm"
             />
           </div>
@@ -145,7 +150,7 @@ const pdfFilename = computed(() => {
             :to="`/product/${item.slug}`"
             :manufacturer="manufacturerLabel(item.manufacturerSlug)"
             :sku="item.sku"
-            :badges="item.badges?.length ? [...item.badges] : undefined"
+            :badges="toProductCardBadges(item.badges)"
           />
         </div>
       </div>
