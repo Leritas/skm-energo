@@ -90,3 +90,13 @@ model Product {
   categoryId     Int
   category       Category     @relation(fields: [categoryId], references: [id])
 }
+
+model NewsArticle {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  body        String[]
+  publishDate DateTime @db.Date
+  published   Boolean  @default(true)
+}

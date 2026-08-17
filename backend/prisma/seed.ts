@@ -7,6 +7,7 @@ import {
   CATALOG_SEED_PRODUCTS,
   type CatalogSeedCategory,
 } from './catalog-seed-data';
+import { NEWS_SEED_ARTICLES } from './news-seed-data';
 
 const prisma = new PrismaClient();
 
@@ -90,6 +91,26 @@ async function seedCatalog() {
   console.log(
     `Seeded catalog: ${CATALOG_SEED_MANUFACTURERS.length} manufacturers, ${categories.length} categories, ${CATALOG_SEED_PRODUCTS.length} products`,
   );
+}
+
+async function seedNews() {
+  for (const article of NEWS_SEED_ARTICLES) {
+    const data = {
+      title: article.title,
+      excerpt: article.excerpt,
+      body: article.body,
+      publishDate: new Date(article.publishDate),
+      published: true,
+    };
+
+    await prisma.newsArticle.upsert({
+      where: { slug: article.slug },
+      update: data,
+      create: { slug: article.slug, ...data },
+    });
+  }
+
+  console.log(`Seeded news: ${NEWS_SEED_ARTICLES.length} articles`);
 }
 
 async function main() {
@@ -176,6 +197,7 @@ async function main() {
   });
 
   await seedCatalog();
+  await seedNews();
 
   console.log(`Seeded roles: user(#${userRole.id}), moderator, admin(#${adminRole.id})`);
   console.log(`Seeded admin user: ${email}`);

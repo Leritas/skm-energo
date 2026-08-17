@@ -4,15 +4,15 @@
 
 ## Принятые решения
 
-| Решение | Выбор |
-|---------|-------|
-| Frontend | Nuxt (SSR), Vue 3, TypeScript, Pinia, Tailwind |
-| Backend | NestJS REST API |
-| БД | PostgreSQL + Prisma (этап 2) |
-| Админка | `/admin` в Nuxt |
-| v1 scope | E-commerce: регистрация, корзина, заказы, ЛК + админка |
-| Контент | Не мигрируем ~747 страниц; админка для добавления данных |
-| Оплата v1 | Ручная обработка менеджером; задел под онлайн-оплату в v2 |
+| Решение     | Выбор                                                           |
+| ----------- | --------------------------------------------------------------- |
+| Frontend    | Nuxt (SSR), Vue 3, TypeScript, Pinia, Tailwind                  |
+| Backend     | NestJS REST API                                                 |
+| БД          | PostgreSQL + Prisma (этап 2)                                    |
+| Админка     | `/admin` в Nuxt                                                 |
+| v1 scope    | E-commerce: регистрация, корзина, заказы, ЛК + админка          |
+| Контент     | Не мигрируем ~747 страниц; админка для добавления данных        |
+| Оплата v1   | Ручная обработка менеджером; задел под онлайн-оплату в v2       |
 | Черновик БД | [db-draft.sql](./db-draft.sql) — reference, не migration source |
 
 ---
@@ -37,13 +37,13 @@
 
 ### Функционал
 
-| Есть сейчас | Нет сейчас |
-|-------------|------------|
-| Каталог, breadcrumbs, sidebar | Корзина, ЛК |
-| Поиск (POST) | Онлайн-оплата |
-| «Заказать звонок» | Админка |
-| Форма обратной связи + captcha | API / SSR |
-| Новости (минимально) | Отзывы, заказы |
+| Есть сейчас                    | Нет сейчас     |
+| ------------------------------ | -------------- |
+| Каталог, breadcrumbs, sidebar  | Корзина, ЛК    |
+| Поиск (POST)                   | Онлайн-оплата  |
+| «Заказать звонок»              | Админка        |
+| Форма обратной связи + captcha | API / SSR      |
+| Новости (минимально)           | Отзывы, заказы |
 
 Карточка товара: заголовок, фото, PDF — без цены и «купить».
 
@@ -81,16 +81,16 @@
 
 Parent epics для этапов 1–10: [#10](https://github.com/Leritas/skm-energo/issues/10) … [#19](https://github.com/Leritas/skm-energo/issues/19). Implementation slices — sub-issues с native `blocked_by`.
 
-| Этап | Epic | Frontier / sub-issues |
-|------|------|------------------------|
-| 1 | [#10](https://github.com/Leritas/skm-energo/issues/10) | [#5](https://github.com/Leritas/skm-energo/issues/5) docs closure ✅ |
-| 2 | [#11](https://github.com/Leritas/skm-energo/issues/11) | [#4](https://github.com/Leritas/skm-energo/issues/4) catalog API, [#7](https://github.com/Leritas/skm-energo/issues/7) news |
-| 3 | [#12](https://github.com/Leritas/skm-energo/issues/12) ✅ | — |
-| 4 | [#13](https://github.com/Leritas/skm-energo/issues/13) | (slices TBD) |
-| 5 | [#14](https://github.com/Leritas/skm-energo/issues/14) | [#6](https://github.com/Leritas/skm-energo/issues/6), [#8](https://github.com/Leritas/skm-energo/issues/8), [#9](https://github.com/Leritas/skm-energo/issues/9) |
-| 6 | [#15](https://github.com/Leritas/skm-energo/issues/15) | (slices TBD) |
-| 7 | [#16](https://github.com/Leritas/skm-energo/issues/16) | [#21](https://github.com/Leritas/skm-energo/issues/21)–[#24](https://github.com/Leritas/skm-energo/issues/24) |
-| 8–10 | [#17](https://github.com/Leritas/skm-energo/issues/17)–[#19](https://github.com/Leritas/skm-energo/issues/19) | [#20](https://github.com/Leritas/skm-energo/issues/20) SSR auth → #19 |
+| Этап | Epic                                                                                                          | Frontier / sub-issues                                                                                                                                            |
+| ---- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | [#10](https://github.com/Leritas/skm-energo/issues/10)                                                        | [#5](https://github.com/Leritas/skm-energo/issues/5) docs closure ✅                                                                                             |
+| 2    | [#11](https://github.com/Leritas/skm-energo/issues/11) ✅                                                     | [#4](https://github.com/Leritas/skm-energo/issues/4) catalog API ✅, [#7](https://github.com/Leritas/skm-energo/issues/7) news ✅                                |
+| 3    | [#12](https://github.com/Leritas/skm-energo/issues/12) ✅                                                     | —                                                                                                                                                                |
+| 4    | [#13](https://github.com/Leritas/skm-energo/issues/13)                                                        | (slices TBD)                                                                                                                                                     |
+| 5    | [#14](https://github.com/Leritas/skm-energo/issues/14)                                                        | [#6](https://github.com/Leritas/skm-energo/issues/6), [#8](https://github.com/Leritas/skm-energo/issues/8), [#9](https://github.com/Leritas/skm-energo/issues/9) |
+| 6    | [#15](https://github.com/Leritas/skm-energo/issues/15)                                                        | (slices TBD)                                                                                                                                                     |
+| 7    | [#16](https://github.com/Leritas/skm-energo/issues/16)                                                        | [#21](https://github.com/Leritas/skm-energo/issues/21)–[#24](https://github.com/Leritas/skm-energo/issues/24)                                                    |
+| 8–10 | [#17](https://github.com/Leritas/skm-energo/issues/17)–[#19](https://github.com/Leritas/skm-energo/issues/19) | [#20](https://github.com/Leritas/skm-energo/issues/20) SSR auth → #19                                                                                            |
 
 Этап 0 и этап 11 (v2) — только в этом документе, без parent epic.
 
@@ -102,21 +102,21 @@ Parent epics для этапов 1–10: [#10](https://github.com/Leritas/skm-en
 
 Маршруты вне критериев текущего этапа — **preview UX**, не блокер закрытия этапа 1:
 
-| Route | Назначение | Данные | Sitemap |
-|-------|------------|--------|---------|
-| `/cart`, `/checkout` | Корзина / оформление | mock / placeholder | исключить до этапа 6 |
-| `/profile/**` | ЛК (shell ✅, P1 info API ✅) | orders/favorites — mocks до P2–P4 | исключить |
-| `/admin` | Админ-панель | stub до этапа 4 | исключить |
+| Route                | Назначение                    | Данные                            | Sitemap              |
+| -------------------- | ----------------------------- | --------------------------------- | -------------------- |
+| `/cart`, `/checkout` | Корзина / оформление          | mock / placeholder                | исключить до этапа 6 |
+| `/profile/**`        | ЛК (shell ✅, P1 info API ✅) | orders/favorites — mocks до P2–P4 | исключить            |
+| `/admin`             | Админ-панель                  | stub до этапа 4                   | исключить            |
 
 **Dev-copy:** на **публичных** страницах этапа 1b (`/`, `/about`, `/services`, `/contacts`, `/catalog/**`, `/news/**`, `/product/[slug]`) — без «этап N roadmap», «mock», «stub». На stub-маршрутах допустим preview-copy до соответствующего этапа.
 
 ### Отложено (не потеряно)
 
-| Решение | Когда | Примечание |
-|---------|-------|------------|
-| Category taxonomy v2 | После live catalog | Пересборка дерева категорий с нуля (не копия manufacturer-first старого сайта) |
-| E2E smoke tests | После #4 (live data) | Playwright/regression на mock не приоритет |
-| SSR-safe auth session | Этап 10 / [#20](https://github.com/Leritas/skm-energo/issues/20) | Client-only middleware принят для v1 |
+| Решение               | Когда                                                            | Примечание                                                                     |
+| --------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Category taxonomy v2  | После live catalog                                               | Пересборка дерева категорий с нуля (не копия manufacturer-first старого сайта) |
+| E2E smoke tests       | После #4 (live data)                                             | Playwright/regression на mock не приоритет                                     |
+| SSR-safe auth session | Этап 10 / [#20](https://github.com/Leritas/skm-energo/issues/20) | Client-only middleware принят для v1                                           |
 
 ---
 
@@ -162,14 +162,14 @@ Parent epics для этапов 1–10: [#10](https://github.com/Leritas/skm-en
 
 ---
 
-### Этап 2 — База данных и Prisma 🔄
+### Этап 2 — База данных и Prisma ✅
 
 - Prisma schema на основе [db-draft.sql](./db-draft.sql) + расширения выше
-- Миграции, seed (2–3 производителя, дерево категорий, 5–10 товаров)
+- Миграции, seed (2–3 производителя, дерево категорий, 5–10 товаров, новости)
 - NestJS Prisma module, repository/service паттерны
 - Read API: catalog + news (замена mock constants)
 
-**GitHub:** [#11](https://github.com/Leritas/skm-energo/issues/11) — start [#4](https://github.com/Leritas/skm-energo/issues/4)
+**GitHub:** [#11](https://github.com/Leritas/skm-energo/issues/11) — [#4](https://github.com/Leritas/skm-energo/issues/4), [#7](https://github.com/Leritas/skm-energo/issues/7) ✅
 
 **Ориентир:** 2–3 дня
 
@@ -315,20 +315,20 @@ Parent epics для этапов 1–10: [#10](https://github.com/Leritas/skm-en
 
 ## Оценка объёма
 
-| Этап | Ориентир | Сложность |
-|------|----------|-----------|
-| 0. Инициализация | 1–2 дня | Низкая |
-| 1. Каркас UI | 3–5 дней | Средняя |
-| 2. Prisma + seed | 2–3 дня | Средняя |
-| 3. Auth | 3–4 дня | Средняя |
-| 4. Админка | 7–10 дней | Высокая |
-| 5. Каталог (live delta) | 3–5 дней | Средняя |
-| 6. Корзина + заказы | 5–7 дней | Высокая |
-| 7. ЛК + отзывы | 3–4 дня | Средняя |
-| 8. Формы/лиды | 2–3 дня | Низкая |
-| 9. Поставщики | 2–3 дня | Средняя |
-| 10. Production | 3–5 дней | Средняя |
-| 11. Оплата v2 | 5–7 дней | Высокая |
+| Этап                    | Ориентир  | Сложность |
+| ----------------------- | --------- | --------- |
+| 0. Инициализация        | 1–2 дня   | Низкая    |
+| 1. Каркас UI            | 3–5 дней  | Средняя   |
+| 2. Prisma + seed        | 2–3 дня   | Средняя   |
+| 3. Auth                 | 3–4 дня   | Средняя   |
+| 4. Админка              | 7–10 дней | Высокая   |
+| 5. Каталог (live delta) | 3–5 дней  | Средняя   |
+| 6. Корзина + заказы     | 5–7 дней  | Высокая   |
+| 7. ЛК + отзывы          | 3–4 дня   | Средняя   |
+| 8. Формы/лиды           | 2–3 дня   | Низкая    |
+| 9. Поставщики           | 2–3 дня   | Средняя   |
+| 10. Production          | 3–5 дней  | Средняя   |
+| 11. Оплата v2           | 5–7 дней  | Высокая   |
 
 **Итого v1 (этапы 0–10):** ~6–10 недель для одного разработчика.
 
