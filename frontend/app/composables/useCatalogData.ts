@@ -3,43 +3,41 @@ import type {
   CatalogManufacturer,
   CatalogProductDetail,
   CatalogProductListItem,
-} from '~/types/catalog'
+} from '~/types/catalog';
 
 function buildCatalogQuery(
   params: Record<string, string | null | undefined>,
 ): string {
-  const search = new URLSearchParams()
+  const search = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
     if (value) {
-      search.set(key, value)
+      search.set(key, value);
     }
   }
-  const query = search.toString()
-  return query ? `?${query}` : ''
+  const query = search.toString();
+  return query ? `?${query}` : '';
 }
 
 export function useCatalogManufacturers() {
-  const { api } = useApi()
+  const { api } = useApi();
 
-  return useAsyncData(
-    'catalog-manufacturers',
-    () =>
-      api<CatalogManufacturer[]>('/catalog/manufacturers', { auth: false }),
-  )
+  return useAsyncData('catalog-manufacturers', () =>
+    api<CatalogManufacturer[]>('/catalog/manufacturers', { auth: false }),
+  );
 }
 
 export async function useCatalogAllCategories() {
-  const { api } = useApi()
+  const { api } = useApi();
 
   return await useAsyncData('catalog-all-categories', () =>
     api<CatalogCategory[]>('/catalog/categories', { auth: false }),
-  )
+  );
 }
 
 export function useCatalogCategories(
   manufacturerSlug: MaybeRefOrGetter<string | null>,
 ) {
-  const { api } = useApi()
+  const { api } = useApi();
 
   return useAsyncData(
     () => `catalog-categories-${toValue(manufacturerSlug) ?? 'all'}`,
@@ -49,14 +47,14 @@ export function useCatalogCategories(
         { auth: false },
       ),
     { watch: [() => toValue(manufacturerSlug)] },
-  )
+  );
 }
 
 export function useCatalogProducts(
   categorySlug: MaybeRefOrGetter<string | null>,
   manufacturerSlug: MaybeRefOrGetter<string | null>,
 ) {
-  const { api } = useApi()
+  const { api } = useApi();
 
   return useAsyncData(
     () =>
@@ -70,16 +68,13 @@ export function useCatalogProducts(
         { auth: false },
       ),
     {
-      watch: [
-        () => toValue(categorySlug),
-        () => toValue(manufacturerSlug),
-      ],
+      watch: [() => toValue(categorySlug), () => toValue(manufacturerSlug)],
     },
-  )
+  );
 }
 
 export async function useCatalogProduct(slug: MaybeRefOrGetter<string>) {
-  const { api } = useApi()
+  const { api } = useApi();
 
   return await useAsyncData(
     () => `catalog-product-${toValue(slug)}`,
@@ -88,7 +83,7 @@ export async function useCatalogProduct(slug: MaybeRefOrGetter<string>) {
         auth: false,
       }),
     { watch: [() => toValue(slug)] },
-  )
+  );
 }
 
 export async function fetchSimilarProducts(
@@ -96,25 +91,19 @@ export async function fetchSimilarProducts(
   limit = 3,
 ): Promise<CatalogProductListItem[]> {
   if (!similarSlugs.length) {
-    return []
+    return [];
   }
 
-  const { api } = useApi()
-  const results = await Promise.all(
-    similarSlugs.slice(0, limit).map(async (similarSlug) => {
-      try {
-        return await api<CatalogProductDetail>(
-          `/catalog/products/${similarSlug}`,
-          { auth: false },
-        )
-      }
-      catch {
-        return null
-      }
-    }),
-  )
+  const { api } = useApi();
+  const results = await Promise.allSettled(
+    similarSlugs.slice(0, limit).map((similarSlug) =>
+      api<CatalogProductDetail>(`/catalog/products/${similarSlug}`, {
+        auth: false,
+      }),
+    ),
+  );
 
-  return results.filter(
-    (item): item is CatalogProductDetail => item !== null,
-  )
+  return results.flatMap((result) =>
+    result.status === 'fulfilled' ? [result.value] : [],
+  );
 }

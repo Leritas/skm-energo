@@ -1,49 +1,43 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import type { CatalogProductDetail } from '~/types/catalog'
-import {
-  getCategoryBreadcrumbs,
-  getManufacturerLabel,
-  mapProductBadges,
-} from '~/utils/catalog'
-import { SITE } from '~/constants/site'
+import { computed, ref } from 'vue';
+import { getCategoryBreadcrumbs, getManufacturerLabel } from '~/utils/catalog';
+import { SITE } from '~/constants/site';
 
-const route = useRoute()
-const slug = computed(() => String(route.params.slug ?? ''))
+const route = useRoute();
+const slug = computed(() => String(route.params.slug ?? ''));
 
-const { data: productData, error: productError } = await useCatalogProduct(slug)
-const { data: manufacturers } = useCatalogManufacturers()
-const { data: allCategories } = await useCatalogAllCategories()
+const { data: product, error: productError } = await useCatalogProduct(slug);
+const { data: manufacturers } = useCatalogManufacturers();
+const { data: allCategories } = await useCatalogAllCategories();
 
 if (productError.value) {
-  const statusCode = (productError.value as { statusCode?: number }).statusCode
   throw createError({
-    statusCode: statusCode === 404 ? 404 : 500,
+    statusCode: productError.value.statusCode === 404 ? 404 : 500,
     statusMessage:
-      statusCode === 404 ? 'Товар не найден' : 'Не удалось загрузить товар',
-  })
+      productError.value.statusCode === 404
+        ? 'Товар не найден'
+        : 'Не удалось загрузить товар',
+  });
 }
-
-const product = computed(() => productData.value as CatalogProductDetail)
 
 const { data: similarProducts } = await useAsyncData(
   () =>
     `catalog-similar-${slug.value}-${product.value?.similarSlugs.join(',') ?? ''}`,
   () => fetchSimilarProducts(product.value?.similarSlugs ?? []),
   { watch: [() => product.value?.similarSlugs] },
-)
+);
 
 function manufacturerLabel(manufacturerSlug: string) {
-  return getManufacturerLabel(manufacturerSlug, manufacturers.value)
+  return getManufacturerLabel(manufacturerSlug, manufacturers.value);
 }
 
 useSeoMeta({
   title: () => `${product.value!.title} — ${SITE.name}`,
   description: () => product.value!.description,
-})
+});
 
 const breadcrumbs = computed(() => {
-  const item = product.value!
+  const item = product.value!;
   return [
     ...getCategoryBreadcrumbs(
       item.categorySlug,
@@ -51,23 +45,23 @@ const breadcrumbs = computed(() => {
       allCategories.value ?? [],
     ),
     { label: item.title },
-  ]
-})
+  ];
+});
 
-const activeTab = ref('desc')
+const activeTab = ref('desc');
 const tabItems = [
   { label: 'Описание', value: 'desc', content: '' },
   { label: 'Характеристики', value: 'specs', content: '' },
   { label: 'PDF', value: 'pdf', content: '' },
-]
+];
 
 const pdfFilename = computed(() => {
-  const href = product.value?.pdfHref
+  const href = product.value?.pdfHref;
   if (!href) {
-    return undefined
+    return undefined;
   }
-  return href.split('/').pop() ?? 'datasheet.pdf'
-})
+  return href.split('/').pop() ?? 'datasheet.pdf';
+});
 </script>
 
 <template>
@@ -83,17 +77,20 @@ const pdfFilename = computed(() => {
       </SkmPageHeader>
 
       <div class="grid gap-10 lg:grid-cols-2">
-        <SkmProductGallery
-          :images="[]"
-          :alt="product!.title"
-        />
+        <SkmProductGallery :images="[]" :alt="product!.title" />
 
         <div>
           <div v-if="product!.badges?.length" class="mb-4 flex flex-wrap gap-2">
             <SkmBadge
               v-for="badge in product!.badges"
               :key="badge"
-              :label="badge === 'pdf' ? 'PDF' : badge === 'new' ? 'Новинка' : 'Под заказ'"
+              :label="
+                badge === 'pdf'
+                  ? 'PDF'
+                  : badge === 'new'
+                    ? 'Новинка'
+                    : 'Под заказ'
+              "
               tone="neutral"
               size="sm"
             />
@@ -148,7 +145,7 @@ const pdfFilename = computed(() => {
             :to="`/product/${item.slug}`"
             :manufacturer="manufacturerLabel(item.manufacturerSlug)"
             :sku="item.sku"
-            :badges="mapProductBadges(item.badges)"
+            :badges="item.badges?.length ? [...item.badges] : undefined"
           />
         </div>
       </div>

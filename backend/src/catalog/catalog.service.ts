@@ -138,10 +138,7 @@ export class CatalogService {
     const roots: CatalogCategoryNode[] = [];
 
     for (const row of rows) {
-      const node = nodes.get(row.id);
-      if (!node) {
-        continue;
-      }
+      const node = nodes.get(row.id)!;
 
       if (row.parentId === null) {
         roots.push(node);

@@ -4,45 +4,34 @@ import {
   getManufacturerLabel,
   parseManufacturerQuery,
   resolveCategoryFromPath,
-} from '~/utils/catalog'
+} from '~/utils/catalog';
 
 export async function useCatalog() {
-  const route = useRoute()
-  const { data: manufacturers } = useCatalogManufacturers()
-  const { data: allCategories } = await useCatalogAllCategories()
+  const route = useRoute();
+  const { data: manufacturers } = useCatalogManufacturers();
+  const { data: allCategories } = await useCatalogAllCategories();
 
   const categoryPath = computed(() => {
-    const slug = route.params.slug
+    const slug = route.params.slug;
     if (!slug) {
-      return [] as string[]
+      return [] as string[];
     }
-    return Array.isArray(slug) ? slug : [slug]
-  })
+    return Array.isArray(slug) ? slug : [slug];
+  });
 
-  const categorySlug = computed(
-    () =>
-      resolveCategoryFromPath(
-        categoryPath.value,
-        allCategories.value ?? [],
-      ).categorySlug,
-  )
+  const categoryResolution = computed(() =>
+    resolveCategoryFromPath(categoryPath.value, allCategories.value ?? []),
+  );
 
-  const isValidCategory = computed(() =>
-    resolveCategoryFromPath(
-      categoryPath.value,
-      allCategories.value ?? [],
-    ).isValid,
-  )
+  const categorySlug = computed(() => categoryResolution.value.categorySlug);
+  const isValidCategory = computed(() => categoryResolution.value.isValid);
 
   const manufacturerSlug = computed(() =>
     parseManufacturerQuery(route.query.manufacturer, manufacturers.value),
-  )
+  );
 
-  const { data: visibleCategories } = useCatalogCategories(manufacturerSlug)
-  const { data: products } = useCatalogProducts(
-    categorySlug,
-    manufacturerSlug,
-  )
+  const { data: visibleCategories } = useCatalogCategories(manufacturerSlug);
+  const { data: products } = useCatalogProducts(categorySlug, manufacturerSlug);
 
   const breadcrumbs = computed(() =>
     getCategoryBreadcrumbs(
@@ -50,7 +39,7 @@ export async function useCatalog() {
       manufacturerSlug.value,
       allCategories.value ?? [],
     ),
-  )
+  );
 
   function catalogUrl(
     nextCategorySlug?: string | null,
@@ -59,18 +48,16 @@ export async function useCatalog() {
     const manufacturer =
       nextManufacturerSlug === undefined
         ? manufacturerSlug.value
-        : nextManufacturerSlug
-    return buildCatalogUrl(nextCategorySlug, manufacturer)
+        : nextManufacturerSlug;
+    return buildCatalogUrl(nextCategorySlug, manufacturer);
   }
 
   async function setManufacturer(nextManufacturerSlug: string | null) {
-    await navigateTo(
-      buildCatalogUrl(categorySlug.value, nextManufacturerSlug),
-    )
+    await navigateTo(buildCatalogUrl(categorySlug.value, nextManufacturerSlug));
   }
 
   function manufacturerLabel(slug: string) {
-    return getManufacturerLabel(slug, manufacturers.value)
+    return getManufacturerLabel(slug, manufacturers.value);
   }
 
   return {
@@ -79,11 +66,11 @@ export async function useCatalog() {
     categorySlug,
     isValidCategory,
     manufacturerSlug,
-    visibleCategories: computed(() => visibleCategories.value ?? []),
-    products: computed(() => products.value ?? []),
+    visibleCategories,
+    products,
     breadcrumbs,
     catalogUrl,
     setManufacturer,
     manufacturerLabel,
-  }
+  };
 }

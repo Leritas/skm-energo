@@ -1,15 +1,18 @@
-import type { CatalogCategory } from '~/types/catalog'
+import type { CatalogCategory } from '~/types/catalog';
 
-export type { CatalogCategory }
-
-/** Normalized category tree (ref: legacy site line names). Storybook / demos only. */
 export const CATALOG_CATEGORIES: CatalogCategory[] = [
   {
     slug: 'predohraniteli',
     label: 'Предохранители, держатели и аксессуары',
     children: [
-      { slug: 'nizkovoltnye-predohraniteli', label: 'Низковольтные предохранители' },
-      { slug: 'plavkie-vn', label: 'Плавкие предохранители высокого напряжения' },
+      {
+        slug: 'nizkovoltnye-predohraniteli',
+        label: 'Низковольтные предохранители',
+      },
+      {
+        slug: 'plavkie-vn',
+        label: 'Плавкие предохранители высокого напряжения',
+      },
     ],
   },
   {
@@ -49,4 +52,4 @@ export const CATALOG_CATEGORIES: CatalogCategory[] = [
       { slug: 'solnechnye-invertory', label: 'Солнечные инверторы' },
     ],
   },
-]
+];

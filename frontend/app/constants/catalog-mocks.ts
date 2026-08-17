@@ -1,31 +1,27 @@
-import type {
-  CatalogManufacturer,
-  ProductBadge,
-} from '~/types/catalog'
+import type { CatalogManufacturer, ProductBadge } from '~/types/catalog';
 
-export type Manufacturer = CatalogManufacturer
-export type { ProductBadge }
+export type Manufacturer = CatalogManufacturer;
+export type { ProductBadge };
 
 export interface MockProduct {
-  slug: string
-  title: string
-  manufacturerSlug: string
-  categorySlug: string
-  sku: string
-  description: string
-  specs: Array<{ label: string; value: string }>
-  pdfHref?: string
-  badges?: ProductBadge[]
-  similarSlugs?: string[]
+  slug: string;
+  title: string;
+  manufacturerSlug: string;
+  categorySlug: string;
+  sku: string;
+  description: string;
+  specs: Array<{ label: string; value: string }>;
+  pdfHref?: string;
+  badges?: ProductBadge[];
+  similarSlugs?: string[];
 }
 
-/** Storybook / isolated demos only — public routes use catalog read API. */
 export const MANUFACTURERS: Manufacturer[] = [
   { slug: 'mersen', label: 'MERSEN' },
   { slug: 'casram', label: 'CASRAM' },
   { slug: 'lampar', label: 'Lampar' },
   { slug: 'hiitio', label: 'HIITIO' },
-]
+];
 
 export const MOCK_PRODUCTS: MockProduct[] = [
   {
@@ -75,7 +71,8 @@ export const MOCK_PRODUCTS: MockProduct[] = [
     manufacturerSlug: 'mersen',
     categorySlug: 'plavkie-vn',
     sku: 'FL-10KV',
-    description: 'Высоковольтный плавкий предохранитель для распределительных сетей 10 kV.',
+    description:
+      'Высоковольтный плавкий предохранитель для распределительных сетей 10 kV.',
     specs: [{ label: 'Напряжение', value: '10 kV' }],
     badges: ['pdf', 'onRequest'],
     similarSlugs: ['fuse-link-6kv'],
@@ -139,7 +136,8 @@ export const MOCK_PRODUCTS: MockProduct[] = [
     manufacturerSlug: 'mersen',
     categorySlug: 'vysokovoltnye-razediniteli',
     sku: 'DS-12',
-    description: 'Высоковольтный разъединитель для распределительных устройств.',
+    description:
+      'Высоковольтный разъединитель для распределительных устройств.',
     specs: [{ label: 'Напряжение', value: '12 kV' }],
     badges: ['onRequest'],
   },
@@ -199,7 +197,8 @@ export const MOCK_PRODUCTS: MockProduct[] = [
     manufacturerSlug: 'casram',
     categorySlug: 'aksessuary',
     sku: 'CAS-AK-01',
-    description: 'Набор креплений и контактных элементов для держателей CASRAM.',
+    description:
+      'Набор креплений и контактных элементов для держателей CASRAM.',
     specs: [{ label: 'Совместимость', value: 'CASRAM NH' }],
   },
   {
@@ -218,10 +217,11 @@ export const MOCK_PRODUCTS: MockProduct[] = [
     manufacturerSlug: 'hiitio',
     categorySlug: 'akkumulyatory',
     sku: 'HI-BAT-100',
-    description: 'Свинцово-кислотная аккумуляторная батарея для систем резервного питания.',
+    description:
+      'Свинцово-кислотная аккумуляторная батарея для систем резервного питания.',
     specs: [
       { label: 'Напряжение', value: '12 V' },
       { label: 'Ёмкость', value: '100 Ah' },
     ],
   },
-]
+];
