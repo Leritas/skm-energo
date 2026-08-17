@@ -15,7 +15,7 @@ export const Default: Story = {
     number: 'SKM-1042',
     dateLabel: '18 июля 2026',
     status: 'processing',
-    to: '/account/orders/1042',
+    to: '/profile/orders/active',
   },
   render: (args) => ({
     components: { SkmOrderCard },

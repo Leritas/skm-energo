@@ -79,7 +79,7 @@ app/components/
 │   ├── SkmContainer/
 │   ├── SkmSection/
 │   └── SkmDesignSystem/     # Overview story
-└── layout/                  # shell сайта (SkmHeader, SkmFooter, …)
+└── layout/                  # shell сайта (SkmHeader, SkmFooter, SkmUserMenu, …)
 ```
 
 ### Правила
@@ -136,7 +136,30 @@ frontend/
 | `/contacts` | Контакты + форма (UI) | ✅ |
 | `/catalog` | Каталог (заглушка + дерево категорий) | ✅ |
 | `/news` | Новости (заглушка) | ✅ |
-| `/admin` | Админ-панель (заглушка) | — |
+| `/login` | Вход | ✅ |
+| `/register` | Регистрация покупателя | ✅ |
+| `/profile/**` | Личный кабинет (см. profile design) | — |
+| `/account` | Redirect → `/profile` | ✅ |
+| `/admin` | Админ-панель (заглушка, `hasAccessToAdmin`) | — |
+
+## Auth & профиль
+
+| Doc | Описание |
+|-----|----------|
+| [Auth RBAC design](../docs/superpowers/specs/2026-07-21-auth-roles-permissions-design.md) | JWT, permissions, роли |
+| [Account & header](../docs/superpowers/specs/2026-07-23-account-profile-header.md) | `SkmUserMenu` |
+| [Personal profile roadmap](../docs/superpowers/specs/2026-07-30-personal-profile-design.md) | `/profile/*` shell + API phases |
+
+### Компоненты
+
+| Компонент | Где | Назначение |
+|-----------|-----|------------|
+| `SkmUserMenu` | Header (desktop + mobile) | Popover: login/register или кабинет/админ/выход |
+| `app/stores/auth.ts` | Pinia | Сессия, tokens в `localStorage` |
+| `app/middleware/auth.ts` | `/profile/**` | Редирект на `/login` без сессии (client-only) |
+| `app/middleware/admin.ts` | `/admin` | Требует `hasAccessToAdmin` (client-only) |
+
+Иконка профиля в header видна на всех публичных страницах. После входа данные подтягиваются через `GET /api/auth/me`.
 
 ## Модули Nuxt
 

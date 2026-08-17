@@ -44,8 +44,19 @@ export default defineNuxtConfig({
     url: process.env.NUXT_PUBLIC_SITE_URL || 'https://skmenergo.ru',
     name: 'СКМ-Энергосервис',
   },
+  build: {
+    transpile: ['@skm/specs'],
+  },
+  vite: {
+    optimizeDeps: {
+      include: ['@skm/specs'],
+    },
+  },
   sitemap: {
-    exclude: ['/admin/**'],
+    exclude: ['/admin/**', '/login', '/register', '/account/**', '/profile/**'],
+  },
+  routeRules: {
+    '/account/**': { redirect: '/profile' },
   },
   devServer: {
     port: 3000,

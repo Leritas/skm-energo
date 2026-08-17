@@ -23,3 +23,18 @@ export const Default: Story = {
     template: '<div class="max-w-md p-4"><SkmReviewCard v-bind="args" /></div>',
   }),
 }
+
+export const EditMode: Story = {
+  args: { editMode: true },
+  render: (args) => ({
+    components: { SkmReviewCard },
+    setup: () => ({
+      args,
+      onSubmit: (payload: { rating: number; text: string }) => {
+        console.log('submit', payload)
+      },
+    }),
+    template:
+      '<div class="max-w-md p-4"><SkmReviewCard v-bind="args" @submit="onSubmit" /></div>',
+  }),
+}
