@@ -97,6 +97,8 @@ Global prefix: **`/api`**
 | GET                   | `/api/catalog/categories`      | Category tree (`?manufacturer=` hides empty branches) |
 | GET                   | `/api/catalog/products`        | Product list (`?category=`, `?manufacturer=`)         |
 | GET                   | `/api/catalog/products/:slug`  | Product detail (SKU, specs, PDF)                      |
+| GET                   | `/api/news`                    | News list (newest first)                              |
+| GET                   | `/api/news/:slug`              | News article detail                                   |
 | GET                   | `/api/docs`                    | Swagger UI                                            |
 
 Пример health check:
@@ -111,9 +113,10 @@ curl http://localhost:3001/api/health
 ```
 backend/
 ├── prisma/
-│   ├── schema.prisma           # Auth + catalog models
-│   ├── seed.ts                 # Roles, admin user, catalog seed
-│   └── catalog-seed-data.ts    # Stage 1b mock catalog data
+│   ├── schema.prisma           # Auth + catalog + news models
+│   ├── seed.ts                 # Roles, admin user, catalog + news seed
+│   ├── catalog-seed-data.ts    # Stage 1b mock catalog data
+│   └── news-seed-data.ts       # Stage 1b mock news data
 ├── src/
 │   ├── main.ts                 # Bootstrap: CORS, Swagger, ValidationPipe, prefix /api
 │   ├── app.module.ts           # Root module
@@ -121,6 +124,7 @@ backend/
 │   ├── app.service.ts
 │   ├── auth/                   # register, login, refresh, logout, me
 │   ├── catalog/                # public read API: categories, products
+│   ├── news/                   # public read API: news articles
 │   ├── profile/                # PATCH profile, change-password
 │   ├── users/                  # staff users CRUD
 │   ├── roles/                  # roles + permissions
@@ -184,7 +188,7 @@ npm run test:cov      # coverage
 
 См. [docs/roadmap.md](../docs/roadmap.md):
 
-- **Этап 2** ✅ — Prisma catalog schema, seed, catalog read API ([#4](https://github.com/Leritas/skm-energo/issues/4)); news read API — [#7](https://github.com/Leritas/skm-energo/issues/7)
+- **Этап 2** ✅ — Prisma catalog + news schema, seed, read API ([#4](https://github.com/Leritas/skm-energo/issues/4), [#7](https://github.com/Leritas/skm-energo/issues/7))
 - **Этап 3** ✅ — JWT auth, RBAC (`@skm/specs` + динамические роли), profile API
 - **Этап 4+** — CRUD каталога, заказы, файлы, email
 

@@ -13,6 +13,7 @@ import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
 import { ProfileModule } from './profile/profile.module';
 import { CatalogModule } from './catalog/catalog.module';
+import { NewsModule } from './news/news.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CatalogModule } from './catalog/catalog.module';
     AuthModule,
     ProfileModule,
     CatalogModule,
+    NewsModule,
     UsersModule,
     RolesModule,
     HealthModule,

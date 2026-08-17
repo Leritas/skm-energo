@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { NEWS_ARTICLES } from '~/constants/news-mocks'
-import { SITE } from '~/constants/site'
+import { formatNewsDate } from '~/utils/news';
+import { SITE } from '~/constants/site';
+
+const { data: articles } = await useNewsArticles();
 
 useSeoMeta({
   title: `Новости — ${SITE.name}`,
   description: `Новости компании ${SITE.legalName}.`,
-})
+});
 
-const breadcrumbs = [
-  { label: 'Главная', to: '/' },
-  { label: 'Новости' },
-]
+const breadcrumbs = [{ label: 'Главная', to: '/' }, { label: 'Новости' }];
 </script>
 
 <template>
@@ -27,11 +26,11 @@ const breadcrumbs = [
 
       <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <SkmNewsCard
-          v-for="item in NEWS_ARTICLES"
+          v-for="item in articles ?? []"
           :key="item.slug"
           :title="item.title"
           :to="`/news/${item.slug}`"
-          :date-label="item.dateLabel"
+          :date-label="formatNewsDate(item.publishDate)"
           :excerpt="item.excerpt"
         />
       </div>
