@@ -25,6 +25,7 @@
     "vue-router": "^5.1.0"
   },
   "devDependencies": {
+    "@iconify-json/lucide": "^1.2.123",
     "@nuxt/eslint": "^1.16.0",
     "@nuxtjs/sitemap": "^8.2.2",
     "@storybook/addon-docs": "10.4.6",

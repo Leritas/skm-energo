@@ -94,15 +94,26 @@
 
 ---
 
-### Этап 1 — Дизайн-система и публичный каркас
+### Этап 1 — Дизайн-система и публичный каркас ✅
 
-- Layout: header, footer, breadcrumbs
-- Страницы: `/`, `/about`, `/services`, `/contacts`, `/catalog`
+#### 1a — Design System ✅
+
+- SKM UI Kit (primitives) + Domain UI + Layout shell
+- Storybook, ESLint guardrail, `@skm/components`
+- Specs: [2026-07-13-skm-ui-kit-design.md](./superpowers/specs/2026-07-13-skm-ui-kit-design.md), [2026-07-20-skm-ui-kit-roadmap.md](./superpowers/specs/2026-07-20-skm-ui-kit-roadmap.md)
+
+#### 1b — Public shell ✅
+
+- Layout: header (catalog dropdown), footer, breadcrumbs
+- Pages: `/`, `/about`, `/services`, `/contacts`, `/catalog/**`, `/news/**`, `/product/[slug]`
+- Category-first catalog + optional manufacturer filter (mock data, ~18 products)
 - SEO: `useSeoMeta`, sitemap, robots.txt
-- Адаптивная вёрстка (mobile-first)
-- Референс меню — со старого сайта
+- Публичные страницы без dev-copy; формы → neutral success
+- Stub pages (cart, profile, …) — preview only, не критерий этапа
 
-**Ориентир:** 3–5 дней
+**Критерий:** публичный сайт выглядит как prod на mock-данных; README/roadmap синхронизированы.
+
+**Ориентир:** 3–5 дней (1a выполнен ранее)
 
 ---
 

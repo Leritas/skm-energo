@@ -1,22 +1,21 @@
 <script setup lang="ts">
-import { SkmBadge, SkmSearchBox } from '@skm/components'
+import { MANUFACTURERS } from '~/constants/catalog-mocks'
+import { SkmSearchBox } from '@skm/components'
 
 const props = withDefaults(
   defineProps<{
     query?: string
-    chips?: string[]
-    activeChip?: string | null
+    activeManufacturerSlug?: string | null
   }>(),
   {
     query: '',
-    chips: () => [],
-    activeChip: null,
+    activeManufacturerSlug: null,
   },
 )
 
 const emit = defineEmits<{
   'update:query': [value: string]
-  'update:activeChip': [value: string | null]
+  'toggle-manufacturer': [slug: string | null]
   submit: [value: string]
 }>()
 
@@ -24,8 +23,11 @@ function onQueryUpdate(value: string) {
   emit('update:query', value)
 }
 
-function toggleChip(chip: string) {
-  emit('update:activeChip', props.activeChip === chip ? null : chip)
+function toggleManufacturer(slug: string) {
+  emit(
+    'toggle-manufacturer',
+    props.activeManufacturerSlug === slug ? null : slug,
+  )
 }
 </script>
 
@@ -37,20 +39,17 @@ function toggleChip(chip: string) {
       @update:model-value="onQueryUpdate"
       @submit="emit('submit', $event)"
     />
-    <div
-      v-if="chips.length"
-      class="flex flex-wrap gap-2"
-    >
+    <div class="flex flex-wrap gap-2">
       <button
-        v-for="chip in chips"
-        :key="chip"
+        v-for="manufacturer in MANUFACTURERS"
+        :key="manufacturer.slug"
         type="button"
         class="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500"
-        @click="toggleChip(chip)"
+        @click="toggleManufacturer(manufacturer.slug)"
       >
         <SkmBadge
-          :label="chip"
-          :tone="activeChip === chip ? 'accent' : 'neutral'"
+          :label="manufacturer.label"
+          :tone="activeManufacturerSlug === manufacturer.slug ? 'accent' : 'neutral'"
           size="sm"
         />
       </button>

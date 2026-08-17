@@ -10,7 +10,7 @@ const toast = useToast()
 function handleSearch() {
   toast.add({
     title: 'Поиск',
-    description: 'Функция будет доступна на этапе 5 roadmap.',
+    description: 'Используйте поиск в каталоге или свяжитесь с менеджером.',
     color: 'neutral',
   })
 }
