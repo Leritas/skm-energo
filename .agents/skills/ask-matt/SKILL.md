@@ -23,7 +23,7 @@ The route most work travels. You have an idea and want it built.
    - **Yes** → **`/to-spec`** (turn the thread into a spec), then **`/to-tickets`** to split it into tracer-bullet tickets, each declaring its **blocking edges**. On a local tracker that's one file per ticket under `.scratch/<feature>/issues/`, worked blockers-first by hand; on a real tracker the edges become native blocking links, so any ticket whose blockers are done can be grabbed — kick off **`/implement`** per ticket, **`/clear`ing context between each one**. Each ticket is self-contained, so the last one's context is disposable.
    - **No** → **`/implement`** right here, in the same context window.
 
-   Either way, **`/implement`** builds each issue by driving **`/tdd`** internally — one red-green slice at a time — then closes out by running **`/code-review`**, a two-axis review (Standards + Spec) of the diff, before committing. Then **`/issue-review`** verifies tickets against the code and syncs GitHub; if you're still on a feature branch, it offers **`/ship-pr`** (PR + merge + delete branch) before closing issues. Reach for **`/tdd`**, **`/code-review`**, **`/ship-pr`**, and **`/issue-review`** individually when you only need that step.
+   Either way, **`/implement`** builds each issue by driving **`/tdd`** internally — one red-green slice at a time — then runs **`/deslop`**, **`/code-review`** (Standards + Spec), fixes findings, and commits on the feature branch. **Default:** stop and report — you check locally, then run **`/ship-pr`** and **`/issue-review`** when ready. **`-auto`:** continues through **`/ship-pr`** and **`/issue-review --auto-ship`** without asking. Reach for individual skills when you only need that step.
 
 ### Context hygiene
 

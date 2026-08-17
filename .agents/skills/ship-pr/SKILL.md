@@ -1,6 +1,6 @@
 ---
 name: ship-pr
-description: Push the current branch, open a pull request to main, merge it, and delete the feature branch. Use when the user runs /ship-pr, agrees to merge during /issue-review, or asks to create and merge a PR.
+description: Push the current branch, open a pull request to main, merge it, and delete the feature branch. Use when the user runs /ship-pr, agrees to merge during /issue-review, or when /implement -auto completes review.
 disable-model-invocation: true
 ---
 
@@ -108,9 +108,11 @@ Return:
 | `--dry-run`          | Show planned commands, title/body draft, and PR number if exists — no push, create, merge, or delete |
 | `--no-delete-branch` | Merge but keep the remote branch (still checkout `main` locally)                                     |
 
-## Called from `/issue-review`
+## Called from `/issue-review` or `/implement -auto`
 
-When `issue-review` asks the user to ship and they agree, run this skill **before** verifying issues on `main`. After a successful ship, return control to `issue-review` with verification base `main`.
+When **`/issue-review --auto-ship`** or **`/implement -auto`** reaches the ship step, run this skill **without asking** — merge is already decided. After a successful ship, return control to `issue-review` with verification base `main`.
+
+When **`/issue-review`** (no `--auto-ship`) asks the user to ship and they agree, run this skill before verifying issues on `main`.
 
 ## Guardrails
 

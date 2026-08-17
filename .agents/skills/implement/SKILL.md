@@ -1,10 +1,21 @@
 ---
 name: implement
-description: 'Implement a piece of work based on a spec or set of tickets.'
+description: 'Implement a piece of work based on a spec or set of tickets. Default mode stops after review for manual merge; -auto runs the full ship pipeline.'
 disable-model-invocation: true
 ---
 
 Implement the work described by the user in the spec or tickets.
+
+## Flags
+
+| Flag        | Effect                                                                                                                                                           |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **(none)**  | **Manual mode** — implement, deslop, code-review, fix, commit on the feature branch, **stop and report**. User reviews locally, then runs `/ship-pr` when ready. |
+| **`-auto`** | **Auto mode** — same as manual through commit, then automatically run `/ship-pr` and `/issue-review` (no merge prompt).                                          |
+
+Parse the flag from the user prompt: `/implement #9 -auto`, `/implement issue 9 --auto`, etc.
+
+**Questions during work are always allowed** in both modes (blockers, ambiguous spec, destructive git ops). In **`-auto`**, do **not** ask whether to ship — shipping is implicit.
 
 ## 0. Branch setup (one ticket per branch)
 
@@ -66,24 +77,72 @@ gh issue edit <N> --add-assignee @me
 
 ## 1. Implement
 
-Use /tdd where possible, at pre-agreed seams.
+Use `/tdd` where possible, at pre-agreed seams.
 
 Run typechecking regularly, single test files regularly, and the full test suite once at the end.
 
-## 2. Review and commit
+## 2. Deslop
 
-Once done, use /code-review to review the work.
+Run **`/deslop`** (read the deslop skill) against `git diff main...HEAD`. Remove AI slop introduced on this branch; keep behaviour unchanged unless fixing a clear bug.
 
-Commit your work to the **feature branch** (`issue<N>.<slug>`).
+## 3. Code review and fixes
 
-## 3. Close the loop
+Run **`/code-review`** with fixed point **`main`** (three-dot diff: `git diff main...HEAD`).
 
-Then run /issue-review on the ticket numbers (it will offer /ship-pr if not on main).
+**Act on findings before committing:**
 
-Typical git flow end-to-end:
+| Finding                                         | Action                                                                                                                                           |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Quick fix (bug, spec miss, obvious smell)       | Fix now; re-run affected tests                                                                                                                   |
+| Inconvenient / slow refactor, not blocking ship | **Defer** — open a follow-up GitHub issue immediately (`gh issue create`) with context and link from the implementation report so it is not lost |
+| False positive                                  | Note in report; no change                                                                                                                        |
+
+If deslop or review edits code, run tests again before commit.
+
+## 4. Commit
+
+Commit all work to the **feature branch** (`issue<N>.<slug>`). One commit is fine unless the repo habit is otherwise.
+
+## 5. Close the loop — depends on mode
+
+### Manual mode (default)
+
+**Stop here.** Report to the user:
+
+1. **Implemented** — branch name, ticket(s), short summary of behaviour
+2. **Deslop** — what was cleaned (or “nothing needed”)
+3. **Code review** — findings, what was fixed, what was deferred (with new issue numbers)
+4. **Tests** — what ran and passed
+5. **Next step** — user should try the feature locally, then run **`/ship-pr`** when satisfied
+
+Do **not** run `/ship-pr` or `/issue-review` unless the user asks or passed **`-auto`**.
+
+### Auto mode (`-auto`)
+
+Continue without asking:
+
+1. Run **`/ship-pr`** (read `.agents/skills/ship-pr/SKILL.md` and execute it).
+2. Run **`/issue-review`** on the ticket number(s) with **`--auto-ship`** so it verifies on `main` without a merge prompt.
+
+Report the full pipeline result: PR URL, merge status, issue-review verdict, any deferred follow-up issues.
+
+## Typical flows
+
+**Manual (default):**
 
 ```
-/implement #4  →  issue4.catalog
-  → code + commit on branch
-  → /issue-review  →  /ship-pr  →  merge + delete branch  →  issue closed
+/implement #9
+  → issue9.<slug>
+  → implement → deslop → code-review → fix → commit
+  → report → (user checks) → /ship-pr → /issue-review
+```
+
+**Auto:**
+
+```
+/implement #9 -auto
+  → issue9.<slug>
+  → implement → deslop → code-review → fix → commit
+  → /ship-pr → /issue-review --auto-ship
+  → issue closed on main
 ```

@@ -1,12 +1,12 @@
 ---
 name: issue-review
-description: Verify GitHub issues against shipped code and sync tracker state — check acceptance criteria, post a verification comment, close completed tickets, or report gaps and next steps. On a feature branch, offers to run /ship-pr first. Use when the user runs /issue-review with ticket numbers, or asks to verify, close, or sync GitHub issues.
+description: Verify GitHub issues against shipped code and sync tracker state — check acceptance criteria, post a verification comment, close completed tickets, or report gaps and next steps. On a feature branch, offers to run /ship-pr first (unless --auto-ship). Use when the user runs /issue-review with ticket numbers, or asks to verify, close, or sync GitHub issues.
 disable-model-invocation: true
 ---
 
 # Issue Review
 
-Close the loop after **`/implement`** → **`/code-review`** → commit. This skill checks whether specified GitHub issues are **done in the codebase**, syncs GitHub, and — when you're not on `main` — can ship the branch first.
+Close the loop after **`/implement`** → deslop → **`/code-review`** → commit. This skill checks whether specified GitHub issues are **done in the codebase**, syncs GitHub, and — when you're not on `main` — can ship the branch first.
 
 `/code-review` judges a **diff** (Standards + Spec). **`/issue-review`** judges **issue completion** and **writes to GitHub** (comment, close, labels).
 
@@ -16,19 +16,25 @@ If `docs/agents/issue-tracker.md` is missing, tell the user to run `/setup-matt-
 
 After implementation is committed and reviewed. Typical flow:
 
+**Manual `/implement` (default):**
+
 ```
-/implement → /code-review → commit → /issue-review
-                                         ↓ (not on main?)
-                                    offer /ship-pr
-                                         ↓
-                              verify on main → close issues
+/implement → deslop → /code-review → fix → commit → (user checks locally)
+  → /ship-pr → /issue-review → verify on main → close issues
+```
+
+**Auto `/implement -auto`:**
+
+```
+/implement -auto → … → commit → /ship-pr → /issue-review --auto-ship
+  → verify on main → close issues
 ```
 
 Do **not** run instead of `/code-review`.
 
 ## Process
 
-### 0. Detect branch — offer to ship
+### 0. Detect branch — offer to ship (unless `--auto-ship`)
 
 ```bash
 git branch --show-current
@@ -37,7 +43,9 @@ git merge-base --is-ancestor HEAD main && echo on-main || echo feature-branch
 
 **If current branch is `main` (or `master`):** skip to step 1; verification base is `main`.
 
-**If on a feature branch:** use **AskQuestion** (or ask in chat if unavailable):
+**If on a feature branch and `--auto-ship` is set** (from `/implement -auto`, or user passed the flag): run **`/ship-pr`** immediately — no AskQuestion. On success, continue on `main`. On failure, stop and report.
+
+**If on a feature branch and `--auto-ship` is not set:** use **AskQuestion** (or ask in chat if unavailable):
 
 > You're on `<branch>`, not `main`. Create a PR, merge to `main`, and delete the branch before verifying issues?
 
@@ -65,6 +73,7 @@ Deduplicate. Fetch each with `gh issue view <n>`.
 | On `main` after ship or already on `main`         | `main` @ `HEAD`                 |
 | User declined ship                                | current feature branch @ `HEAD` |
 | `--dry-run` on feature branch, user declined ship | current branch (report only)    |
+| `--auto-ship` after successful ship               | `main` @ `HEAD`                 |
 
 Record implementing commits: `git log main..HEAD --oneline` when base is not `main`, or “already on main” when empty.
 
@@ -133,26 +142,31 @@ Summary table (issue, verdict, GitHub action), done / still to do, suggested nex
 
 ## Flags
 
-| Flag        | Effect                                                |
-| ----------- | ----------------------------------------------------- |
-| `--dry-run` | No push, PR, merge, comments, or closes — report only |
+| Flag          | Effect                                                                          |
+| ------------- | ------------------------------------------------------------------------------- |
+| `--dry-run`   | No push, PR, merge, comments, or closes — report only                           |
+| `--auto-ship` | On a feature branch, run `/ship-pr` without asking (used by `/implement -auto`) |
 
-Branch and ship decisions are handled in step 0, not via flags.
+Branch ship prompts are handled in step 0. **`--auto-ship`** suppresses the merge question; **`--dry-run`** suppresses all GitHub writes.
 
 ## Relationship to other skills
 
 ```
-/to-tickets → /implement → /code-review → commit
-                              ↓
-                       /issue-review
-                              ↓ (feature branch?)
-                         /ship-pr → merge main
+/to-tickets → /implement [-auto] → deslop → /code-review → fix → commit
+                              ↓ manual                          ↓ -auto
+                         report & stop                    /ship-pr
+                              ↓                                  ↓
+                    (user) /ship-pr              /issue-review --auto-ship
+                              ↓                                  ↓
+                       /issue-review                  verify + close issues
                               ↓
                     verify + close issues
 ```
 
-- **`/ship-pr`** — push, PR, merge, delete branch (also invoked from step 0).
-- **`/code-review`** — pre-ship diff review.
+- **`/implement -auto`** — runs ship + issue-review with `--auto-ship`; never asks to merge.
+- **`/implement`** (default) — stops after commit; user runs `/ship-pr` when ready.
+- **`/ship-pr`** — push, PR, merge, delete branch.
+- **`/code-review`** — pre-ship diff review (Standards + Spec).
 - **`/triage`** — not for your own tickets.
 
 ## Additional resources
