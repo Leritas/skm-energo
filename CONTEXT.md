@@ -25,7 +25,7 @@ Stage 1b deliverable: layout + skeleton pages without backend API.
 _Avoid_: MVP, static site
 
 **Stub page**:
-Preview route outside current stage criteria (cart, profile, checkout). Kept for UX preview.
+Preview route outside current stage criteria (`/cart`, `/checkout`, `/admin`; `/profile/**` partially live). Kept for UX preview; excluded from sitemap until the owning stage ships. Dev-copy («этап N», «mock») allowed on stubs, not on public shell routes.
 _Avoid_: WIP page, draft route
 
 **Category**:

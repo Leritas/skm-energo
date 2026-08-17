@@ -77,6 +77,49 @@
 
 ---
 
+## GitHub issues
+
+Parent epics для этапов 1–10: [#10](https://github.com/Leritas/skm-energo/issues/10) … [#19](https://github.com/Leritas/skm-energo/issues/19). Implementation slices — sub-issues с native `blocked_by`.
+
+| Этап | Epic | Frontier / sub-issues |
+|------|------|------------------------|
+| 1 | [#10](https://github.com/Leritas/skm-energo/issues/10) | [#5](https://github.com/Leritas/skm-energo/issues/5) docs closure ✅ |
+| 2 | [#11](https://github.com/Leritas/skm-energo/issues/11) | [#4](https://github.com/Leritas/skm-energo/issues/4) catalog API, [#7](https://github.com/Leritas/skm-energo/issues/7) news |
+| 3 | [#12](https://github.com/Leritas/skm-energo/issues/12) ✅ | — |
+| 4 | [#13](https://github.com/Leritas/skm-energo/issues/13) | (slices TBD) |
+| 5 | [#14](https://github.com/Leritas/skm-energo/issues/14) | [#6](https://github.com/Leritas/skm-energo/issues/6), [#8](https://github.com/Leritas/skm-energo/issues/8), [#9](https://github.com/Leritas/skm-energo/issues/9) |
+| 6 | [#15](https://github.com/Leritas/skm-energo/issues/15) | (slices TBD) |
+| 7 | [#16](https://github.com/Leritas/skm-energo/issues/16) | [#21](https://github.com/Leritas/skm-energo/issues/21)–[#24](https://github.com/Leritas/skm-energo/issues/24) |
+| 8–10 | [#17](https://github.com/Leritas/skm-energo/issues/17)–[#19](https://github.com/Leritas/skm-energo/issues/19) | [#20](https://github.com/Leritas/skm-energo/issues/20) SSR auth → #19 |
+
+Этап 0 и этап 11 (v2) — только в этом документе, без parent epic.
+
+---
+
+## Политики
+
+### Stub pages (preview routes)
+
+Маршруты вне критериев текущего этапа — **preview UX**, не блокер закрытия этапа 1:
+
+| Route | Назначение | Данные | Sitemap |
+|-------|------------|--------|---------|
+| `/cart`, `/checkout` | Корзина / оформление | mock / placeholder | исключить до этапа 6 |
+| `/profile/**` | ЛК (shell ✅, P1 info API ✅) | orders/favorites — mocks до P2–P4 | исключить |
+| `/admin` | Админ-панель | stub до этапа 4 | исключить |
+
+**Dev-copy:** на **публичных** страницах этапа 1b (`/`, `/about`, `/services`, `/contacts`, `/catalog/**`, `/news/**`, `/product/[slug]`) — без «этап N roadmap», «mock», «stub». На stub-маршрутах допустим preview-copy до соответствующего этапа.
+
+### Отложено (не потеряно)
+
+| Решение | Когда | Примечание |
+|---------|-------|------------|
+| Category taxonomy v2 | После live catalog | Пересборка дерева категорий с нуля (не копия manufacturer-first старого сайта) |
+| E2E smoke tests | После #4 (live data) | Playwright/regression на mock не приоритет |
+| SSR-safe auth session | Этап 10 / [#20](https://github.com/Leritas/skm-energo/issues/20) | Client-only middleware принят для v1 |
+
+---
+
 ## Этапы реализации
 
 ### Этап 0 — Фундамент монорепы ✅
@@ -113,15 +156,20 @@
 
 **Критерий:** публичный сайт выглядит как prod на mock-данных; README/roadmap синхронизированы.
 
+**GitHub:** [#10](https://github.com/Leritas/skm-energo/issues/10) ✅
+
 **Ориентир:** 3–5 дней (1a выполнен ранее)
 
 ---
 
-### Этап 2 — База данных и Prisma
+### Этап 2 — База данных и Prisma 🔄
 
 - Prisma schema на основе [db-draft.sql](./db-draft.sql) + расширения выше
 - Миграции, seed (2–3 производителя, дерево категорий, 5–10 товаров)
 - NestJS Prisma module, repository/service паттерны
+- Read API: catalog + news (замена mock constants)
+
+**GitHub:** [#11](https://github.com/Leritas/skm-energo/issues/11) — start [#4](https://github.com/Leritas/skm-energo/issues/4)
 
 **Ориентир:** 2–3 дня
 
@@ -140,6 +188,8 @@
 
 **Known limitation:** auth middleware client-only (SSR flash on hard refresh) — deferred [#20](https://github.com/Leritas/skm-energo/issues/20).
 
+**GitHub:** [#12](https://github.com/Leritas/skm-energo/issues/12) ✅
+
 **Ориентир:** 3–4 дня
 
 ---
@@ -150,17 +200,26 @@
 - Медиа-библиотека (upload/delete)
 - Dashboard: заказы, заявки
 
+**GitHub:** [#13](https://github.com/Leritas/skm-energo/issues/13)
+
 **Ориентир:** 7–10 дней
 
 ---
 
-### Этап 5 — Публичный каталог
+### Этап 5 — Публичный каталог (live data delta)
 
-- `/catalog`, `/catalog/[...slug]`, `/product/[slug]`
-- Поиск (PostgreSQL full-text / pg_trgm)
-- SSR для SEO
+**Уже в этапе 1b (mock):** маршруты `/catalog/**`, `/product/[slug]`, category-first UX, manufacturer filter, PDP, similar strip, SSR meta, breadcrumbs.
 
-**Ориентир:** 5–7 дней
+**Остаётся (этап 5):**
+
+- Wire public pages to catalog read API ([#6](https://github.com/Leritas/skm-energo/issues/6))
+- Поиск end-to-end (header + catalog; pg_trgm / full-text) ([#8](https://github.com/Leritas/skm-energo/issues/8))
+- Similar products from API ([#9](https://github.com/Leritas/skm-energo/issues/9))
+- News live data — tracked under этап 2 ([#7](https://github.com/Leritas/skm-energo/issues/7))
+
+**GitHub:** [#14](https://github.com/Leritas/skm-energo/issues/14); implementation sub-issues under [#11](https://github.com/Leritas/skm-energo/issues/11)
+
+**Ориентир:** 3–5 дней (delta; UI уже есть)
 
 ---
 
@@ -171,6 +230,8 @@
 - Оплата v1: `pending_manual`
 - Email-уведомления
 - Админка: управление заказами
+
+**GitHub:** [#15](https://github.com/Leritas/skm-energo/issues/15) — blocks profile P2 ([#22](https://github.com/Leritas/skm-energo/issues/22))
 
 **Ориентир:** 5–7 дней
 
@@ -208,6 +269,8 @@
 - Captcha (Turnstile / reCAPTCHA)
 - Админка: просмотр лидов
 
+**GitHub:** [#17](https://github.com/Leritas/skm-energo/issues/17)
+
 **Ориентир:** 2–3 дня
 
 ---
@@ -217,6 +280,8 @@
 - CRUD поставщиков
 - Product ↔ Supplier
 - Учёт остатков, оповещения
+
+**GitHub:** [#18](https://github.com/Leritas/skm-energo/issues/18)
 
 **Ориентир:** 2–3 дня
 
@@ -229,6 +294,9 @@
 - Yandex Metrika
 - 301-redirect со старых `.html` URL
 - Rate limiting, логирование
+- SSR-safe auth ([#20](https://github.com/Leritas/skm-energo/issues/20))
+
+**GitHub:** [#19](https://github.com/Leritas/skm-energo/issues/19)
 
 **Ориентир:** 3–5 дней
 
@@ -254,7 +322,7 @@
 | 2. Prisma + seed | 2–3 дня | Средняя |
 | 3. Auth | 3–4 дня | Средняя |
 | 4. Админка | 7–10 дней | Высокая |
-| 5. Каталог | 5–7 дней | Высокая |
+| 5. Каталог (live delta) | 3–5 дней | Средняя |
 | 6. Корзина + заказы | 5–7 дней | Высокая |
 | 7. ЛК + отзывы | 3–4 дня | Средняя |
 | 8. Формы/лиды | 2–3 дня | Низкая |
