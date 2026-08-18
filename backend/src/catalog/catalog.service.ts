@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { parseProductSpecs } from './catalog-specs';
 import {
   filterProductsByCatalogFilter,
   filterVisibleCategoryTree,
@@ -28,6 +29,8 @@ export interface CatalogProductDetailDto extends CatalogProductListItemDto {
   description: string;
   specs: Array<{ label: string; value: string }>;
   pdfHref: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
 }
 
 export interface CatalogManufacturerDto {
@@ -46,6 +49,8 @@ const PUBLIC_CATEGORY_WHERE = {
 } as const;
 
 const PUBLIC_PRODUCT_WHERE = {
+  isPublished: true,
+  deletedAt: null,
   manufacturer: PUBLIC_MANUFACTURER_WHERE,
   category: PUBLIC_CATEGORY_WHERE,
 } as const;
@@ -124,19 +129,17 @@ export class CatalogService {
       },
     });
 
-    if (
-      !product ||
-      !this.isPublicManufacturer(product.manufacturer) ||
-      !this.isPublicCategory(product.category)
-    ) {
+    if (!product || !this.isPublicProduct(product)) {
       throw new NotFoundException('Product not found');
     }
 
     return {
       ...this.toListItem(product),
       description: product.description,
-      specs: this.parseSpecs(product.specs),
+      specs: parseProductSpecs(product.specs),
       pdfHref: product.pdfHref,
+      seoTitle: product.seoTitle,
+      seoDescription: product.seoDescription,
     };
   }
 
@@ -200,6 +203,8 @@ export class CatalogService {
       )
       ${categoryFilter}
       ${manufacturerFilter}
+      AND p."isPublished" = true
+      AND p."deletedAt" IS NULL
       AND m."isPublished" = true
       AND m."deletedAt" IS NULL
       AND c."isPublished" = true
@@ -231,14 +236,13 @@ export class CatalogService {
   ): Promise<CatalogProductListItemDto[]> {
     const product = await this.prisma.product.findUnique({
       where: { slug },
-      select: {
-        slug: true,
-        categoryId: true,
-        manufacturerId: true,
+      include: {
+        manufacturer: true,
+        category: true,
       },
     });
 
-    if (!product) {
+    if (!product || !this.isPublicProduct(product)) {
       throw new NotFoundException('Product not found');
     }
 
@@ -351,26 +355,6 @@ export class CatalogService {
     };
   }
 
-  private parseSpecs(value: unknown): Array<{ label: string; value: string }> {
-    if (!Array.isArray(value)) {
-      return [];
-    }
-
-    return value.flatMap((item) => {
-      if (
-        typeof item === 'object' &&
-        item !== null &&
-        'label' in item &&
-        'value' in item &&
-        typeof item.label === 'string' &&
-        typeof item.value === 'string'
-      ) {
-        return [{ label: item.label, value: item.value }];
-      }
-      return [];
-    });
-  }
-
   private async assertManufacturerExists(
     manufacturerSlug: string | null,
   ): Promise<void> {
@@ -398,6 +382,20 @@ export class CatalogService {
     deletedAt: Date | null;
   }): boolean {
     return category.isPublished && category.deletedAt === null;
+  }
+
+  private isPublicProduct(product: {
+    isPublished: boolean;
+    deletedAt: Date | null;
+    manufacturer: { isPublished: boolean; deletedAt: Date | null };
+    category: { isPublished: boolean; deletedAt: Date | null };
+  }): boolean {
+    return (
+      product.isPublished &&
+      product.deletedAt === null &&
+      this.isPublicManufacturer(product.manufacturer) &&
+      this.isPublicCategory(product.category)
+    );
   }
 
   private async assertCategoryExists(categorySlug: string): Promise<void> {

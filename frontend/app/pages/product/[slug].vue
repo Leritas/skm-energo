@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import {
-  productBadgeLabel,
-  productBadgeTone,
-  toProductCardBadges,
-} from '~/components/ui/SkmProductCard/badgeDisplay';
 import { getCategoryBreadcrumbs, getManufacturerLabel } from '~/utils/catalog';
 import { SITE } from '~/constants/site';
+import {
+  buildProductJsonLd,
+  formatProductDocumentTitle,
+  resolveProductSeoDescription,
+  resolveProductSeoTitle,
+} from '~/utils/product-seo';
 
 const route = useRoute();
+const config = useRuntimeConfig();
 const slug = computed(() => String(route.params.slug ?? ''));
 
 const { data: product, error: productError } = await useCatalogProduct(slug);
@@ -31,9 +32,56 @@ function manufacturerLabel(manufacturerSlug: string) {
   return getManufacturerLabel(manufacturerSlug, manufacturers.value);
 }
 
+const seoTitle = computed(() =>
+  formatProductDocumentTitle(resolveProductSeoTitle(product.value!), SITE.name),
+);
+const seoDescription = computed(() =>
+  resolveProductSeoDescription(product.value!),
+);
+const canonicalUrl = computed(
+  () => `${config.public.siteUrl}/product/${product.value!.slug}`,
+);
+const categoryLabel = computed(() => {
+  const trail = getCategoryBreadcrumbs(
+    product.value!.categorySlug,
+    null,
+    allCategories.value ?? [],
+  );
+  return trail[trail.length - 1]?.label ?? product.value!.categorySlug;
+});
+
 useSeoMeta({
-  title: () => `${product.value!.title} — ${SITE.name}`,
-  description: () => product.value!.description,
+  title: seoTitle,
+  description: seoDescription,
+  ogTitle: seoTitle,
+  ogDescription: seoDescription,
+  ogType: 'website',
+  ogUrl: canonicalUrl,
+  twitterCard: 'summary',
+  twitterTitle: seoTitle,
+  twitterDescription: seoDescription,
+});
+
+const jsonLd = computed(() =>
+  JSON.stringify(
+    buildProductJsonLd({
+      product: product.value!,
+      manufacturerLabel: manufacturerLabel(product.value!.manufacturerSlug),
+      categoryLabel: categoryLabel.value,
+      url: canonicalUrl.value,
+    }),
+  ),
+);
+
+useHead({
+  link: [{ rel: 'canonical', href: canonicalUrl }],
+  script: [
+    {
+      key: 'product-jsonld',
+      type: 'application/ld+json',
+      innerHTML: jsonLd,
+    },
+  ],
 });
 
 const breadcrumbs = computed(() => {
@@ -47,102 +95,18 @@ const breadcrumbs = computed(() => {
     { label: item.title },
   ];
 });
-
-const activeTab = ref('desc');
-const tabItems = [
-  { label: 'Описание', value: 'desc', content: '' },
-  { label: 'Характеристики', value: 'specs', content: '' },
-  { label: 'PDF', value: 'pdf', content: '' },
-];
-
-const pdfFilename = computed(() => {
-  const href = product.value?.pdfHref;
-  if (!href) {
-    return undefined;
-  }
-  return href.split('/').pop() ?? 'datasheet.pdf';
-});
 </script>
 
 <template>
   <SkmSection>
     <SkmContainer>
-      <SkmPageHeader
-        :title="product!.title"
-        :description="`${manufacturerLabel(product!.manufacturerSlug)} · арт. ${product!.sku}`"
-      >
-        <template #breadcrumbs>
-          <SkmBreadcrumbs :items="breadcrumbs" />
-        </template>
-      </SkmPageHeader>
-
-      <div class="grid gap-10 lg:grid-cols-2">
-        <SkmProductGallery :images="[]" :alt="product!.title" />
-
-        <div>
-          <div v-if="product!.badges?.length" class="mb-4 flex flex-wrap gap-2">
-            <SkmBadge
-              v-for="badge in toProductCardBadges(product!.badges)"
-              :key="badge"
-              :label="productBadgeLabel(badge)"
-              :tone="productBadgeTone(badge)"
-              size="sm"
-            />
-          </div>
-          <p class="text-sm leading-relaxed text-neutral-600">
-            {{ product!.description }}
-          </p>
-          <div class="mt-6">
-            <SkmButton variant="primary" to="/contacts">
-              Запросить поставку
-            </SkmButton>
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-12">
-        <SkmTabs v-model="activeTab" :items="tabItems" />
-        <div class="mt-6">
-          <p
-            v-if="activeTab === 'desc'"
-            class="text-sm leading-relaxed text-neutral-600"
-          >
-            {{ product!.description }}
-          </p>
-          <SkmSpecList
-            v-else-if="activeTab === 'specs'"
-            :items="product!.specs"
-          />
-          <div v-else-if="activeTab === 'pdf'">
-            <SkmFileLink
-              v-if="product!.pdfHref && pdfFilename"
-              :href="product!.pdfHref"
-              :filename="pdfFilename"
-              size-label="PDF"
-            />
-            <p v-else class="text-sm text-neutral-500">
-              Документация будет добавлена менеджером при запросе поставки.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="similarProducts?.length" class="mt-16">
-        <h2 class="text-xl font-semibold text-neutral-900">
-          Похожие товары других производителей
-        </h2>
-        <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <SkmProductCard
-            v-for="item in similarProducts"
-            :key="item.slug"
-            :title="item.title"
-            :to="`/product/${item.slug}`"
-            :manufacturer="manufacturerLabel(item.manufacturerSlug)"
-            :sku="item.sku"
-            :badges="toProductCardBadges(item.badges)"
-          />
-        </div>
-      </div>
+      <CatalogProductDetailView
+        :product="product!"
+        :manufacturer-label="manufacturerLabel(product!.manufacturerSlug)"
+        :breadcrumbs="breadcrumbs"
+        :similar-products="similarProducts ?? []"
+        :similar-manufacturer-label="manufacturerLabel"
+      />
     </SkmContainer>
   </SkmSection>
 </template>

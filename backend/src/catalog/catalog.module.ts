@@ -4,9 +4,15 @@ import { CatalogAdminService } from './catalog-admin.service';
 import { CategoryAdminService } from './category-admin.service';
 import { CatalogController } from './catalog.controller';
 import { CatalogService } from './catalog.service';
+import { ProductAdminService } from './product-admin.service';
 
 @Module({
   controllers: [CatalogController, CatalogAdminController],
-  providers: [CatalogService, CatalogAdminService, CategoryAdminService],
+  providers: [
+    CatalogService,
+    CatalogAdminService,
+    CategoryAdminService,
+    ProductAdminService,
+  ],
 })
 export class CatalogModule {}
