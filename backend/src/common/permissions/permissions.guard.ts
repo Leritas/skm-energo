@@ -8,6 +8,7 @@ import { Reflector } from '@nestjs/core';
 import type { Permission } from '@skm/specs';
 import { Request } from 'express';
 import { JwtPayloadUser } from '../auth/current-user.decorator';
+import { REQUIRE_ANY_PERMISSIONS_KEY } from './require-any-permissions.decorator';
 import { REQUIRE_PERMISSIONS_KEY } from './require-permissions.decorator';
 import { PermissionsService } from './permissions.service';
 
@@ -21,12 +22,18 @@ export class PermissionsGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const required = this.reflector.getAllAndOverride<Permission[] | undefined>(
-      REQUIRE_PERMISSIONS_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredAll = this.reflector.getAllAndOverride<
+      Permission[] | undefined
+    >(REQUIRE_PERMISSIONS_KEY, [context.getHandler(), context.getClass()]);
 
-    if (!required || required.length === 0) {
+    const requiredAny = this.reflector.getAllAndOverride<
+      Permission[] | undefined
+    >(REQUIRE_ANY_PERMISSIONS_KEY, [context.getHandler(), context.getClass()]);
+
+    if (
+      (!requiredAll || requiredAll.length === 0) &&
+      (!requiredAny || requiredAny.length === 0)
+    ) {
       return true;
     }
 
@@ -36,13 +43,26 @@ export class PermissionsGuard implements CanActivate {
       throw new ForbiddenException('Authentication required');
     }
 
-    const allowed = await this.permissionsService.userHasPermissions(
-      userId,
-      required,
-    );
-    if (!allowed) {
-      throw new ForbiddenException('Insufficient permissions');
+    if (requiredAll && requiredAll.length > 0) {
+      const allowed = await this.permissionsService.userHasPermissions(
+        userId,
+        requiredAll,
+      );
+      if (!allowed) {
+        throw new ForbiddenException('Insufficient permissions');
+      }
     }
+
+    if (requiredAny && requiredAny.length > 0) {
+      const allowed = await this.permissionsService.userHasAnyPermission(
+        userId,
+        requiredAny,
+      );
+      if (!allowed) {
+        throw new ForbiddenException('Insufficient permissions');
+      }
+    }
+
     return true;
   }
 }

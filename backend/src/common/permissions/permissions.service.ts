@@ -3,6 +3,7 @@ import {
   ALL_PERMISSIONS,
   assertPermissions,
   hasAllPermissions,
+  hasAnyPermission,
   type Permission,
 } from '@skm/specs';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -33,6 +34,14 @@ export class PermissionsService {
   ): Promise<boolean> {
     const permissions = await this.getUserPermissions(userId);
     return hasAllPermissions(permissions, required);
+  }
+
+  async userHasAnyPermission(
+    userId: number,
+    required: readonly Permission[],
+  ): Promise<boolean> {
+    const permissions = await this.getUserPermissions(userId);
+    return hasAnyPermission(permissions, required);
   }
 
   validatePermissionList(values: string[]): Permission[] {

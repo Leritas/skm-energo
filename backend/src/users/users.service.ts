@@ -3,14 +3,54 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Permission } from '@skm/specs';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { ListUsersQueryDto } from './dto/list-users-query.dto';
 import { SetUserRolesDto } from './dto/set-user-roles.dto';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findStaff(query: ListUsersQueryDto) {
+    const { page, limit } = query;
+    const skip = (page - 1) * limit;
+
+    const where = {
+      roles: {
+        some: {
+          role: {
+            permissions: {
+              has: Permission.hasAccessToAdmin,
+            },
+          },
+        },
+      },
+    };
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { email: 'asc' },
+        include: {
+          roles: { include: { role: true } },
+        },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return {
+      items: users.map((user) => this.toDto(user)),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit) || 1,
+    };
+  }
 
   async create(dto: CreateUserDto) {
     const email = dto.email.toLowerCase();
