@@ -142,4 +142,16 @@ export class CatalogProductDetailResponseDto extends CatalogProductListItemRespo
 
   @ApiPropertyOptional({ example: '/files/nh00-160a.pdf', nullable: true })
   pdfHref!: string | null;
+
+  @ApiPropertyOptional({
+    example: 'Предохранитель NH00 160A — поставка',
+    nullable: true,
+  })
+  seoTitle!: string | null;
+
+  @ApiPropertyOptional({
+    example: 'Низковольтный предохранитель NH00 для промышленных щитов.',
+    nullable: true,
+  })
+  seoDescription!: string | null;
 }

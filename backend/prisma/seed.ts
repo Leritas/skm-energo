@@ -73,6 +73,7 @@ async function seedCatalog() {
         similarSlugs: product.similarSlugs ?? [],
         manufacturerId,
         categoryId,
+        isPublished: true,
       },
       create: {
         slug: product.slug,
@@ -85,6 +86,7 @@ async function seedCatalog() {
         similarSlugs: product.similarSlugs ?? [],
         manufacturerId,
         categoryId,
+        isPublished: true,
       },
     });
   }

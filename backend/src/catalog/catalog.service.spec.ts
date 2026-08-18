@@ -55,6 +55,10 @@ describe('CatalogService', () => {
           pdfHref: '/files/nh00-160a.pdf',
           badges: ['pdf'],
           similarSlugs: ['fuse-link-6kv'],
+          seoTitle: 'NH00 160A — поставка',
+          seoDescription: 'Низковольтный предохранитель NH00 для щитов.',
+          isPublished: true,
+          deletedAt: null,
           manufacturer: { slug: 'mersen', isPublished: true, deletedAt: null },
           category: {
             slug: 'nizkovoltnye-predohraniteli',
@@ -76,6 +80,8 @@ describe('CatalogService', () => {
       specs: [{ label: 'Номинальный ток', value: '160 A' }],
       pdfHref: '/files/nh00-160a.pdf',
       badges: ['pdf'],
+      seoTitle: 'NH00 160A — поставка',
+      seoDescription: 'Низковольтный предохранитель NH00 для щитов.',
       manufacturerSlug: 'mersen',
       categorySlug: 'nizkovoltnye-predohraniteli',
     });
@@ -103,6 +109,10 @@ describe('CatalogService', () => {
           slug: 'fuse-link-10kv',
           categoryId: 2,
           manufacturerId: 1,
+          isPublished: true,
+          deletedAt: null,
+          manufacturer: { isPublished: true, deletedAt: null },
+          category: { isPublished: true, deletedAt: null },
         }),
         findMany: jest.fn().mockResolvedValue([
           {
@@ -125,6 +135,8 @@ describe('CatalogService', () => {
         categoryId: 2,
         manufacturerId: { not: 1 },
         slug: { not: 'fuse-link-10kv' },
+        isPublished: true,
+        deletedAt: null,
         manufacturer: { isPublished: true, deletedAt: null },
         category: { isPublished: true, deletedAt: null },
       },
@@ -154,6 +166,10 @@ describe('CatalogService', () => {
           slug: 'c09-220',
           categoryId: 5,
           manufacturerId: 4,
+          isPublished: true,
+          deletedAt: null,
+          manufacturer: { isPublished: true, deletedAt: null },
+          category: { isPublished: true, deletedAt: null },
         }),
         findMany: jest.fn().mockResolvedValue([]),
       },
@@ -207,6 +223,70 @@ describe('CatalogService', () => {
     });
   });
 
+  it('hides an unpublished product from the public PDP', async () => {
+    const prisma = {
+      product: {
+        findUnique: jest.fn().mockResolvedValue({
+          slug: 'draft-fuse',
+          title: 'Черновик',
+          sku: 'DRAFT-1',
+          description: 'Ещё не опубликован.',
+          specs: [],
+          pdfHref: null,
+          badges: [],
+          seoTitle: null,
+          seoDescription: null,
+          isPublished: false,
+          deletedAt: null,
+          manufacturer: { slug: 'mersen', isPublished: true, deletedAt: null },
+          category: {
+            slug: 'nizkovoltnye-predohraniteli',
+            isPublished: true,
+            deletedAt: null,
+          },
+        }),
+      },
+    };
+
+    const service = new CatalogService(prisma as never);
+
+    await expect(service.getProductBySlug('draft-fuse')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+  });
+
+  it('hides a soft-deleted product from the public PDP', async () => {
+    const prisma = {
+      product: {
+        findUnique: jest.fn().mockResolvedValue({
+          slug: 'old-fuse',
+          title: 'Архив',
+          sku: 'OLD-1',
+          description: 'Снят с публикации.',
+          specs: [],
+          pdfHref: null,
+          badges: [],
+          seoTitle: null,
+          seoDescription: null,
+          isPublished: false,
+          deletedAt: new Date('2026-08-18T10:00:00.000Z'),
+          manufacturer: { slug: 'mersen', isPublished: true, deletedAt: null },
+          category: {
+            slug: 'nizkovoltnye-predohraniteli',
+            isPublished: true,
+            deletedAt: null,
+          },
+        }),
+      },
+    };
+
+    const service = new CatalogService(prisma as never);
+
+    await expect(service.getProductBySlug('old-fuse')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+  });
+
   it('hides a product whose category is unpublished', async () => {
     const prisma = {
       product: {
@@ -218,6 +298,10 @@ describe('CatalogService', () => {
           specs: [],
           pdfHref: null,
           badges: [],
+          seoTitle: null,
+          seoDescription: null,
+          isPublished: true,
+          deletedAt: null,
           manufacturer: { slug: 'mersen', isPublished: true, deletedAt: null },
           category: {
             slug: 'nizkovoltnye-predohraniteli',

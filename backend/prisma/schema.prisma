@@ -91,6 +91,10 @@ model Product {
   pdfHref        String?
   badges         String[]
   similarSlugs   String[]
+  seoTitle       String?
+  seoDescription String?
+  isPublished    Boolean      @default(true)
+  deletedAt      DateTime?
   manufacturerId Int
   manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
   categoryId     Int

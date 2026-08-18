@@ -105,3 +105,67 @@ export interface UpdateCategoryRequest {
   parentId?: number | null;
   isPublished?: boolean;
 }
+
+export interface AdminProductSpecDto {
+  label: string;
+  value: string;
+}
+
+export interface AdminProductAssignmentOptionDto {
+  id: number;
+  slug: string;
+  name: string;
+}
+
+export interface AdminProductAssignmentOptionsDto {
+  manufacturers: AdminProductAssignmentOptionDto[];
+  categories: AdminProductAssignmentOptionDto[];
+}
+
+export interface AdminProductDto {
+  id: number;
+  slug: string;
+  title: string;
+  sku: string;
+  description: string;
+  specs: AdminProductSpecDto[];
+  pdfHref: string | null;
+  badges: string[];
+  seoTitle: string | null;
+  seoDescription: string | null;
+  manufacturerId: number;
+  manufacturerSlug: string;
+  manufacturerName: string;
+  categoryId: number;
+  categorySlug: string;
+  categoryName: string;
+  isPublished: boolean;
+  deletedAt: string | null;
+}
+
+export interface CreateProductRequest {
+  title: string;
+  sku: string;
+  description: string;
+  specs?: AdminProductSpecDto[];
+  pdfHref?: string | null;
+  seoTitle?: string;
+  seoDescription?: string;
+  manufacturerId: number;
+  categoryId: number;
+  isPublished?: boolean;
+}
+
+export interface UpdateProductRequest {
+  slug?: string;
+  title?: string;
+  sku?: string;
+  description?: string;
+  specs?: AdminProductSpecDto[];
+  pdfHref?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  manufacturerId?: number;
+  categoryId?: number;
+  isPublished?: boolean;
+}
