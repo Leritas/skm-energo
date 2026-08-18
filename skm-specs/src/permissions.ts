@@ -10,8 +10,10 @@ export const Permission = {
   canManageOrders: 'canManageOrders',
   hasAccessToNews: 'hasAccessToNews',
   canManageNews: 'canManageNews',
-  canCreateItems: 'canCreateItems',
-  canManageItems: 'canManageItems',
+  hasAccessToCatalog: 'hasAccessToCatalog',
+  canManageManufacturers: 'canManageManufacturers',
+  canManageCategories: 'canManageCategories',
+  canManageProducts: 'canManageProducts',
 } as const;
 
 export type Permission = (typeof Permission)[keyof typeof Permission];

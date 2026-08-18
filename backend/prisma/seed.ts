@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { ALL_PERMISSIONS, Permission } from '@skm/specs';
+import { ALL_PERMISSIONS, Permission, migrateLegacyCatalogPermissions } from '@skm/specs';
 import {
   CATALOG_SEED_CATEGORIES,
   CATALOG_SEED_MANUFACTURERS,
@@ -113,6 +113,30 @@ async function seedNews() {
   console.log(`Seeded news: ${NEWS_SEED_ARTICLES.length} articles`);
 }
 
+async function migrateRoleCatalogPermissions() {
+  const roles = await prisma.role.findMany();
+  let updated = 0;
+
+  for (const role of roles) {
+    const migrated = migrateLegacyCatalogPermissions(role.permissions);
+    const before = [...role.permissions].sort().join(',');
+    const after = [...migrated].sort().join(',');
+    if (before === after) {
+      continue;
+    }
+
+    await prisma.role.update({
+      where: { id: role.id },
+      data: { permissions: migrated },
+    });
+    updated += 1;
+  }
+
+  if (updated > 0) {
+    console.log(`Migrated catalog permissions for ${updated} role(s)`);
+  }
+}
+
 async function main() {
   const userRole = await prisma.role.upsert({
     where: { slug: 'user' },
@@ -195,6 +219,8 @@ async function main() {
       roleId: adminRole.id,
     },
   });
+
+  await migrateRoleCatalogPermissions();
 
   await seedCatalog();
   await seedNews();
