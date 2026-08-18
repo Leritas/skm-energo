@@ -1,4 +1,4 @@
-import { hasAllPermissions, Permission } from '@skm/specs';
+import { hasAllPermissions, hasAnyPermission, Permission } from '@skm/specs';
 import { PermissionsService } from './permissions.service';
 
 describe('permission helpers', () => {
@@ -23,6 +23,22 @@ describe('permission helpers', () => {
     expect(
       hasAllPermissions(perms, [
         Permission.hasAccessToNews,
+        Permission.canDeleteUsers,
+      ]),
+    ).toBe(false);
+  });
+
+  it('requires OR for any-permission checks', () => {
+    const perms = [Permission.canCreateUsers];
+    expect(
+      hasAnyPermission(perms, [
+        Permission.canCreateUsers,
+        Permission.canManageRoles,
+      ]),
+    ).toBe(true);
+    expect(
+      hasAnyPermission(perms, [
+        Permission.canManageRoles,
         Permission.canDeleteUsers,
       ]),
     ).toBe(false);

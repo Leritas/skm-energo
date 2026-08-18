@@ -53,9 +53,20 @@ export function hasAllPermissions(
   return required.every((p) => userPermissions.includes(p));
 }
 
-export function assertPermissions(
-  values: readonly string[],
-): Permission[] {
+export function hasAnyPermission(
+  userPermissions: readonly string[],
+  required: readonly Permission[],
+): boolean {
+  if (required.length === 0) {
+    return true;
+  }
+  if (hasAbsoluteControl(userPermissions)) {
+    return true;
+  }
+  return required.some((p) => userPermissions.includes(p));
+}
+
+export function assertPermissions(values: readonly string[]): Permission[] {
   const invalid = values.filter((v) => !isPermission(v));
   if (invalid.length > 0) {
     throw new Error(`Unknown permissions: ${invalid.join(', ')}`);
