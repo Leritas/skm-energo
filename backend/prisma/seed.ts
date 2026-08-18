@@ -18,11 +18,12 @@ async function seedCatalogCategories(
   for (const category of categories) {
     const row = await prisma.category.upsert({
       where: { slug: category.slug },
-      update: { name: category.name, parentId },
+      update: { name: category.name, parentId, isPublished: true },
       create: {
         slug: category.slug,
         name: category.name,
         parentId,
+        isPublished: true,
       },
     });
 

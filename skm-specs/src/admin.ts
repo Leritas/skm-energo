@@ -71,3 +71,37 @@ export interface UpdateManufacturerRequest {
   name?: string;
   isPublished?: boolean;
 }
+
+export interface AdminCategoryDto {
+  id: number;
+  slug: string;
+  name: string;
+  description: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  parentId: number | null;
+  isPublished: boolean;
+  deletedAt: string | null;
+  productCount: number;
+  childCount: number;
+}
+
+export interface CreateCategoryRequest {
+  slug: string;
+  name: string;
+  description?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  parentId?: number | null;
+  isPublished?: boolean;
+}
+
+export interface UpdateCategoryRequest {
+  slug?: string;
+  name?: string;
+  description?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  parentId?: number | null;
+  isPublished?: boolean;
+}

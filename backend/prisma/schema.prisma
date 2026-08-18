@@ -67,14 +67,18 @@ model Manufacturer {
 }
 
 model Category {
-  id          Int        @id @default(autoincrement())
-  slug        String     @unique
-  name        String
-  description String?
-  parentId    Int?
-  parent      Category?  @relation("CategoryTree", fields: [parentId], references: [id])
-  children    Category[] @relation("CategoryTree")
-  products    Product[]
+  id             Int        @id @default(autoincrement())
+  slug           String     @unique
+  name           String
+  description    String?
+  seoTitle       String?
+  seoDescription String?
+  parentId       Int?
+  isPublished    Boolean    @default(true)
+  deletedAt      DateTime?
+  parent         Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children       Category[] @relation("CategoryTree")
+  products       Product[]
 }
 
 model Product {

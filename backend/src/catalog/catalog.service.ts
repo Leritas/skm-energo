@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -43,8 +40,14 @@ const PUBLIC_MANUFACTURER_WHERE = {
   deletedAt: null,
 } as const;
 
+const PUBLIC_CATEGORY_WHERE = {
+  isPublished: true,
+  deletedAt: null,
+} as const;
+
 const PUBLIC_PRODUCT_WHERE = {
   manufacturer: PUBLIC_MANUFACTURER_WHERE,
+  category: PUBLIC_CATEGORY_WHERE,
 } as const;
 
 @Injectable()
@@ -121,7 +124,11 @@ export class CatalogService {
       },
     });
 
-    if (!product || !this.isPublicManufacturer(product.manufacturer)) {
+    if (
+      !product ||
+      !this.isPublicManufacturer(product.manufacturer) ||
+      !this.isPublicCategory(product.category)
+    ) {
       throw new NotFoundException('Product not found');
     }
 
@@ -195,6 +202,8 @@ export class CatalogService {
       ${manufacturerFilter}
       AND m."isPublished" = true
       AND m."deletedAt" IS NULL
+      AND c."isPublished" = true
+      AND c."deletedAt" IS NULL
       ORDER BY GREATEST(
         similarity(p.title, ${term}),
         similarity(p.sku, ${term}),
@@ -253,10 +262,14 @@ export class CatalogService {
 
   private async loadCategoryTree(): Promise<CatalogCategoryNode[]> {
     const rows = await this.prisma.category.findMany({
+      where: PUBLIC_CATEGORY_WHERE,
       orderBy: [{ parentId: 'asc' }, { id: 'asc' }],
     });
 
-    const nodes = new Map<number, CatalogCategoryNode & { childIds: number[] }>();
+    const nodes = new Map<
+      number,
+      CatalogCategoryNode & { childIds: number[] }
+    >();
 
     for (const row of rows) {
       nodes.set(row.id, {
@@ -345,12 +358,12 @@ export class CatalogService {
 
     return value.flatMap((item) => {
       if (
-        typeof item === 'object'
-        && item !== null
-        && 'label' in item
-        && 'value' in item
-        && typeof item.label === 'string'
-        && typeof item.value === 'string'
+        typeof item === 'object' &&
+        item !== null &&
+        'label' in item &&
+        'value' in item &&
+        typeof item.label === 'string' &&
+        typeof item.value === 'string'
       ) {
         return [{ label: item.label, value: item.value }];
       }
@@ -380,9 +393,16 @@ export class CatalogService {
     return manufacturer.isPublished && manufacturer.deletedAt === null;
   }
 
+  private isPublicCategory(category: {
+    isPublished: boolean;
+    deletedAt: Date | null;
+  }): boolean {
+    return category.isPublished && category.deletedAt === null;
+  }
+
   private async assertCategoryExists(categorySlug: string): Promise<void> {
-    const category = await this.prisma.category.findUnique({
-      where: { slug: categorySlug },
+    const category = await this.prisma.category.findFirst({
+      where: { slug: categorySlug, ...PUBLIC_CATEGORY_WHERE },
     });
     if (!category) {
       throw new NotFoundException('Category not found');

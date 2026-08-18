@@ -17,6 +17,11 @@ defineProps<{
       :can-manage="canManage"
     />
 
+    <AdminCategoriesPanel
+      v-else-if="tab === 'categories'"
+      :can-manage="canManage"
+    />
+
     <template v-else>
       <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
