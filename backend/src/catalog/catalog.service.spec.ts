@@ -14,8 +14,16 @@ function createPrismaMock(overrides: {
       findMany: jest.fn(),
       ...overrides.product,
     },
-    manufacturer: { findUnique: jest.fn(), findMany: jest.fn(), findFirst: jest.fn() },
-    category: { findUnique: jest.fn() },
+    manufacturer: {
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
+    },
+    category: {
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+      findFirst: jest.fn(),
+    },
     $queryRaw: overrides.$queryRaw ?? jest.fn(),
   };
 }
@@ -48,7 +56,11 @@ describe('CatalogService', () => {
           badges: ['pdf'],
           similarSlugs: ['fuse-link-6kv'],
           manufacturer: { slug: 'mersen', isPublished: true, deletedAt: null },
-          category: { slug: 'nizkovoltnye-predohraniteli' },
+          category: {
+            slug: 'nizkovoltnye-predohraniteli',
+            isPublished: true,
+            deletedAt: null,
+          },
         }),
       },
     };
@@ -114,6 +126,7 @@ describe('CatalogService', () => {
         manufacturerId: { not: 1 },
         slug: { not: 'fuse-link-10kv' },
         manufacturer: { isPublished: true, deletedAt: null },
+        category: { isPublished: true, deletedAt: null },
       },
       include: {
         manufacturer: true,
@@ -166,9 +179,9 @@ describe('CatalogService', () => {
 
   it('lists only published, non-deleted manufacturers', async () => {
     const prisma = createPrismaMock({});
-    prisma.manufacturer.findMany = jest.fn().mockResolvedValue([
-      { slug: 'mersen', name: 'Mersen' },
-    ]);
+    prisma.manufacturer.findMany = jest
+      .fn()
+      .mockResolvedValue([{ slug: 'mersen', name: 'Mersen' }]);
 
     const service = new CatalogService(prisma as never);
     const result = await service.listManufacturers();
@@ -178,6 +191,48 @@ describe('CatalogService', () => {
       orderBy: { name: 'asc' },
     });
     expect(result).toEqual([{ slug: 'mersen', label: 'Mersen' }]);
+  });
+
+  it('loads only published, non-deleted categories for the public tree', async () => {
+    const prisma = createPrismaMock({});
+    prisma.category.findMany.mockResolvedValue([]);
+    prisma.product.findMany.mockResolvedValue([]);
+
+    const service = new CatalogService(prisma as never);
+    await service.getCategoryTree(null);
+
+    expect(prisma.category.findMany).toHaveBeenCalledWith({
+      where: { isPublished: true, deletedAt: null },
+      orderBy: [{ parentId: 'asc' }, { id: 'asc' }],
+    });
+  });
+
+  it('hides a product whose category is unpublished', async () => {
+    const prisma = {
+      product: {
+        findUnique: jest.fn().mockResolvedValue({
+          slug: 'nh00-160a',
+          title: 'Предохранитель NH00 160A',
+          sku: 'NH00-160',
+          description: 'Низковольтный предохранитель серии NH00.',
+          specs: [],
+          pdfHref: null,
+          badges: [],
+          manufacturer: { slug: 'mersen', isPublished: true, deletedAt: null },
+          category: {
+            slug: 'nizkovoltnye-predohraniteli',
+            isPublished: false,
+            deletedAt: null,
+          },
+        }),
+      },
+    };
+
+    const service = new CatalogService(prisma as never);
+
+    await expect(service.getProductBySlug('nh00-160a')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 
   it('searches products by title, sku, and manufacturer name', async () => {
