@@ -50,3 +50,24 @@ export interface UpdateRoleRequest {
   name?: string;
   permissions?: Permission[];
 }
+
+export interface AdminManufacturerDto {
+  id: number;
+  slug: string;
+  name: string;
+  isPublished: boolean;
+  deletedAt: string | null;
+  productCount: number;
+}
+
+export interface CreateManufacturerRequest {
+  slug: string;
+  name: string;
+  isPublished?: boolean;
+}
+
+export interface UpdateManufacturerRequest {
+  slug?: string;
+  name?: string;
+  isPublished?: boolean;
+}

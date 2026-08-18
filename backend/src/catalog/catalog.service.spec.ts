@@ -14,7 +14,7 @@ function createPrismaMock(overrides: {
       findMany: jest.fn(),
       ...overrides.product,
     },
-    manufacturer: { findUnique: jest.fn() },
+    manufacturer: { findUnique: jest.fn(), findMany: jest.fn(), findFirst: jest.fn() },
     category: { findUnique: jest.fn() },
     $queryRaw: overrides.$queryRaw ?? jest.fn(),
   };
@@ -47,7 +47,7 @@ describe('CatalogService', () => {
           pdfHref: '/files/nh00-160a.pdf',
           badges: ['pdf'],
           similarSlugs: ['fuse-link-6kv'],
-          manufacturer: { slug: 'mersen' },
+          manufacturer: { slug: 'mersen', isPublished: true, deletedAt: null },
           category: { slug: 'nizkovoltnye-predohraniteli' },
         }),
       },
@@ -113,6 +113,7 @@ describe('CatalogService', () => {
         categoryId: 2,
         manufacturerId: { not: 1 },
         slug: { not: 'fuse-link-10kv' },
+        manufacturer: { isPublished: true, deletedAt: null },
       },
       include: {
         manufacturer: true,
@@ -163,6 +164,22 @@ describe('CatalogService', () => {
     expect(prisma.$queryRaw).not.toHaveBeenCalled();
   });
 
+  it('lists only published, non-deleted manufacturers', async () => {
+    const prisma = createPrismaMock({});
+    prisma.manufacturer.findMany = jest.fn().mockResolvedValue([
+      { slug: 'mersen', name: 'Mersen' },
+    ]);
+
+    const service = new CatalogService(prisma as never);
+    const result = await service.listManufacturers();
+
+    expect(prisma.manufacturer.findMany).toHaveBeenCalledWith({
+      where: { isPublished: true, deletedAt: null },
+      orderBy: { name: 'asc' },
+    });
+    expect(result).toEqual([{ slug: 'mersen', label: 'Mersen' }]);
+  });
+
   it('searches products by title, sku, and manufacturer name', async () => {
     const prisma = createPrismaMock({
       $queryRaw: jest.fn().mockResolvedValue([
@@ -176,14 +193,18 @@ describe('CatalogService', () => {
         },
       ]),
     });
-    prisma.manufacturer.findUnique.mockResolvedValue({ slug: 'mersen' });
+    prisma.manufacturer.findFirst.mockResolvedValue({
+      slug: 'mersen',
+      isPublished: true,
+      deletedAt: null,
+    });
 
     const service = new CatalogService(prisma as never);
     const result = await service.searchProducts('NH00', null, 'mersen', 10);
 
     expect(prisma.$queryRaw).toHaveBeenCalledTimes(1);
-    expect(prisma.manufacturer.findUnique).toHaveBeenCalledWith({
-      where: { slug: 'mersen' },
+    expect(prisma.manufacturer.findFirst).toHaveBeenCalledWith({
+      where: { slug: 'mersen', isPublished: true, deletedAt: null },
     });
     expect(result).toEqual([
       {

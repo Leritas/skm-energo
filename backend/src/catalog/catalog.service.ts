@@ -38,6 +38,15 @@ export interface CatalogManufacturerDto {
   label: string;
 }
 
+const PUBLIC_MANUFACTURER_WHERE = {
+  isPublished: true,
+  deletedAt: null,
+} as const;
+
+const PUBLIC_PRODUCT_WHERE = {
+  manufacturer: PUBLIC_MANUFACTURER_WHERE,
+} as const;
+
 @Injectable()
 export class CatalogService {
   constructor(private readonly prisma: PrismaService) {}
@@ -57,6 +66,7 @@ export class CatalogService {
 
   async listManufacturers(): Promise<CatalogManufacturerDto[]> {
     const rows = await this.prisma.manufacturer.findMany({
+      where: PUBLIC_MANUFACTURER_WHERE,
       orderBy: { name: 'asc' },
     });
 
@@ -88,7 +98,10 @@ export class CatalogService {
     );
 
     const rows = await this.prisma.product.findMany({
-      where: { slug: { in: filtered.map((item) => item.slug) } },
+      where: {
+        slug: { in: filtered.map((item) => item.slug) },
+        ...PUBLIC_PRODUCT_WHERE,
+      },
       include: {
         manufacturer: true,
         category: true,
@@ -108,7 +121,7 @@ export class CatalogService {
       },
     });
 
-    if (!product) {
+    if (!product || !this.isPublicManufacturer(product.manufacturer)) {
       throw new NotFoundException('Product not found');
     }
 
@@ -180,6 +193,8 @@ export class CatalogService {
       )
       ${categoryFilter}
       ${manufacturerFilter}
+      AND m."isPublished" = true
+      AND m."deletedAt" IS NULL
       ORDER BY GREATEST(
         similarity(p.title, ${term}),
         similarity(p.sku, ${term}),
@@ -223,6 +238,7 @@ export class CatalogService {
         categoryId: product.categoryId,
         manufacturerId: { not: product.manufacturerId },
         slug: { not: slug },
+        ...PUBLIC_PRODUCT_WHERE,
       },
       include: {
         manufacturer: true,
@@ -289,6 +305,7 @@ export class CatalogService {
 
   private async loadProductRefs(): Promise<CatalogProductRef[]> {
     const rows = await this.prisma.product.findMany({
+      where: PUBLIC_PRODUCT_WHERE,
       select: {
         slug: true,
         category: { select: { slug: true } },
@@ -348,12 +365,19 @@ export class CatalogService {
       return;
     }
 
-    const manufacturer = await this.prisma.manufacturer.findUnique({
-      where: { slug: manufacturerSlug },
+    const manufacturer = await this.prisma.manufacturer.findFirst({
+      where: { slug: manufacturerSlug, ...PUBLIC_MANUFACTURER_WHERE },
     });
     if (!manufacturer) {
       throw new NotFoundException('Manufacturer not found');
     }
+  }
+
+  private isPublicManufacturer(manufacturer: {
+    isPublished: boolean;
+    deletedAt: Date | null;
+  }): boolean {
+    return manufacturer.isPublished && manufacturer.deletedAt === null;
   }
 
   private async assertCategoryExists(categorySlug: string): Promise<void> {
