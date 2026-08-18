@@ -102,11 +102,14 @@ model Product {
 }
 
 model NewsArticle {
-  id          Int      @id @default(autoincrement())
-  slug        String   @unique
-  title       String
-  excerpt     String
-  body        String[]
-  publishDate DateTime @db.Date
-  published   Boolean  @default(true)
+  id             Int       @id @default(autoincrement())
+  slug           String    @unique
+  title          String
+  excerpt        String
+  body           String[]
+  publishDate    DateTime  @db.Date
+  published      Boolean   @default(true)
+  seoTitle       String?
+  seoDescription String?
+  deletedAt      DateTime?
 }

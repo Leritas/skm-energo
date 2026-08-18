@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class NewsListItemResponseDto {
   @ApiProperty({ example: 'hiitio-expand' })
@@ -26,4 +26,10 @@ export class NewsDetailResponseDto extends NewsListItemResponseDto {
     type: String,
   })
   body!: string[];
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  seoTitle!: string | null;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  seoDescription!: string | null;
 }
