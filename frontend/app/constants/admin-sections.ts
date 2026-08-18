@@ -73,7 +73,10 @@ export function canAccessAdminSection(
     case 'catalog':
       return canAccessCatalogSection(userPermissions);
     case 'news':
-      return hasPermission(userPermissions, Permission.hasAccessToNews);
+      return hasAnyPermission(userPermissions, [
+        Permission.hasAccessToNews,
+        Permission.canManageNews,
+      ]);
     case 'users':
       return hasAnyPermission(userPermissions, USERS_PERMISSIONS);
     default: {

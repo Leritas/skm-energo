@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { formatNewsDate } from '~/utils/news';
+import {
+  formatNewsDate,
+  resolveNewsSeoDescription,
+  resolveNewsSeoTitle,
+} from '~/utils/news';
 import { SITE } from '~/constants/site';
 
 const route = useRoute();
@@ -18,8 +22,8 @@ if (articleError.value) {
 }
 
 useSeoMeta({
-  title: () => `${article.value!.title} — ${SITE.name}`,
-  description: () => article.value!.excerpt,
+  title: () => `${resolveNewsSeoTitle(article.value!)} — ${SITE.name}`,
+  description: () => resolveNewsSeoDescription(article.value!),
 });
 
 const breadcrumbs = computed(() => [

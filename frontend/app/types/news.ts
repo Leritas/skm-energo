@@ -7,4 +7,6 @@ export interface NewsListItem {
 
 export interface NewsArticleDetail extends NewsListItem {
   body: string[];
+  seoTitle: string | null;
+  seoDescription: string | null;
 }

@@ -10,7 +10,14 @@ export interface NewsListItemDto {
 
 export interface NewsDetailDto extends NewsListItemDto {
   body: string[];
+  seoTitle: string | null;
+  seoDescription: string | null;
 }
+
+const PUBLIC_NEWS_WHERE = {
+  published: true,
+  deletedAt: null,
+} as const;
 
 @Injectable()
 export class NewsService {
@@ -18,7 +25,7 @@ export class NewsService {
 
   async listArticles(): Promise<NewsListItemDto[]> {
     const rows = await this.prisma.newsArticle.findMany({
-      where: { published: true },
+      where: PUBLIC_NEWS_WHERE,
       orderBy: [{ publishDate: 'desc' }, { id: 'desc' }],
     });
 
@@ -27,7 +34,7 @@ export class NewsService {
 
   async getArticleBySlug(slug: string): Promise<NewsDetailDto> {
     const article = await this.prisma.newsArticle.findFirst({
-      where: { slug, published: true },
+      where: { slug, ...PUBLIC_NEWS_WHERE },
     });
 
     if (!article) {
@@ -37,6 +44,8 @@ export class NewsService {
     return {
       ...this.toListItem(article),
       body: article.body,
+      seoTitle: article.seoTitle,
+      seoDescription: article.seoDescription,
     };
   }
 

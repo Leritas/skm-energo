@@ -169,3 +169,38 @@ export interface UpdateProductRequest {
   categoryId?: number;
   isPublished?: boolean;
 }
+
+export interface AdminNewsArticleDto {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string;
+  body: string[];
+  publishDate: string;
+  published: boolean;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  deletedAt: string | null;
+}
+
+export interface CreateNewsArticleRequest {
+  slug: string;
+  title: string;
+  excerpt: string;
+  body: string[];
+  publishDate: string;
+  published?: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
+}
+
+export interface UpdateNewsArticleRequest {
+  slug?: string;
+  title?: string;
+  excerpt?: string;
+  body?: string[];
+  publishDate?: string;
+  published?: boolean;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+}
