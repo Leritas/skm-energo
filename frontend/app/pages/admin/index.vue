@@ -1,44 +1,39 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: false,
-  middleware: 'admin',
-})
-
 useSeoMeta({
-  title: 'Админка — СКМ-Энергосервис',
-})
+  title: 'Обзор — Админка — СКМ-Энергосервис',
+});
 
-const auth = useAuthStore()
+const auth = useAuthStore();
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-slate-900 text-white">
-    <div class="max-w-md rounded-2xl bg-slate-800 p-8 text-center">
-      <h1 class="text-2xl font-bold">
-        Админ-панель
-      </h1>
-      <p class="mt-3 text-slate-300">
-        Доступ разрешён для
-        <span class="text-blue-300">{{ auth.user?.email }}</span>.
-        Полная реализация — этап 4 roadmap.
-      </p>
-      <p class="mt-2 text-xs text-slate-400">
-        Permissions: {{ auth.user?.permissions?.join(', ') }}
-      </p>
-      <div class="mt-6 flex justify-center gap-4">
-        <NuxtLink
-          to="/"
-          class="text-blue-400 hover:underline"
+  <div>
+    <h1 class="text-2xl font-bold text-neutral-900 md:text-3xl">Обзор</h1>
+    <p v-if="auth.user" class="mt-2 text-neutral-600">
+      Добро пожаловать, {{ auth.user.name }}.
+    </p>
+
+    <div class="mt-8 grid gap-4 md:grid-cols-2">
+      <div class="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <h2
+          class="text-sm font-semibold uppercase tracking-wide text-neutral-500"
         >
-          На главную
-        </NuxtLink>
-        <button
-          type="button"
-          class="text-slate-300 hover:underline"
-          @click="auth.logout().then(() => navigateTo('/login'))"
+          Статус
+        </h2>
+        <p class="mt-2 text-neutral-900">
+          Админ-панель готова к наполнению CRUD-экранами этапа 4.
+        </p>
+      </div>
+      <div class="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <h2
+          class="text-sm font-semibold uppercase tracking-wide text-neutral-500"
         >
-          Выйти
-        </button>
+          Доступные разделы
+        </h2>
+        <p class="mt-2 text-neutral-900">
+          В боковом меню отображаются только те разделы, к которым у вас есть
+          права.
+        </p>
       </div>
     </div>
   </div>
