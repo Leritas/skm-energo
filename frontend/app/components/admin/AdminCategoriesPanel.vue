@@ -375,7 +375,7 @@ onMounted(() => {
 
           <SkmFormField
             label="Родитель"
-            hint="Пустой выбор — корневая категория"
+            hint="«Корень каталога» — самый верхний уровень"
           >
             <USelectMenu
               v-model="form.parentKey"
