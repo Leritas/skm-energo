@@ -1,4 +1,5 @@
 import {
+  canAccessCatalogSection,
   hasPermission,
   Permission,
   type Permission as PermissionType,
@@ -22,11 +23,6 @@ function hasAnyPermission(
     hasPermission(userPermissions, permission),
   );
 }
-
-const CATALOG_PERMISSIONS = [
-  Permission.canCreateItems,
-  Permission.canManageItems,
-] as const;
 
 const USERS_PERMISSIONS = [
   Permission.canCreateUsers,
@@ -75,7 +71,7 @@ export function canAccessAdminSection(
     case 'dashboard':
       return hasPermission(userPermissions, Permission.hasAccessToAdmin);
     case 'catalog':
-      return hasAnyPermission(userPermissions, CATALOG_PERMISSIONS);
+      return canAccessCatalogSection(userPermissions);
     case 'news':
       return hasPermission(userPermissions, Permission.hasAccessToNews);
     case 'users':

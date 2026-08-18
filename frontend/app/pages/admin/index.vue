@@ -4,16 +4,17 @@ useSeoMeta({
 });
 
 const auth = useAuthStore();
+
+const description = computed(() =>
+  auth.user ? `Добро пожаловать, ${auth.user.name}.` : undefined,
+);
 </script>
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold text-neutral-900 md:text-3xl">Обзор</h1>
-    <p v-if="auth.user" class="mt-2 text-neutral-600">
-      Добро пожаловать, {{ auth.user.name }}.
-    </p>
+    <SkmPageHeader title="Обзор" :description="description" />
 
-    <div class="mt-8 grid gap-4 md:grid-cols-2">
+    <div class="grid gap-4 md:grid-cols-2">
       <div class="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
         <h2
           class="text-sm font-semibold uppercase tracking-wide text-neutral-500"

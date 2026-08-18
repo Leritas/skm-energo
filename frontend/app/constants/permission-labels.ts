@@ -12,8 +12,10 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   [Permission.canManageOrders]: 'Управление заказами',
   [Permission.hasAccessToNews]: 'Просмотр новостей',
   [Permission.canManageNews]: 'Управление новостями',
-  [Permission.canCreateItems]: 'Создание товаров',
-  [Permission.canManageItems]: 'Управление каталогом',
+  [Permission.hasAccessToCatalog]: 'Просмотр каталога',
+  [Permission.canManageManufacturers]: 'Управление производителями',
+  [Permission.canManageCategories]: 'Управление категориями',
+  [Permission.canManageProducts]: 'Управление товарами',
 };
 
 export const PERMISSION_GROUPS: readonly {
@@ -42,6 +44,11 @@ export const PERMISSION_GROUPS: readonly {
   },
   {
     label: 'Каталог',
-    permissions: [Permission.canCreateItems, Permission.canManageItems],
+    permissions: [
+      Permission.hasAccessToCatalog,
+      Permission.canManageManufacturers,
+      Permission.canManageCategories,
+      Permission.canManageProducts,
+    ],
   },
 ];
