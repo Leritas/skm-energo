@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { AttachedFileDto } from '../../media/dto/attached-file.dto';
 
 export class NewsListItemResponseDto {
   @ApiProperty({ example: 'hiitio-expand' })
@@ -15,6 +16,9 @@ export class NewsListItemResponseDto {
 
   @ApiProperty({ example: '2026-07-15' })
   publishDate!: string;
+
+  @ApiProperty({ type: AttachedFileDto, nullable: true })
+  coverPhoto!: AttachedFileDto | null;
 }
 
 export class NewsDetailResponseDto extends NewsListItemResponseDto {

@@ -5,21 +5,33 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import type { NewsArticle } from '@prisma/client';
+import type { NewsArticle, Photo } from '@prisma/client';
+import type { AttachedFile } from '@skm/specs';
 import { hasAbsoluteControl, type Permission } from '@skm/specs';
+import { MediaUrlService } from '../media/media-url.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AdminNewsArticleDto } from './dto/admin-news-article.dto';
 import { CreateNewsArticleDto } from './dto/create-news-article.dto';
 import { UpdateNewsArticleDto } from './dto/update-news-article.dto';
 
+const NEWS_COVER_INCLUDE = {
+  photos: { orderBy: { sortOrder: 'asc' as const }, take: 1 },
+} as const;
+
+type NewsArticleWithCover = NewsArticle & { photos: Photo[] };
+
 @Injectable()
 export class NewsAdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly urls: MediaUrlService,
+  ) {}
 
   async listArticles(includeArchived: boolean): Promise<AdminNewsArticleDto[]> {
     const rows = await this.prisma.newsArticle.findMany({
       where: includeArchived ? undefined : { deletedAt: null },
       orderBy: [{ publishDate: 'desc' }, { id: 'desc' }],
+      include: NEWS_COVER_INCLUDE,
     });
 
     return rows.map((row) => this.toDto(row));
@@ -39,6 +51,7 @@ export class NewsAdminService {
         seoTitle: this.normalizeText(dto.seoTitle ?? null),
         seoDescription: this.normalizeText(dto.seoDescription ?? null),
       },
+      include: NEWS_COVER_INCLUDE,
     });
 
     return this.toDto(row);
@@ -79,6 +92,7 @@ export class NewsAdminService {
         seoTitle: this.optionalText(dto.seoTitle),
         seoDescription: this.optionalText(dto.seoDescription),
       },
+      include: NEWS_COVER_INCLUDE,
     });
 
     return this.toDto(row);
@@ -97,6 +111,7 @@ export class NewsAdminService {
         deletedAt: new Date(),
         published: false,
       },
+      include: NEWS_COVER_INCLUDE,
     });
 
     return this.toDto(row);
@@ -112,6 +127,7 @@ export class NewsAdminService {
     const row = await this.prisma.newsArticle.update({
       where: { id },
       data: { deletedAt: null },
+      include: NEWS_COVER_INCLUDE,
     });
 
     return this.toDto(row);
@@ -163,7 +179,7 @@ export class NewsAdminService {
     return trimmed.length > 0 ? trimmed : null;
   }
 
-  private toDto(row: NewsArticle): AdminNewsArticleDto {
+  private toDto(row: NewsArticleWithCover): AdminNewsArticleDto {
     return {
       id: row.id,
       slug: row.slug,
@@ -175,6 +191,12 @@ export class NewsAdminService {
       seoTitle: row.seoTitle,
       seoDescription: row.seoDescription,
       deletedAt: row.deletedAt?.toISOString() ?? null,
+      coverPhoto: this.toCoverPhoto(row.photos),
     };
+  }
+
+  private toCoverPhoto(photos: Photo[]): AttachedFile | null {
+    const cover = photos[0];
+    return cover ? this.urls.toAttachedPhoto(cover) : null;
   }
 }

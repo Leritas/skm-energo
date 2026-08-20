@@ -1,21 +1,27 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   ParseIntPipe,
   Patch,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { PhotoFileInterceptor } from '../media/photo-file.interceptor';
 import { Permission } from '@skm/specs';
 import {
   CurrentUser,
@@ -27,8 +33,10 @@ import { RequirePermissions } from '../common/permissions/require-permissions.de
 import { AdminNewsArticleDto } from './dto/admin-news-article.dto';
 import { CreateNewsArticleDto } from './dto/create-news-article.dto';
 import { ListNewsAdminQueryDto } from './dto/list-news-admin-query.dto';
+import { NewsCoverPhotoResponseDto } from './dto/news-cover-photo-response.dto';
 import { UpdateNewsArticleDto } from './dto/update-news-article.dto';
 import { NewsAdminService } from './news-admin.service';
+import { NewsMediaAdminService } from './news-media-admin.service';
 
 const NEWS_READ_PERMISSIONS = [
   Permission.hasAccessToNews,
@@ -41,6 +49,7 @@ const NEWS_READ_PERMISSIONS = [
 export class NewsAdminController {
   constructor(
     private readonly newsAdminService: NewsAdminService,
+    private readonly newsMediaAdminService: NewsMediaAdminService,
     private readonly permissionsService: PermissionsService,
   ) {}
 
@@ -86,5 +95,27 @@ export class NewsAdminController {
   @ApiOkResponse({ type: AdminNewsArticleDto })
   restoreArticle(@Param('id', ParseIntPipe) id: number) {
     return this.newsAdminService.restore(id);
+  }
+
+  @Post(':id/cover-photo')
+  @RequirePermissions(Permission.canManageNews)
+  @UseInterceptors(PhotoFileInterceptor)
+  @ApiCreatedResponse({ type: NewsCoverPhotoResponseDto })
+  uploadCoverPhoto(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File | undefined,
+  ) {
+    if (!file) {
+      throw new BadRequestException('file is required');
+    }
+    return this.newsMediaAdminService.replaceCoverPhoto(id, file);
+  }
+
+  @Delete(':id/cover-photo')
+  @RequirePermissions(Permission.canManageNews)
+  @HttpCode(204)
+  @ApiNoContentResponse()
+  async deleteCoverPhoto(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.newsMediaAdminService.deleteCoverPhoto(id);
   }
 }

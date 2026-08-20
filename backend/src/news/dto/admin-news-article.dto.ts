@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { AttachedFileDto } from '../../media/dto/attached-file.dto';
 
 export class AdminNewsArticleDto {
   @ApiProperty()
@@ -30,4 +31,7 @@ export class AdminNewsArticleDto {
 
   @ApiProperty({ type: String, nullable: true })
   deletedAt!: string | null;
+
+  @ApiProperty({ type: AttachedFileDto, nullable: true })
+  coverPhoto!: AttachedFileDto | null;
 }

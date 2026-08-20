@@ -1,5 +1,6 @@
 import type {
   AdminNewsArticleDto,
+  AttachedFile,
   CreateNewsArticleRequest,
   UpdateNewsArticleRequest,
 } from '@skm/specs';
@@ -39,11 +40,28 @@ export function useNewsAdmin() {
     });
   }
 
+  function replaceCoverPhoto(id: number, file: File) {
+    const body = new FormData();
+    body.append('file', file);
+    return api<{ photo: AttachedFile }>(`/admin/news/${id}/cover-photo`, {
+      method: 'POST',
+      body,
+    });
+  }
+
+  function deleteCoverPhoto(id: number) {
+    return api<void>(`/admin/news/${id}/cover-photo`, {
+      method: 'DELETE',
+    });
+  }
+
   return {
     listArticles,
     createArticle,
     updateArticle,
     archiveArticle,
     restoreArticle,
+    replaceCoverPhoto,
+    deleteCoverPhoto,
   };
 }
