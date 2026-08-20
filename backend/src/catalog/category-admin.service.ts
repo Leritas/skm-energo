@@ -5,8 +5,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, type Photo } from '@prisma/client';
+import type { AttachedFile } from '@skm/specs';
 import { hasAbsoluteControl, type Permission } from '@skm/specs';
+import { MediaUrlService } from '../media/media-url.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { wouldCreateCategoryCycle } from './category-admin-tree';
 import { AdminCategoryDto } from './dto/admin-category.dto';
@@ -14,29 +16,33 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
 type CategoryRow = Prisma.CategoryGetPayload<{
-  include: { _count: { select: { products: true; children: true } } };
+  include: typeof CATEGORY_ADMIN_INCLUDE;
 }>;
 
 const ACTIVE_CHILD_WHERE = { deletedAt: null } as const;
 
-const CATEGORY_COUNT_INCLUDE = {
+const CATEGORY_ADMIN_INCLUDE = {
   _count: {
     select: {
       products: true,
       children: { where: ACTIVE_CHILD_WHERE },
     },
   },
+  photos: { orderBy: { sortOrder: 'asc' as const }, take: 1 },
 } as const;
 
 @Injectable()
 export class CategoryAdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly urls: MediaUrlService,
+  ) {}
 
   async listCategories(includeArchived: boolean): Promise<AdminCategoryDto[]> {
     const rows = await this.prisma.category.findMany({
       where: includeArchived ? undefined : { deletedAt: null },
       orderBy: { name: 'asc' },
-      include: CATEGORY_COUNT_INCLUDE,
+      include: CATEGORY_ADMIN_INCLUDE,
     });
 
     return rows.map((row) => this.toDto(row));
@@ -56,7 +62,7 @@ export class CategoryAdminService {
         parentId: dto.parentId ?? null,
         isPublished: dto.isPublished ?? false,
       },
-      include: CATEGORY_COUNT_INCLUDE,
+      include: CATEGORY_ADMIN_INCLUDE,
     });
 
     return this.toDto(row);
@@ -93,7 +99,7 @@ export class CategoryAdminService {
         parentId: dto.parentId,
         isPublished: dto.isPublished,
       },
-      include: CATEGORY_COUNT_INCLUDE,
+      include: CATEGORY_ADMIN_INCLUDE,
     });
 
     return this.toDto(row);
@@ -130,7 +136,7 @@ export class CategoryAdminService {
         deletedAt: new Date(),
         isPublished: false,
       },
-      include: CATEGORY_COUNT_INCLUDE,
+      include: CATEGORY_ADMIN_INCLUDE,
     });
 
     return this.toDto(row);
@@ -148,7 +154,7 @@ export class CategoryAdminService {
     const row = await this.prisma.category.update({
       where: { id },
       data: { deletedAt: null },
-      include: CATEGORY_COUNT_INCLUDE,
+      include: CATEGORY_ADMIN_INCLUDE,
     });
 
     return this.toDto(row);
@@ -232,6 +238,12 @@ export class CategoryAdminService {
       deletedAt: row.deletedAt?.toISOString() ?? null,
       productCount: row._count.products,
       childCount: row._count.children,
+      coverPhoto: this.toCoverPhoto(row.photos),
     };
+  }
+
+  private toCoverPhoto(photos: Photo[]): AttachedFile | null {
+    const cover = photos[0];
+    return cover ? this.urls.toAttachedPhoto(cover) : null;
   }
 }

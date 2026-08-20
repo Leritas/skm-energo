@@ -3,6 +3,7 @@ import type { AttachedFile } from '@skm/specs';
 export interface CatalogCategory {
   slug: string;
   label: string;
+  coverPhoto: AttachedFile | null;
   children?: CatalogCategory[];
 }
 

@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { AttachedFileDto } from '../../media/dto/attached-file.dto';
 
 export class AdminCategoryDto {
   @ApiProperty()
@@ -33,4 +34,7 @@ export class AdminCategoryDto {
 
   @ApiProperty()
   childCount!: number;
+
+  @ApiPropertyOptional({ type: AttachedFileDto, nullable: true })
+  coverPhoto!: AttachedFileDto | null;
 }

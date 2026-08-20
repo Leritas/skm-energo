@@ -1,5 +1,6 @@
 import type {
   AdminCategoryDto,
+  AttachedFile,
   CreateCategoryRequest,
   UpdateCategoryRequest,
 } from '@skm/specs';
@@ -39,11 +40,31 @@ export function useCategoriesAdmin() {
     });
   }
 
+  function replaceCoverPhoto(id: number, file: File) {
+    const body = new FormData();
+    body.append('file', file);
+    return api<{ photo: AttachedFile }>(
+      `/admin/catalog/categories/${id}/cover-photo`,
+      {
+        method: 'POST',
+        body,
+      },
+    );
+  }
+
+  function deleteCoverPhoto(id: number) {
+    return api<void>(`/admin/catalog/categories/${id}/cover-photo`, {
+      method: 'DELETE',
+    });
+  }
+
   return {
     listCategories,
     createCategory,
     updateCategory,
     archiveCategory,
     restoreCategory,
+    replaceCoverPhoto,
+    deleteCoverPhoto,
   };
 }

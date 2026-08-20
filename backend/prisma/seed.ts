@@ -9,6 +9,7 @@ import {
 } from './catalog-seed-data';
 import { NEWS_SEED_ARTICLES } from './news-seed-data';
 import { seedNewsMedia } from './seed-news-media';
+import { seedCategoryMedia } from './seed-category-media';
 import { seedProductMedia } from './seed-product-media';
 
 const prisma = new PrismaClient();
@@ -227,6 +228,7 @@ async function main() {
 
   await seedCatalog();
   await seedProductMedia(prisma);
+  await seedCategoryMedia(prisma);
   await seedNews();
   await seedNewsMedia(prisma);
 
