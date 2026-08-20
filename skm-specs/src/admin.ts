@@ -151,6 +151,7 @@ export interface CreateProductRequest {
   sku: string;
   description: string;
   specs?: AdminProductSpecDto[];
+  badges?: Array<'new' | 'onRequest'>;
   seoTitle?: string;
   seoDescription?: string;
   manufacturerId: number;
@@ -164,6 +165,7 @@ export interface UpdateProductRequest {
   sku?: string;
   description?: string;
   specs?: AdminProductSpecDto[];
+  badges?: Array<'new' | 'onRequest'>;
   seoTitle?: string | null;
   seoDescription?: string | null;
   manufacturerId?: number;

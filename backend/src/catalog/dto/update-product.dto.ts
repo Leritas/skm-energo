@@ -1,8 +1,10 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  ArrayUnique,
   IsArray,
   IsBoolean,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -11,6 +13,7 @@ import {
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
+import { PRODUCT_MARKETING_BADGES } from '../../media/media.constants';
 import { ProductSpecDto } from './product-spec.dto';
 
 export class UpdateProductDto {
@@ -73,4 +76,15 @@ export class UpdateProductDto {
   @IsOptional()
   @IsBoolean()
   isPublished?: boolean;
+
+  @ApiPropertyOptional({
+    type: String,
+    isArray: true,
+    enum: PRODUCT_MARKETING_BADGES,
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @IsIn(PRODUCT_MARKETING_BADGES, { each: true })
+  badges?: string[];
 }

@@ -79,7 +79,7 @@ export class ProductAdminService {
         sku: dto.sku.trim(),
         description: dto.description.trim(),
         specs: normalizeProductSpecs(dto.specs) as unknown as Prisma.InputJsonValue,
-        badges: [],
+        badges: dto.badges ?? [],
         similarSlugs: [],
         seoTitle: this.normalizeText(dto.seoTitle ?? null),
         seoDescription: this.normalizeText(dto.seoDescription ?? null),
@@ -132,6 +132,7 @@ export class ProductAdminService {
           dto.specs === undefined
             ? undefined
             : (normalizeProductSpecs(dto.specs) as unknown as Prisma.InputJsonValue),
+        badges: dto.badges,
         seoTitle: this.optionalText(dto.seoTitle),
         seoDescription: this.optionalText(dto.seoDescription),
         manufacturerId: dto.manufacturerId,
