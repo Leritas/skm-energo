@@ -79,6 +79,8 @@ model Category {
   parent         Category?  @relation("CategoryTree", fields: [parentId], references: [id])
   children       Category[] @relation("CategoryTree")
   products       Product[]
+  photos         Photo[]
+  documents      Document[]
 }
 
 model Product {
@@ -99,6 +101,8 @@ model Product {
   manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
   categoryId     Int
   category       Category     @relation(fields: [categoryId], references: [id])
+  photos         Photo[]
+  documents      Document[]
 }
 
 model NewsArticle {
@@ -112,4 +116,44 @@ model NewsArticle {
   seoTitle       String?
   seoDescription String?
   deletedAt      DateTime?
+  photos         Photo[]
+  documents      Document[]
+}
+
+model Photo {
+  id            Int          @id @default(autoincrement())
+  sortOrder     Int          @default(0)
+  filename      String
+  storedName    String       @unique
+  mimeType      String
+  sizeBytes     Int
+  productId     Int?
+  newsArticleId Int?
+  categoryId    Int?
+  product       Product?     @relation(fields: [productId], references: [id])
+  newsArticle   NewsArticle? @relation(fields: [newsArticleId], references: [id])
+  category      Category?    @relation(fields: [categoryId], references: [id])
+
+  @@index([productId, sortOrder])
+  @@index([newsArticleId])
+  @@index([categoryId])
+}
+
+model Document {
+  id            Int          @id @default(autoincrement())
+  sortOrder     Int          @default(0)
+  filename      String
+  storedName    String       @unique
+  mimeType      String
+  sizeBytes     Int
+  productId     Int?
+  newsArticleId Int?
+  categoryId    Int?
+  product       Product?     @relation(fields: [productId], references: [id])
+  newsArticle   NewsArticle? @relation(fields: [newsArticleId], references: [id])
+  category      Category?    @relation(fields: [categoryId], references: [id])
+
+  @@index([productId, sortOrder])
+  @@index([newsArticleId])
+  @@index([categoryId])
 }
