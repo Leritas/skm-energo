@@ -81,16 +81,16 @@
 
 Parent epics для этапов 1–10: [#10](https://github.com/Leritas/skm-energo/issues/10) … [#19](https://github.com/Leritas/skm-energo/issues/19). Implementation slices — sub-issues с native `blocked_by`.
 
-| Этап | Epic                                                                                                          | Frontier / sub-issues                                                                                                                                            |
-| ---- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1    | [#10](https://github.com/Leritas/skm-energo/issues/10)                                                        | [#5](https://github.com/Leritas/skm-energo/issues/5) docs closure ✅                                                                                             |
-| 2    | [#11](https://github.com/Leritas/skm-energo/issues/11) ✅                                                     | [#4](https://github.com/Leritas/skm-energo/issues/4) catalog API ✅, [#7](https://github.com/Leritas/skm-energo/issues/7) news ✅                                |
-| 3    | [#12](https://github.com/Leritas/skm-energo/issues/12) ✅                                                     | —                                                                                                                                                                |
-| 4    | [#13](https://github.com/Leritas/skm-energo/issues/13)                                                        | (slices TBD)                                                                                                                                                     |
-| 5    | [#14](https://github.com/Leritas/skm-energo/issues/14)                                                        | [#6](https://github.com/Leritas/skm-energo/issues/6), [#8](https://github.com/Leritas/skm-energo/issues/8), [#9](https://github.com/Leritas/skm-energo/issues/9) |
-| 6    | [#15](https://github.com/Leritas/skm-energo/issues/15)                                                        | (slices TBD)                                                                                                                                                     |
-| 7    | [#16](https://github.com/Leritas/skm-energo/issues/16)                                                        | [#21](https://github.com/Leritas/skm-energo/issues/21)–[#24](https://github.com/Leritas/skm-energo/issues/24)                                                    |
-| 8–10 | [#17](https://github.com/Leritas/skm-energo/issues/17)–[#19](https://github.com/Leritas/skm-energo/issues/19) | [#20](https://github.com/Leritas/skm-energo/issues/20) SSR auth → #19                                                                                            |
+| Этап | Epic                                                                                                          | Frontier / sub-issues                                                                                                                                                                                                        |
+| ---- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | [#10](https://github.com/Leritas/skm-energo/issues/10)                                                        | [#5](https://github.com/Leritas/skm-energo/issues/5) docs closure ✅                                                                                                                                                         |
+| 2    | [#11](https://github.com/Leritas/skm-energo/issues/11) ✅                                                     | [#4](https://github.com/Leritas/skm-energo/issues/4) catalog API ✅, [#7](https://github.com/Leritas/skm-energo/issues/7) news ✅                                                                                            |
+| 3    | [#12](https://github.com/Leritas/skm-energo/issues/12) ✅                                                     | —                                                                                                                                                                                                                            |
+| 4    | [#13](https://github.com/Leritas/skm-energo/issues/13)                                                        | (slices TBD)                                                                                                                                                                                                                 |
+| 5    | [#14](https://github.com/Leritas/skm-energo/issues/14)                                                        | [#70](https://github.com/Leritas/skm-energo/issues/70)–[#73](https://github.com/Leritas/skm-energo/issues/73), [#67](https://github.com/Leritas/skm-energo/issues/67)–[#69](https://github.com/Leritas/skm-energo/issues/69) |
+| 6    | [#15](https://github.com/Leritas/skm-energo/issues/15)                                                        | (slices TBD)                                                                                                                                                                                                                 |
+| 7    | [#16](https://github.com/Leritas/skm-energo/issues/16)                                                        | [#21](https://github.com/Leritas/skm-energo/issues/21)–[#24](https://github.com/Leritas/skm-energo/issues/24)                                                                                                                |
+| 8–10 | [#17](https://github.com/Leritas/skm-energo/issues/17)–[#19](https://github.com/Leritas/skm-energo/issues/19) | [#20](https://github.com/Leritas/skm-energo/issues/20) SSR auth → #19                                                                                                                                                        |
 
 Этап 0 и этап 11 (v2) — только в этом документе, без parent epic.
 
@@ -206,20 +206,31 @@ Parent epics для этапов 1–10: [#10](https://github.com/Leritas/skm-en
 
 ---
 
-### Этап 5 — Публичный каталог (live data delta)
+### Этап 5 — Публичный каталог (PostgreSQL + медиа 4b)
 
-**Уже в этапе 1b (mock):** маршруты `/catalog/**`, `/product/[slug]`, category-first UX, manufacturer filter, PDP, similar strip, SSR meta, breadcrumbs.
+**Не delta «подключить API к mock-UI».** Этап 1b дал маршруты и UX-каркас на mocks; этап 5 — **пересборка публичного каталога** на данных из `/admin` и Stage 4b media (`AttachedFile`: фото/PDF товара, cover категории, публичные URL).
 
-**Остаётся (этап 5):**
+**Grilling (2026-08-20):** published tree + product-subtree prune; manufacturer filter сужает дерево; flat URLs; category page = две секции (subcategory tiles / product tiles); prototype → implement; #46 out.
 
-- Wire public pages to catalog read API ([#6](https://github.com/Leritas/skm-energo/issues/6))
-- Поиск end-to-end (header + catalog; pg_trgm / full-text) ([#8](https://github.com/Leritas/skm-energo/issues/8))
-- Similar products from API ([#9](https://github.com/Leritas/skm-energo/issues/9))
-- News live data — tracked under этап 2 ([#7](https://github.com/Leritas/skm-energo/issues/7))
+**Spec:** [2026-08-20-public-catalog-rebuild.md](./superpowers/specs/2026-08-20-public-catalog-rebuild.md) · **ADR:** [0001-visible-catalog-taxonomy.md](./adr/0001-visible-catalog-taxonomy.md)
 
-**GitHub:** [#14](https://github.com/Leritas/skm-energo/issues/14); implementation sub-issues under [#11](https://github.com/Leritas/skm-energo/issues/11)
+**Scope (этап 5):**
 
-**Ориентир:** 3–5 дней (delta; UI уже есть)
+| Slice                     | Issues                                                                                                                            |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Prototypes (design gate)  | [#70](https://github.com/Leritas/skm-energo/issues/70) category tiles, [#71](https://github.com/Leritas/skm-energo/issues/71) PDP |
+| Taxonomy + category pages | [#67](https://github.com/Leritas/skm-energo/issues/67) — data layer сразу; visual после #70                                       |
+| Header / mobile nav       | [#72](https://github.com/Leritas/skm-energo/issues/72)                                                                            |
+| PDP rebuild (4b media)    | [#73](https://github.com/Leritas/skm-energo/issues/73) — после #71                                                                |
+| Search                    | [#68](https://github.com/Leritas/skm-energo/issues/68)                                                                            |
+| Similar strip             | [#69](https://github.com/Leritas/skm-energo/issues/69) — на новом PDP (#73)                                                       |
+| News live data            | [#7](https://github.com/Leritas/skm-energo/issues/7) ✅                                                                           |
+
+**Superseded:** [#6](https://github.com/Leritas/skm-energo/issues/6), [#8](https://github.com/Leritas/skm-energo/issues/8), [#9](https://github.com/Leritas/skm-energo/issues/9) — delta поверх 1b; acceptance not met.
+
+**GitHub:** [#14](https://github.com/Leritas/skm-energo/issues/14)
+
+**Ориентир:** 5–7 дней
 
 ---
 
@@ -253,7 +264,7 @@ Parent epics для этапов 1–10: [#10](https://github.com/Leritas/skm-en
 
 - **P2** Orders from API — blocked by этап 6 (корзина/заказы)
 - **P3** Reviews API — after P2
-- **P4** Favorites API — after live catalog (этап 5 / #6)
+- **P4** Favorites API — after live catalog (этап 5 / #67)
 
 - Спека: [superpowers/specs/2026-07-30-personal-profile-design.md](./superpowers/specs/2026-07-30-personal-profile-design.md)
 - GitHub: [#16](https://github.com/Leritas/skm-energo/issues/16)
@@ -315,20 +326,20 @@ Parent epics для этапов 1–10: [#10](https://github.com/Leritas/skm-en
 
 ## Оценка объёма
 
-| Этап                    | Ориентир  | Сложность |
-| ----------------------- | --------- | --------- |
-| 0. Инициализация        | 1–2 дня   | Низкая    |
-| 1. Каркас UI            | 3–5 дней  | Средняя   |
-| 2. Prisma + seed        | 2–3 дня   | Средняя   |
-| 3. Auth                 | 3–4 дня   | Средняя   |
-| 4. Админка              | 7–10 дней | Высокая   |
-| 5. Каталог (live delta) | 3–5 дней  | Средняя   |
-| 6. Корзина + заказы     | 5–7 дней  | Высокая   |
-| 7. ЛК + отзывы          | 3–4 дня   | Средняя   |
-| 8. Формы/лиды           | 2–3 дня   | Низкая    |
-| 9. Поставщики           | 2–3 дня   | Средняя   |
-| 10. Production          | 3–5 дней  | Средняя   |
-| 11. Оплата v2           | 5–7 дней  | Высокая   |
+| Этап                                 | Ориентир  | Сложность |
+| ------------------------------------ | --------- | --------- |
+| 0. Инициализация                     | 1–2 дня   | Низкая    |
+| 1. Каркас UI                         | 3–5 дней  | Средняя   |
+| 2. Prisma + seed                     | 2–3 дня   | Средняя   |
+| 3. Auth                              | 3–4 дня   | Средняя   |
+| 4. Админка                           | 7–10 дней | Высокая   |
+| 5. Публичный каталог (PG + media 4b) | 5–7 дней  | Средняя   |
+| 6. Корзина + заказы                  | 5–7 дней  | Высокая   |
+| 7. ЛК + отзывы                       | 3–4 дня   | Средняя   |
+| 8. Формы/лиды                        | 2–3 дня   | Низкая    |
+| 9. Поставщики                        | 2–3 дня   | Средняя   |
+| 10. Production                       | 3–5 дней  | Средняя   |
+| 11. Оплата v2                        | 5–7 дней  | Высокая   |
 
 **Итого v1 (этапы 0–10):** ~6–10 недель для одного разработчика.
 

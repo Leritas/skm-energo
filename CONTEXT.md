@@ -48,6 +48,26 @@ _Avoid_: Vendor, supplier (in code)
 A product from another manufacturer shown on PDP as a cross-brand alternative. Separate card, not a shared listing.
 _Avoid_: Analogue, cross-sell
 
+**Visible category tree**:
+The public catalog taxonomy after publish rules and product-subtree prune: only published categories that contain ≥1 matching published product in their subtree (scoped by active Manufacturer filter when set). Single source for dropdown, sidebar, breadcrumbs, and slug validation.
+_Avoid_: Full category tree, all categories (on public routes)
+
+**Flat category URL**:
+Public category address `/catalog/{categorySlug}` — one slug segment, globally unique; nested hierarchy shown in breadcrumbs only, not in the path.
+_Avoid_: Nested catalog path, category path segments
+
+**Catalog category tile**:
+Domain UI card for a subcategory on catalog pages — landscape/wide cover treatment, links deeper into the visible category tree.
+_Avoid_: Category card (ambiguous with UI Kit primitive)
+
+**Catalog product tile**:
+Domain UI card for a product in catalog grids — square product media, manufacturer label, SKU, badges.
+_Avoid_: Product card (ambiguous with UI Kit `SkmProductCard` primitive)
+
+**Manufacturer catalog entry**:
+Choosing a Manufacturer from the header catalog dropdown to open `/catalog?manufacturer=` — entry into filtered browsing, distinct from in-page manufacturer toggle on the filter bar (same catalog filter state, different UI location).
+_Avoid_: Manufacturer page, brand homepage
+
 ## Auth & profile
 
 **User**:
