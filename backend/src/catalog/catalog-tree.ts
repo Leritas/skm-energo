@@ -1,6 +1,9 @@
+import type { AttachedFile } from '@skm/specs';
+
 export interface CatalogCategoryNode {
   slug: string;
   label: string;
+  coverPhoto: AttachedFile | null;
   children?: CatalogCategoryNode[];
 }
 
@@ -103,6 +106,7 @@ export function filterVisibleCategoryTree(
       filtered.push({
         slug: category.slug,
         label: category.label,
+        coverPhoto: category.coverPhoto,
         children: children?.length ? children : undefined,
       });
     }

@@ -91,6 +91,9 @@ export class CatalogCategoryResponseDto {
   @ApiProperty({ example: 'Предохранители, держатели и аксессуары' })
   label!: string;
 
+  @ApiPropertyOptional({ type: AttachedFileDto, nullable: true })
+  coverPhoto!: AttachedFileDto | null;
+
   @ApiPropertyOptional({
     type: () => CatalogCategoryResponseDto,
     isArray: true,

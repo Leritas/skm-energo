@@ -82,6 +82,12 @@ const emptyTitle = computed(() =>
   isSearchActive.value ? 'Ничего не найдено' : 'Нет товаров',
 );
 
+const showCategoryTiles = computed(
+  () => !categorySlug.value && !isSearchActive.value,
+);
+
+const rootCategories = computed(() => visibleCategories.value ?? []);
+
 const emptyDescription = computed(() => {
   if (isSearchActive.value) {
     return 'Измените запрос, сбросьте фильтр производителя или выберите другую категорию.';
@@ -158,17 +164,36 @@ async function handleSearchSubmit(value: string) {
           <h2
             class="mt-8 text-sm font-semibold uppercase tracking-wide text-neutral-900"
           >
-            {{ isSearchActive ? 'Результаты поиска' : 'Товары' }}
+            {{
+              isSearchActive
+                ? 'Результаты поиска'
+                : categorySlug
+                  ? 'Товары'
+                  : 'Категории'
+            }}
           </h2>
 
+          <div
+            v-if="showCategoryTiles && rootCategories.length"
+            class="mt-4 grid gap-6 sm:grid-cols-2 xl:grid-cols-3"
+          >
+            <SkmCategoryCard
+              v-for="category in rootCategories"
+              :key="category.slug"
+              :title="category.label"
+              :to="catalogUrl(category.slug, manufacturerSlug)"
+              :image="category.coverPhoto?.url ?? null"
+            />
+          </div>
+
           <SkmEmpty
-            v-if="!displayedProducts.length"
+            v-else-if="!displayedProducts.length"
             :title="emptyTitle"
             :description="emptyDescription"
             class="mt-4"
           />
 
-          <template v-else>
+          <template v-else-if="displayedProducts.length">
             <div class="mt-4 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
               <SkmProductCard
                 v-for="product in pagedProducts"

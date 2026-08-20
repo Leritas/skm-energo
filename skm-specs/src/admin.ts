@@ -85,6 +85,7 @@ export interface AdminCategoryDto {
   deletedAt: string | null;
   productCount: number;
   childCount: number;
+  coverPhoto: AttachedFile | null;
 }
 
 export interface CreateCategoryRequest {

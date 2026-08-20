@@ -9,21 +9,27 @@ const categories: CatalogCategoryNode[] = [
   {
     slug: 'predohraniteli',
     label: 'Предохранители',
+    coverPhoto: null,
     children: [
-      { slug: 'nizkovoltnye-predohraniteli', label: 'Низковольтные' },
-      { slug: 'plavkie-vn', label: 'Плавкие ВН' },
+      {
+        slug: 'nizkovoltnye-predohraniteli',
+        label: 'Низковольтные',
+        coverPhoto: null,
+      },
+      { slug: 'plavkie-vn', label: 'Плавкие ВН', coverPhoto: null },
     ],
   },
   {
     slug: 'ibp-i-elektropitanie',
     label: 'ИБП',
+    coverPhoto: null,
     children: [
-      { slug: 'akkumulyatory', label: 'АКБ' },
-      { slug: 'ibp', label: 'ИБП' },
-      { slug: 'solnechnye-invertory', label: 'Инверторы' },
+      { slug: 'akkumulyatory', label: 'АКБ', coverPhoto: null },
+      { slug: 'ibp', label: 'ИБП', coverPhoto: null },
+      { slug: 'solnechnye-invertory', label: 'Инверторы', coverPhoto: null },
     ],
   },
-  { slug: 'aksessuary', label: 'Аксессуары' },
+  { slug: 'aksessuary', label: 'Аксессуары', coverPhoto: null },
 ];
 
 const products: CatalogProductRef[] = [

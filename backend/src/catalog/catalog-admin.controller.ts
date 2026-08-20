@@ -35,6 +35,7 @@ import { RequirePermissions } from '../common/permissions/require-permissions.de
 import { CatalogAdminService } from './catalog-admin.service';
 import { CategoryAdminService } from './category-admin.service';
 import { ProductAdminService } from './product-admin.service';
+import { CategoryMediaAdminService } from './category-media-admin.service';
 import { ProductMediaAdminService } from './product-media-admin.service';
 import {
   AttachedFileItemResponseDto,
@@ -56,6 +57,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { ListCategoriesAdminQueryDto } from './dto/list-categories-admin-query.dto';
 import { ListManufacturersAdminQueryDto } from './dto/list-manufacturers-admin-query.dto';
 import { ListProductsAdminQueryDto } from './dto/list-products-admin-query.dto';
+import { CategoryCoverPhotoResponseDto } from './dto/category-cover-photo-response.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { UpdateManufacturerDto } from './dto/update-manufacturer.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -84,6 +86,7 @@ export class CatalogAdminController {
     private readonly categoryAdminService: CategoryAdminService,
     private readonly productAdminService: ProductAdminService,
     private readonly productMediaAdminService: ProductMediaAdminService,
+    private readonly categoryMediaAdminService: CategoryMediaAdminService,
     private readonly permissionsService: PermissionsService,
   ) {}
 
@@ -185,6 +188,30 @@ export class CatalogAdminController {
   @ApiOkResponse({ type: AdminCategoryDto })
   restoreCategory(@Param('id', ParseIntPipe) id: number) {
     return this.categoryAdminService.restore(id);
+  }
+
+  @Post('categories/:categoryId/cover-photo')
+  @RequirePermissions(Permission.canManageCategories)
+  @UseInterceptors(PhotoFileInterceptor)
+  @ApiCreatedResponse({ type: CategoryCoverPhotoResponseDto })
+  uploadCategoryCoverPhoto(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+    @UploadedFile() file: Express.Multer.File | undefined,
+  ) {
+    if (!file) {
+      throw new BadRequestException('file is required');
+    }
+    return this.categoryMediaAdminService.replaceCoverPhoto(categoryId, file);
+  }
+
+  @Delete('categories/:categoryId/cover-photo')
+  @RequirePermissions(Permission.canManageCategories)
+  @HttpCode(204)
+  @ApiNoContentResponse()
+  async deleteCategoryCoverPhoto(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+  ): Promise<void> {
+    await this.categoryMediaAdminService.deleteCoverPhoto(categoryId);
   }
 
   @Get('products')

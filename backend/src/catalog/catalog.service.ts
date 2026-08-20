@@ -16,6 +16,7 @@ import { derivePublicProductBadges } from './product-badges';
 export interface CatalogCategoryDto {
   slug: string;
   label: string;
+  coverPhoto: AttachedFile | null;
   children?: CatalogCategoryDto[];
 }
 
@@ -260,6 +261,9 @@ export class CatalogService {
     const rows = await this.prisma.category.findMany({
       where: PUBLIC_CATEGORY_WHERE,
       orderBy: [{ parentId: 'asc' }, { id: 'asc' }],
+      include: {
+        photos: { orderBy: { sortOrder: 'asc' }, take: 1 },
+      },
     });
 
     const nodes = new Map<
@@ -271,6 +275,9 @@ export class CatalogService {
       nodes.set(row.id, {
         slug: row.slug,
         label: row.name,
+        coverPhoto: row.photos[0]
+          ? this.urls.toAttachedPhoto(row.photos[0])
+          : null,
         childIds: [],
       });
     }
@@ -305,6 +312,7 @@ export class CatalogService {
       return {
         slug: node.slug,
         label: node.label,
+        coverPhoto: node.coverPhoto,
         children: children.length ? children : undefined,
       };
     }

@@ -295,6 +295,9 @@ describe('CatalogService', () => {
     expect(prisma.category.findMany).toHaveBeenCalledWith({
       where: { isPublished: true, deletedAt: null },
       orderBy: [{ parentId: 'asc' }, { id: 'asc' }],
+      include: {
+        photos: { orderBy: { sortOrder: 'asc' }, take: 1 },
+      },
     });
   });
 

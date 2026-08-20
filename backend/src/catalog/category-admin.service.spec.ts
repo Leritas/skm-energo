@@ -7,14 +7,27 @@ import {
 import { Permission } from '@skm/specs';
 import { CategoryAdminService } from './category-admin.service';
 
-const CATEGORY_COUNT_INCLUDE = {
+const CATEGORY_ADMIN_INCLUDE = {
   _count: {
     select: {
       products: true,
       children: { where: { deletedAt: null } },
     },
   },
+  photos: { orderBy: { sortOrder: 'asc' as const }, take: 1 },
 } as const;
+
+function createUrlsMock() {
+  return {
+    toAttachedPhoto: jest.fn((photo: { id: number }) => ({
+      id: photo.id,
+      url: `http://localhost:3001/photos/${photo.id}`,
+      filename: 'cover.jpg',
+      sizeBytes: 100,
+      mimeType: 'image/jpeg',
+    })),
+  };
+}
 
 function createPrismaMock() {
   return {
@@ -43,6 +56,7 @@ function categoryRow(overrides: Record<string, unknown> = {}) {
     isPublished: true,
     deletedAt: null,
     _count: { products: 0, children: 0 },
+    photos: [],
     ...overrides,
   };
 }
@@ -54,13 +68,16 @@ describe('CategoryAdminService', () => {
       categoryRow({ _count: { products: 2, children: 1 } }),
     ]);
 
-    const service = new CategoryAdminService(prisma as never);
+    const service = new CategoryAdminService(
+      prisma as never,
+      createUrlsMock() as never,
+    );
     const result = await service.listCategories(false);
 
     expect(prisma.category.findMany).toHaveBeenCalledWith({
       where: { deletedAt: null },
       orderBy: { name: 'asc' },
-      include: CATEGORY_COUNT_INCLUDE,
+      include: CATEGORY_ADMIN_INCLUDE,
     });
     expect(result).toEqual([
       {
@@ -75,6 +92,7 @@ describe('CategoryAdminService', () => {
         deletedAt: null,
         productCount: 2,
         childCount: 1,
+        coverPhoto: null,
       },
     ]);
   });
@@ -83,7 +101,10 @@ describe('CategoryAdminService', () => {
     const prisma = createPrismaMock();
     prisma.category.findMany.mockResolvedValue([]);
 
-    const service = new CategoryAdminService(prisma as never);
+    const service = new CategoryAdminService(
+      prisma as never,
+      createUrlsMock() as never,
+    );
     await service.listCategories(true);
 
     expect(prisma.category.findMany).toHaveBeenCalledWith(
@@ -104,7 +125,10 @@ describe('CategoryAdminService', () => {
       }),
     );
 
-    const service = new CategoryAdminService(prisma as never);
+    const service = new CategoryAdminService(
+      prisma as never,
+      createUrlsMock() as never,
+    );
     const result = await service.create({
       slug: 'new-branch',
       name: 'Новая ветка',
@@ -120,7 +144,7 @@ describe('CategoryAdminService', () => {
         parentId: null,
         isPublished: false,
       },
-      include: CATEGORY_COUNT_INCLUDE,
+      include: CATEGORY_ADMIN_INCLUDE,
     });
     expect(result.isPublished).toBe(false);
   });
@@ -129,7 +153,10 @@ describe('CategoryAdminService', () => {
     const prisma = createPrismaMock();
     prisma.category.findUnique.mockResolvedValue(null);
 
-    const service = new CategoryAdminService(prisma as never);
+    const service = new CategoryAdminService(
+      prisma as never,
+      createUrlsMock() as never,
+    );
 
     await expect(
       service.create({
@@ -147,7 +174,10 @@ describe('CategoryAdminService', () => {
     prisma.category.count.mockResolvedValue(0);
     prisma.product.count.mockResolvedValue(3);
 
-    const service = new CategoryAdminService(prisma as never);
+    const service = new CategoryAdminService(
+      prisma as never,
+      createUrlsMock() as never,
+    );
 
     await expect(service.softDelete(1)).rejects.toBeInstanceOf(
       ConflictException,
@@ -161,7 +191,10 @@ describe('CategoryAdminService', () => {
     prisma.category.count.mockResolvedValue(2);
     prisma.product.count.mockResolvedValue(0);
 
-    const service = new CategoryAdminService(prisma as never);
+    const service = new CategoryAdminService(
+      prisma as never,
+      createUrlsMock() as never,
+    );
 
     await expect(service.softDelete(1)).rejects.toBeInstanceOf(
       ConflictException,
@@ -181,7 +214,10 @@ describe('CategoryAdminService', () => {
       }),
     );
 
-    const service = new CategoryAdminService(prisma as never);
+    const service = new CategoryAdminService(
+      prisma as never,
+      createUrlsMock() as never,
+    );
     const result = await service.softDelete(1);
 
     expect(prisma.category.update).toHaveBeenCalledWith({
@@ -190,7 +226,7 @@ describe('CategoryAdminService', () => {
         deletedAt: expect.any(Date),
         isPublished: false,
       },
-      include: CATEGORY_COUNT_INCLUDE,
+      include: CATEGORY_ADMIN_INCLUDE,
     });
     expect(result.isPublished).toBe(false);
     expect(result.deletedAt).toBe('2026-08-18T10:00:00.000Z');
@@ -208,13 +244,16 @@ describe('CategoryAdminService', () => {
       categoryRow({ isPublished: false, deletedAt: null }),
     );
 
-    const service = new CategoryAdminService(prisma as never);
+    const service = new CategoryAdminService(
+      prisma as never,
+      createUrlsMock() as never,
+    );
     const result = await service.restore(1);
 
     expect(prisma.category.update).toHaveBeenCalledWith({
       where: { id: 1 },
       data: { deletedAt: null },
-      include: CATEGORY_COUNT_INCLUDE,
+      include: CATEGORY_ADMIN_INCLUDE,
     });
     expect(result.deletedAt).toBeNull();
   });
@@ -224,7 +263,10 @@ describe('CategoryAdminService', () => {
     prisma.category.findUnique.mockResolvedValue(categoryRow());
     prisma.category.findMany.mockResolvedValue([categoryRow()]);
 
-    const service = new CategoryAdminService(prisma as never);
+    const service = new CategoryAdminService(
+      prisma as never,
+      createUrlsMock() as never,
+    );
 
     await expect(
       service.update(1, { slug: 'renamed' }, [Permission.canManageCategories]),
@@ -240,7 +282,10 @@ describe('CategoryAdminService', () => {
     prisma.category.findMany.mockResolvedValue([categoryRow()]);
     prisma.category.update.mockResolvedValue(categoryRow({ slug: 'renamed' }));
 
-    const service = new CategoryAdminService(prisma as never);
+    const service = new CategoryAdminService(
+      prisma as never,
+      createUrlsMock() as never,
+    );
     const result = await service.update(1, { slug: 'renamed' }, [
       Permission.hasAbsoluteControl,
     ]);
@@ -261,7 +306,10 @@ describe('CategoryAdminService', () => {
       categoryRow({ id: 2, slug: 'child', parentId: 1 }),
     ]);
 
-    const service = new CategoryAdminService(prisma as never);
+    const service = new CategoryAdminService(
+      prisma as never,
+      createUrlsMock() as never,
+    );
 
     await expect(
       service.update(1, { parentId: 2 }, [Permission.canManageCategories]),
@@ -286,7 +334,10 @@ describe('CategoryAdminService', () => {
         }),
       );
 
-    const service = new CategoryAdminService(prisma as never);
+    const service = new CategoryAdminService(
+      prisma as never,
+      createUrlsMock() as never,
+    );
 
     await expect(service.restore(2)).rejects.toBeInstanceOf(
       BadRequestException,
@@ -298,7 +349,10 @@ describe('CategoryAdminService', () => {
     const prisma = createPrismaMock();
     prisma.category.findUnique.mockResolvedValue(null);
 
-    const service = new CategoryAdminService(prisma as never);
+    const service = new CategoryAdminService(
+      prisma as never,
+      createUrlsMock() as never,
+    );
 
     await expect(
       service.update(99, { name: 'Missing' }, [Permission.canManageCategories]),
