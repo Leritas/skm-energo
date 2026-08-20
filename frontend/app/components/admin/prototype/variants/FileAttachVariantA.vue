@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { FileAttachPrototype } from './file-attach-mock';
-import { formatFileSize } from './file-attach-mock';
+import type { FileAttachPrototype } from '../file-attach-mock';
+import { formatFileSize } from '../file-attach-mock';
 
 defineProps<{
   proto: FileAttachPrototype;
@@ -80,59 +80,63 @@ defineProps<{
               class="relative w-28 shrink-0"
             >
               <div
-                class="overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50"
+                class="relative overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50"
               >
                 <img
                   :src="photo.url"
                   :alt="photo.filename"
                   class="aspect-square w-full object-cover"
                 />
-              </div>
-              <SkmBadge
-                v-if="index === 0"
-                tone="accent"
-                class="absolute left-1 top-1 text-[10px]"
-              >
-                на карточке
-              </SkmBadge>
-              <div class="mt-2 flex items-center gap-1">
+                <SkmBadge
+                  v-if="index === 0"
+                  tone="accent"
+                  class="absolute left-1 top-1 text-[10px]"
+                >
+                  обложка
+                </SkmBadge>
                 <button
                   type="button"
-                  class="cursor-grab rounded border border-neutral-200 px-1 text-xs text-neutral-500"
+                  class="absolute right-1 top-1 rounded border border-transparent bg-white/90 px-1 py-0.5 text-xs leading-none text-red-600 hover:border-neutral-200 hover:bg-white"
+                  aria-label="Удалить фото"
+                  @click="proto.removePhoto(photo.id)"
+                >
+                  ✕
+                </button>
+              </div>
+              <div class="mt-2 flex items-center justify-center gap-1">
+                <button
+                  type="button"
+                  class="cursor-grab rounded border border-neutral-200 px-1.5 py-0.5 text-xs text-neutral-500"
                   title="Ручка перетаскивания"
                 >
                   ⠿
                 </button>
                 <button
                   type="button"
-                  class="rounded border border-neutral-200 px-1 text-xs"
+                  class="rounded border border-neutral-200 px-1.5 py-0.5 text-xs disabled:opacity-40"
+                  aria-label="Сдвинуть влево"
+                  :disabled="index === 0"
                   @click="proto.movePhoto(photo.id, -1)"
                 >
-                  ↑
+                  ←
                 </button>
                 <button
                   type="button"
-                  class="rounded border border-neutral-200 px-1 text-xs"
+                  class="rounded border border-neutral-200 px-1.5 py-0.5 text-xs disabled:opacity-40"
+                  aria-label="Сдвинуть вправо"
+                  :disabled="index === proto.photos.value.length - 1"
                   @click="proto.movePhoto(photo.id, 1)"
                 >
-                  ↓
+                  →
                 </button>
               </div>
-              <div class="mt-1 flex flex-wrap gap-1">
+              <div v-if="index !== 0" class="mt-1 text-center">
                 <button
-                  v-if="index !== 0"
                   type="button"
                   class="text-[10px] text-accent-600 hover:underline"
                   @click="proto.makePhotoFirst(photo.id)"
                 >
-                  сделать первым
-                </button>
-                <button
-                  type="button"
-                  class="text-[10px] text-red-600 hover:underline"
-                  @click="proto.removePhoto(photo.id)"
-                >
-                  удалить
+                  на обложку
                 </button>
               </div>
             </div>
@@ -178,21 +182,24 @@ defineProps<{
               }}</span>
               <button
                 type="button"
-                class="text-xs"
+                class="text-xs text-neutral-500 hover:text-neutral-800"
+                aria-label="Выше"
                 @click="proto.moveDocument(doc.id, -1)"
               >
                 ↑
               </button>
               <button
                 type="button"
-                class="text-xs"
+                class="text-xs text-neutral-500 hover:text-neutral-800"
+                aria-label="Ниже"
                 @click="proto.moveDocument(doc.id, 1)"
               >
                 ↓
               </button>
               <button
                 type="button"
-                class="text-xs text-red-600"
+                class="text-xs text-red-600 hover:text-red-700"
+                aria-label="Удалить документ"
                 @click="proto.removeDocument(doc.id)"
               >
                 ✕

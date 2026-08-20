@@ -114,7 +114,7 @@ export function useFileAttachPrototype() {
     const [item] = next.splice(index, 1);
     next.unshift(item);
     photos.value = next;
-    persist(`Photo «${item.filename}» — теперь на карточке (mock).`);
+    persist(`Photo «${item.filename}» — теперь обложка (mock).`);
   }
 
   function reorderPhotos(ids: number[]) {
