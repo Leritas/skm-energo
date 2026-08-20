@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AdminNewsArticleDto } from '@skm/specs';
+import type { AdminNewsArticleDto, AttachedFile } from '@skm/specs';
 
 const NEWS_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -13,6 +13,8 @@ const {
   updateArticle,
   archiveArticle,
   restoreArticle,
+  replaceCoverPhoto,
+  deleteCoverPhoto,
 } = useNewsAdmin();
 const { hasAbsoluteControl } = usePermissions();
 const toast = useToast();
@@ -36,6 +38,8 @@ const form = reactive({
   seoTitle: '',
   seoDescription: '',
 });
+
+const coverPhoto = ref<AttachedFile | null>(null);
 
 const isEditing = computed(() => editingArticle.value !== null);
 const canChangeSlug = computed(() => !isEditing.value || hasAbsoluteControl());
@@ -82,6 +86,7 @@ function resetForm() {
   form.published = false;
   form.seoTitle = '';
   form.seoDescription = '';
+  coverPhoto.value = null;
 }
 
 function openCreate() {
@@ -100,6 +105,7 @@ function openEdit(article: AdminNewsArticleDto) {
   form.published = article.published;
   form.seoTitle = article.seoTitle ?? '';
   form.seoDescription = article.seoDescription ?? '';
+  coverPhoto.value = article.coverPhoto;
   formOpen.value = true;
 }
 
@@ -192,6 +198,44 @@ async function handleRestore(article: AdminNewsArticleDto) {
   } catch (error) {
     toast.add({
       title: 'Не удалось восстановить новость',
+      description: error instanceof Error ? error.message : undefined,
+      color: 'error',
+    });
+  }
+}
+
+async function handleCoverReplace(file: File) {
+  const articleId = editingArticle.value?.id;
+  if (!articleId) {
+    return;
+  }
+
+  try {
+    const response = await replaceCoverPhoto(articleId, file);
+    coverPhoto.value = response.photo;
+    toast.add({ title: 'Обложка обновлена', color: 'success' });
+  } catch (error) {
+    toast.add({
+      title: 'Не удалось загрузить обложку',
+      description: error instanceof Error ? error.message : undefined,
+      color: 'error',
+    });
+  }
+}
+
+async function handleCoverDelete() {
+  const articleId = editingArticle.value?.id;
+  if (!articleId) {
+    return;
+  }
+
+  try {
+    await deleteCoverPhoto(articleId);
+    coverPhoto.value = null;
+    toast.add({ title: 'Обложка удалена', color: 'success' });
+  } catch (error) {
+    toast.add({
+      title: 'Не удалось удалить обложку',
       description: error instanceof Error ? error.message : undefined,
       color: 'error',
     });
@@ -416,6 +460,23 @@ onMounted(() => {
               Показывать на публичной странице /news
             </label>
           </SkmFormField>
+
+          <AdminCoverPhotoSlot
+            v-if="isEditing"
+            :cover-photo="coverPhoto"
+            @replace="handleCoverReplace"
+            @delete="handleCoverDelete"
+          />
+          <section
+            v-else
+            class="space-y-2 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-5"
+          >
+            <h3 class="text-sm font-semibold text-neutral-900">Обложка</h3>
+            <p class="text-sm text-neutral-500">
+              Сначала сохраните новость, затем загрузите обложку в режиме
+              редактирования.
+            </p>
+          </section>
 
           <div
             class="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4"
