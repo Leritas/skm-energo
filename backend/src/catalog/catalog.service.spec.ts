@@ -1,6 +1,42 @@
 import { NotFoundException } from '@nestjs/common';
 import { CatalogService } from './catalog.service';
 
+function createUrlsMock() {
+  return {
+    toAttachedPhoto: jest.fn((photo: {
+      id: number;
+      filename: string;
+      sizeBytes: number;
+      mimeType: string;
+    }) => ({
+      id: photo.id,
+      url: `http://localhost:3001/photos/${photo.id}`,
+      filename: photo.filename,
+      sizeBytes: photo.sizeBytes,
+      mimeType: photo.mimeType,
+    })),
+    toAttachedDocument: jest.fn((document: {
+      id: number;
+      filename: string;
+      sizeBytes: number;
+      mimeType: string;
+    }) => ({
+      id: document.id,
+      url: `http://localhost:3001/documents/${document.id}`,
+      filename: document.filename,
+      sizeBytes: document.sizeBytes,
+      mimeType: document.mimeType,
+    })),
+  };
+}
+
+const PRODUCT_MEDIA_INCLUDE = {
+  manufacturer: true,
+  category: true,
+  photos: { orderBy: { sortOrder: 'asc' } },
+  documents: { orderBy: { sortOrder: 'asc' } },
+};
+
 function createPrismaMock(overrides: {
   product?: {
     findUnique?: jest.Mock;
@@ -36,14 +72,14 @@ describe('CatalogService', () => {
       },
     };
 
-    const service = new CatalogService(prisma as never);
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
 
     await expect(service.getProductBySlug('missing')).rejects.toBeInstanceOf(
       NotFoundException,
     );
   });
 
-  it('returns product detail with specs and pdf reference', async () => {
+  it('returns product detail with photos, documents, and derived pdf badge', async () => {
     const prisma = {
       product: {
         findUnique: jest.fn().mockResolvedValue({
@@ -52,8 +88,7 @@ describe('CatalogService', () => {
           sku: 'NH00-160',
           description: 'Низковольтный предохранитель серии NH00.',
           specs: [{ label: 'Номинальный ток', value: '160 A' }],
-          pdfHref: '/files/nh00-160a.pdf',
-          badges: ['pdf'],
+          badges: [],
           similarSlugs: ['fuse-link-6kv'],
           seoTitle: 'NH00 160A — поставка',
           seoDescription: 'Низковольтный предохранитель NH00 для щитов.',
@@ -65,11 +100,27 @@ describe('CatalogService', () => {
             isPublished: true,
             deletedAt: null,
           },
+          photos: [
+            {
+              id: 1,
+              filename: 'nh00.jpg',
+              sizeBytes: 100,
+              mimeType: 'image/jpeg',
+            },
+          ],
+          documents: [
+            {
+              id: 2,
+              filename: 'datasheet.pdf',
+              sizeBytes: 200,
+              mimeType: 'application/pdf',
+            },
+          ],
         }),
       },
     };
 
-    const service = new CatalogService(prisma as never);
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
     const result = await service.getProductBySlug('nh00-160a');
 
     expect(result).toEqual({
@@ -78,7 +129,31 @@ describe('CatalogService', () => {
       sku: 'NH00-160',
       description: 'Низковольтный предохранитель серии NH00.',
       specs: [{ label: 'Номинальный ток', value: '160 A' }],
-      pdfHref: '/files/nh00-160a.pdf',
+      photos: [
+        {
+          id: 1,
+          url: 'http://localhost:3001/photos/1',
+          filename: 'nh00.jpg',
+          sizeBytes: 100,
+          mimeType: 'image/jpeg',
+        },
+      ],
+      documents: [
+        {
+          id: 2,
+          url: 'http://localhost:3001/documents/2',
+          filename: 'datasheet.pdf',
+          sizeBytes: 200,
+          mimeType: 'application/pdf',
+        },
+      ],
+      image: {
+        id: 1,
+        url: 'http://localhost:3001/photos/1',
+        filename: 'nh00.jpg',
+        sizeBytes: 100,
+        mimeType: 'image/jpeg',
+      },
       badges: ['pdf'],
       seoTitle: 'NH00 160A — поставка',
       seoDescription: 'Низковольтный предохранитель NH00 для щитов.',
@@ -95,7 +170,7 @@ describe('CatalogService', () => {
       },
     });
 
-    const service = new CatalogService(prisma as never);
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
 
     await expect(service.listSimilarProducts('missing')).rejects.toBeInstanceOf(
       NotFoundException,
@@ -122,12 +197,14 @@ describe('CatalogService', () => {
             badges: ['onRequest'],
             manufacturer: { slug: 'casram' },
             category: { slug: 'plavkie-vn' },
+            photos: [],
+            documents: [],
           },
         ]),
       },
     });
 
-    const service = new CatalogService(prisma as never);
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
     const result = await service.listSimilarProducts('fuse-link-10kv');
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
@@ -140,10 +217,7 @@ describe('CatalogService', () => {
         manufacturer: { isPublished: true, deletedAt: null },
         category: { isPublished: true, deletedAt: null },
       },
-      include: {
-        manufacturer: true,
-        category: true,
-      },
+      include: PRODUCT_MEDIA_INCLUDE,
       orderBy: { title: 'asc' },
       take: 3,
     });
@@ -155,6 +229,7 @@ describe('CatalogService', () => {
         badges: ['onRequest'],
         manufacturerSlug: 'casram',
         categorySlug: 'plavkie-vn',
+        image: null,
       },
     ]);
   });
@@ -175,7 +250,7 @@ describe('CatalogService', () => {
       },
     });
 
-    const service = new CatalogService(prisma as never);
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
     await service.listSimilarProducts('c09-220', 2);
 
     expect(prisma.product.findMany).toHaveBeenCalledWith(
@@ -186,7 +261,7 @@ describe('CatalogService', () => {
   it('returns an empty list for blank search queries', async () => {
     const prisma = createPrismaMock({});
 
-    const service = new CatalogService(prisma as never);
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
     const result = await service.searchProducts('   ');
 
     expect(result).toEqual([]);
@@ -199,7 +274,7 @@ describe('CatalogService', () => {
       .fn()
       .mockResolvedValue([{ slug: 'mersen', name: 'Mersen' }]);
 
-    const service = new CatalogService(prisma as never);
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
     const result = await service.listManufacturers();
 
     expect(prisma.manufacturer.findMany).toHaveBeenCalledWith({
@@ -214,7 +289,7 @@ describe('CatalogService', () => {
     prisma.category.findMany.mockResolvedValue([]);
     prisma.product.findMany.mockResolvedValue([]);
 
-    const service = new CatalogService(prisma as never);
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
     await service.getCategoryTree(null);
 
     expect(prisma.category.findMany).toHaveBeenCalledWith({
@@ -232,10 +307,11 @@ describe('CatalogService', () => {
           sku: 'DRAFT-1',
           description: 'Ещё не опубликован.',
           specs: [],
-          pdfHref: null,
           badges: [],
           seoTitle: null,
           seoDescription: null,
+          photos: [],
+          documents: [],
           isPublished: false,
           deletedAt: null,
           manufacturer: { slug: 'mersen', isPublished: true, deletedAt: null },
@@ -248,7 +324,7 @@ describe('CatalogService', () => {
       },
     };
 
-    const service = new CatalogService(prisma as never);
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
 
     await expect(service.getProductBySlug('draft-fuse')).rejects.toBeInstanceOf(
       NotFoundException,
@@ -264,10 +340,11 @@ describe('CatalogService', () => {
           sku: 'OLD-1',
           description: 'Снят с публикации.',
           specs: [],
-          pdfHref: null,
           badges: [],
           seoTitle: null,
           seoDescription: null,
+          photos: [],
+          documents: [],
           isPublished: false,
           deletedAt: new Date('2026-08-18T10:00:00.000Z'),
           manufacturer: { slug: 'mersen', isPublished: true, deletedAt: null },
@@ -280,7 +357,7 @@ describe('CatalogService', () => {
       },
     };
 
-    const service = new CatalogService(prisma as never);
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
 
     await expect(service.getProductBySlug('old-fuse')).rejects.toBeInstanceOf(
       NotFoundException,
@@ -296,10 +373,11 @@ describe('CatalogService', () => {
           sku: 'NH00-160',
           description: 'Низковольтный предохранитель серии NH00.',
           specs: [],
-          pdfHref: null,
           badges: [],
           seoTitle: null,
           seoDescription: null,
+          photos: [],
+          documents: [],
           isPublished: true,
           deletedAt: null,
           manufacturer: { slug: 'mersen', isPublished: true, deletedAt: null },
@@ -312,7 +390,7 @@ describe('CatalogService', () => {
       },
     };
 
-    const service = new CatalogService(prisma as never);
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
 
     await expect(service.getProductBySlug('nh00-160a')).rejects.toBeInstanceOf(
       NotFoundException,
@@ -321,24 +399,34 @@ describe('CatalogService', () => {
 
   it('searches products by title, sku, and manufacturer name', async () => {
     const prisma = createPrismaMock({
-      $queryRaw: jest.fn().mockResolvedValue([
-        {
-          slug: 'nh00-160a',
-          title: 'Предохранитель NH00 160A',
-          sku: 'NH00-160',
-          badges: ['pdf'],
-          manufacturerSlug: 'mersen',
-          categorySlug: 'nizkovoltnye-predohraniteli',
-        },
-      ]),
+      $queryRaw: jest.fn().mockResolvedValue([{ slug: 'nh00-160a' }]),
     });
+    prisma.product.findMany.mockResolvedValue([
+      {
+        slug: 'nh00-160a',
+        title: 'Предохранитель NH00 160A',
+        sku: 'NH00-160',
+        badges: [],
+        manufacturer: { slug: 'mersen' },
+        category: { slug: 'nizkovoltnye-predohraniteli' },
+        photos: [],
+        documents: [
+          {
+            id: 3,
+            filename: 'datasheet.pdf',
+            sizeBytes: 100,
+            mimeType: 'application/pdf',
+          },
+        ],
+      },
+    ]);
     prisma.manufacturer.findFirst.mockResolvedValue({
       slug: 'mersen',
       isPublished: true,
       deletedAt: null,
     });
 
-    const service = new CatalogService(prisma as never);
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
     const result = await service.searchProducts('NH00', null, 'mersen', 10);
 
     expect(prisma.$queryRaw).toHaveBeenCalledTimes(1);
@@ -353,6 +441,7 @@ describe('CatalogService', () => {
         badges: ['pdf'],
         manufacturerSlug: 'mersen',
         categorySlug: 'nizkovoltnye-predohraniteli',
+        image: null,
       },
     ]);
   });

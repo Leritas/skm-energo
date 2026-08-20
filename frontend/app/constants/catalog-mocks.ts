@@ -11,7 +11,6 @@ export interface MockProduct {
   sku: string;
   description: string;
   specs: Array<{ label: string; value: string }>;
-  pdfHref?: string;
   badges?: ProductBadge[];
   similarSlugs?: string[];
 }
@@ -37,7 +36,6 @@ export const MOCK_PRODUCTS: MockProduct[] = [
       { label: 'Напряжение', value: '690 V AC' },
       { label: 'Серия', value: 'NH00' },
     ],
-    pdfHref: '/files/nh00-160a.pdf',
     badges: ['pdf'],
     similarSlugs: ['fuse-link-6kv'],
   },
@@ -52,8 +50,6 @@ export const MOCK_PRODUCTS: MockProduct[] = [
       { label: 'Номинальный ток', value: '250 A' },
       { label: 'Напряжение', value: '690 V AC' },
     ],
-    pdfHref: '/files/nh1-250a.pdf',
-    badges: ['pdf'],
   },
   {
     slug: 'holder-nh1',
@@ -106,7 +102,6 @@ export const MOCK_PRODUCTS: MockProduct[] = [
     sku: 'SPD-T1-25',
     description: 'Устройство защиты от перенапряжений класса T1.',
     specs: [{ label: 'Ток', value: '25 kA' }],
-    pdfHref: '/files/spd-t1-25.pdf',
     badges: ['pdf'],
     similarSlugs: ['spd-t2-40'],
   },

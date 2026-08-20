@@ -17,12 +17,50 @@ function createPrismaMock() {
     },
     manufacturer: {
       findUnique: jest.fn(),
+      findMany: jest.fn(),
     },
     category: {
       findUnique: jest.fn(),
+      findMany: jest.fn(),
     },
   };
 }
+
+function createUrlsMock() {
+  return {
+    toAttachedPhoto: jest.fn((photo: {
+      id: number;
+      filename: string;
+      sizeBytes: number;
+      mimeType: string;
+    }) => ({
+      id: photo.id,
+      url: `http://localhost:3001/photos/${photo.id}`,
+      filename: photo.filename,
+      sizeBytes: photo.sizeBytes,
+      mimeType: photo.mimeType,
+    })),
+    toAttachedDocument: jest.fn((document: {
+      id: number;
+      filename: string;
+      sizeBytes: number;
+      mimeType: string;
+    }) => ({
+      id: document.id,
+      url: `http://localhost:3001/documents/${document.id}`,
+      filename: document.filename,
+      sizeBytes: document.sizeBytes,
+      mimeType: document.mimeType,
+    })),
+  };
+}
+
+const PRODUCT_INCLUDE = {
+  manufacturer: true,
+  category: true,
+  photos: { orderBy: { sortOrder: 'asc' } },
+  documents: { orderBy: { sortOrder: 'asc' } },
+};
 
 function productRow(overrides: Record<string, unknown> = {}) {
   return {
@@ -32,8 +70,7 @@ function productRow(overrides: Record<string, unknown> = {}) {
     sku: 'NH00-160',
     description: 'Низковольтный предохранитель серии NH00.',
     specs: [{ label: 'Номинальный ток', value: '160 A' }],
-    pdfHref: '/files/nh00-160a.pdf',
-    badges: ['pdf'],
+    badges: [],
     seoTitle: null,
     seoDescription: null,
     isPublished: true,
@@ -47,6 +84,22 @@ function productRow(overrides: Record<string, unknown> = {}) {
       name: 'Низковольтные предохранители',
       deletedAt: null,
     },
+    photos: [
+      {
+        id: 5,
+        filename: 'nh00.jpg',
+        sizeBytes: 100,
+        mimeType: 'image/jpeg',
+      },
+    ],
+    documents: [
+      {
+        id: 7,
+        filename: 'datasheet.pdf',
+        sizeBytes: 200,
+        mimeType: 'application/pdf',
+      },
+    ],
     ...overrides,
   };
 }
@@ -54,18 +107,16 @@ function productRow(overrides: Record<string, unknown> = {}) {
 describe('ProductAdminService', () => {
   it('lists active products by default', async () => {
     const prisma = createPrismaMock();
+    const urls = createUrlsMock();
     prisma.product.findMany.mockResolvedValue([productRow()]);
 
-    const service = new ProductAdminService(prisma as never);
+    const service = new ProductAdminService(prisma as never, urls as never);
     const result = await service.listProducts(false);
 
     expect(prisma.product.findMany).toHaveBeenCalledWith({
       where: { deletedAt: null },
       orderBy: { title: 'asc' },
-      include: {
-        manufacturer: true,
-        category: true,
-      },
+      include: PRODUCT_INCLUDE,
     });
     expect(result).toEqual([
       {
@@ -75,8 +126,25 @@ describe('ProductAdminService', () => {
         sku: 'NH00-160',
         description: 'Низковольтный предохранитель серии NH00.',
         specs: [{ label: 'Номинальный ток', value: '160 A' }],
-        pdfHref: '/files/nh00-160a.pdf',
-        badges: ['pdf'],
+        photos: [
+          {
+            id: 5,
+            url: 'http://localhost:3001/photos/5',
+            filename: 'nh00.jpg',
+            sizeBytes: 100,
+            mimeType: 'image/jpeg',
+          },
+        ],
+        documents: [
+          {
+            id: 7,
+            url: 'http://localhost:3001/documents/7',
+            filename: 'datasheet.pdf',
+            sizeBytes: 200,
+            mimeType: 'application/pdf',
+          },
+        ],
+        badges: [],
         seoTitle: null,
         seoDescription: null,
         manufacturerId: 10,
@@ -93,9 +161,10 @@ describe('ProductAdminService', () => {
 
   it('includes archived products when requested', async () => {
     const prisma = createPrismaMock();
+    const urls = createUrlsMock();
     prisma.product.findMany.mockResolvedValue([]);
 
-    const service = new ProductAdminService(prisma as never);
+    const service = new ProductAdminService(prisma as never, urls as never);
     await service.listProducts(true);
 
     expect(prisma.product.findMany).toHaveBeenCalledWith(
@@ -105,6 +174,7 @@ describe('ProductAdminService', () => {
 
   it('creates a product unpublished by default and generates a slug', async () => {
     const prisma = createPrismaMock();
+    const urls = createUrlsMock();
     prisma.manufacturer.findUnique.mockResolvedValue({
       id: 10,
       deletedAt: null,
@@ -119,13 +189,14 @@ describe('ProductAdminService', () => {
       productRow({
         id: 8,
         isPublished: false,
-        pdfHref: null,
+        photos: [],
+        documents: [],
         seoTitle: 'NH00 160A купить',
         seoDescription: 'Поставка предохранителей NH00.',
       }),
     );
 
-    const service = new ProductAdminService(prisma as never);
+    const service = new ProductAdminService(prisma as never, urls as never);
     const result = await service.create({
       title: 'Предохранитель NH00 160A',
       sku: 'NH00-160',
@@ -144,7 +215,6 @@ describe('ProductAdminService', () => {
         sku: 'NH00-160',
         description: 'Низковольтный предохранитель серии NH00.',
         specs: [{ label: 'Номинальный ток', value: '160 A' }],
-        pdfHref: null,
         badges: [],
         similarSlugs: [],
         seoTitle: 'NH00 160A купить',
@@ -153,10 +223,7 @@ describe('ProductAdminService', () => {
         categoryId: 20,
         isPublished: false,
       },
-      include: {
-        manufacturer: true,
-        category: true,
-      },
+      include: PRODUCT_INCLUDE,
     });
     expect(result.isPublished).toBe(false);
     expect(result.slug).toBe('predohranitel-nh00-160a');
@@ -164,6 +231,7 @@ describe('ProductAdminService', () => {
 
   it('rejects create when the manufacturer is archived', async () => {
     const prisma = createPrismaMock();
+    const urls = createUrlsMock();
     prisma.manufacturer.findUnique.mockResolvedValue({
       id: 10,
       deletedAt: new Date('2026-08-18T10:00:00.000Z'),
@@ -173,7 +241,7 @@ describe('ProductAdminService', () => {
       deletedAt: null,
     });
 
-    const service = new ProductAdminService(prisma as never);
+    const service = new ProductAdminService(prisma as never, urls as never);
 
     await expect(
       service.create({
@@ -189,6 +257,7 @@ describe('ProductAdminService', () => {
 
   it('rejects a duplicate SKU on create', async () => {
     const prisma = createPrismaMock();
+    const urls = createUrlsMock();
     prisma.manufacturer.findUnique.mockResolvedValue({
       id: 10,
       deletedAt: null,
@@ -199,7 +268,7 @@ describe('ProductAdminService', () => {
     });
     prisma.product.findUnique.mockResolvedValue(productRow());
 
-    const service = new ProductAdminService(prisma as never);
+    const service = new ProductAdminService(prisma as never, urls as never);
 
     await expect(
       service.create({
@@ -215,11 +284,12 @@ describe('ProductAdminService', () => {
 
   it('returns a product for admin preview including drafts', async () => {
     const prisma = createPrismaMock();
+    const urls = createUrlsMock();
     prisma.product.findUnique.mockResolvedValue(
       productRow({ isPublished: false }),
     );
 
-    const service = new ProductAdminService(prisma as never);
+    const service = new ProductAdminService(prisma as never, urls as never);
     const result = await service.getById(1);
 
     expect(result.isPublished).toBe(false);
@@ -228,9 +298,10 @@ describe('ProductAdminService', () => {
 
   it('rejects slug change without absolute control', async () => {
     const prisma = createPrismaMock();
+    const urls = createUrlsMock();
     prisma.product.findUnique.mockResolvedValue(productRow());
 
-    const service = new ProductAdminService(prisma as never);
+    const service = new ProductAdminService(prisma as never, urls as never);
 
     await expect(
       service.update(1, { slug: 'renamed' }, [Permission.canManageProducts]),
@@ -240,12 +311,13 @@ describe('ProductAdminService', () => {
 
   it('allows slug change with absolute control', async () => {
     const prisma = createPrismaMock();
+    const urls = createUrlsMock();
     prisma.product.findUnique
       .mockResolvedValueOnce(productRow())
       .mockResolvedValueOnce(null);
     prisma.product.update.mockResolvedValue(productRow({ slug: 'renamed' }));
 
-    const service = new ProductAdminService(prisma as never);
+    const service = new ProductAdminService(prisma as never, urls as never);
     const result = await service.update(1, { slug: 'renamed' }, [
       Permission.hasAbsoluteControl,
     ]);
@@ -260,6 +332,7 @@ describe('ProductAdminService', () => {
 
   it('archives products and unpublishes them', async () => {
     const prisma = createPrismaMock();
+    const urls = createUrlsMock();
     prisma.product.findUnique.mockResolvedValue(productRow());
     prisma.product.update.mockResolvedValue(
       productRow({
@@ -268,7 +341,7 @@ describe('ProductAdminService', () => {
       }),
     );
 
-    const service = new ProductAdminService(prisma as never);
+    const service = new ProductAdminService(prisma as never, urls as never);
     const result = await service.softDelete(1);
 
     expect(prisma.product.update).toHaveBeenCalledWith({
@@ -277,10 +350,7 @@ describe('ProductAdminService', () => {
         deletedAt: expect.any(Date),
         isPublished: false,
       },
-      include: {
-        manufacturer: true,
-        category: true,
-      },
+      include: PRODUCT_INCLUDE,
     });
     expect(result.isPublished).toBe(false);
     expect(result.deletedAt).toBe('2026-08-18T10:00:00.000Z');
@@ -288,6 +358,7 @@ describe('ProductAdminService', () => {
 
   it('restores archived products', async () => {
     const prisma = createPrismaMock();
+    const urls = createUrlsMock();
     prisma.product.findUnique.mockResolvedValue(
       productRow({
         isPublished: false,
@@ -298,22 +369,20 @@ describe('ProductAdminService', () => {
       productRow({ isPublished: false, deletedAt: null }),
     );
 
-    const service = new ProductAdminService(prisma as never);
+    const service = new ProductAdminService(prisma as never, urls as never);
     const result = await service.restore(1);
 
     expect(prisma.product.update).toHaveBeenCalledWith({
       where: { id: 1 },
       data: { deletedAt: null },
-      include: {
-        manufacturer: true,
-        category: true,
-      },
+      include: PRODUCT_INCLUDE,
     });
     expect(result.deletedAt).toBeNull();
   });
 
   it('rejects restore when the manufacturer is archived', async () => {
     const prisma = createPrismaMock();
+    const urls = createUrlsMock();
     prisma.product.findUnique.mockResolvedValue(
       productRow({
         deletedAt: new Date('2026-08-18T10:00:00.000Z'),
@@ -326,7 +395,7 @@ describe('ProductAdminService', () => {
       }),
     );
 
-    const service = new ProductAdminService(prisma as never);
+    const service = new ProductAdminService(prisma as never, urls as never);
 
     await expect(service.restore(1)).rejects.toBeInstanceOf(
       BadRequestException,
@@ -336,9 +405,10 @@ describe('ProductAdminService', () => {
 
   it('throws when updating a missing product', async () => {
     const prisma = createPrismaMock();
+    const urls = createUrlsMock();
     prisma.product.findUnique.mockResolvedValue(null);
 
-    const service = new ProductAdminService(prisma as never);
+    const service = new ProductAdminService(prisma as never, urls as never);
 
     await expect(
       service.update(99, { title: 'Missing' }, [Permission.canManageProducts]),
@@ -347,6 +417,7 @@ describe('ProductAdminService', () => {
 
   it('lists assignment options from active manufacturers and categories', async () => {
     const prisma = createPrismaMock();
+    const urls = createUrlsMock();
     prisma.manufacturer.findMany = jest.fn().mockResolvedValue([
       { id: 10, slug: 'mersen', name: 'MERSEN' },
     ]);
@@ -358,7 +429,7 @@ describe('ProductAdminService', () => {
       },
     ]);
 
-    const service = new ProductAdminService(prisma as never);
+    const service = new ProductAdminService(prisma as never, urls as never);
     const result = await service.listAssignmentOptions();
 
     expect(prisma.manufacturer.findMany).toHaveBeenCalledWith({

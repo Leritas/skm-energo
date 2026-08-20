@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { AttachedFileDto } from '../../media/dto/attached-file.dto';
 import { ProductSpecDto } from './product-spec.dto';
 
 export class AdminProductAssignmentOptionDto {
@@ -39,8 +40,11 @@ export class AdminProductDto {
   @ApiProperty({ type: ProductSpecDto, isArray: true })
   specs!: ProductSpecDto[];
 
-  @ApiPropertyOptional({ type: String, nullable: true })
-  pdfHref!: string | null;
+  @ApiProperty({ type: AttachedFileDto, isArray: true })
+  photos!: AttachedFileDto[];
+
+  @ApiProperty({ type: AttachedFileDto, isArray: true })
+  documents!: AttachedFileDto[];
 
   @ApiProperty({ type: String, isArray: true })
   badges!: string[];

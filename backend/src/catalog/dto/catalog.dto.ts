@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { AttachedFileDto } from '../../media/dto/attached-file.dto';
 
 export class CatalogFilterQueryDto {
   @ApiPropertyOptional({
@@ -123,6 +124,9 @@ export class CatalogProductListItemResponseDto {
 
   @ApiProperty({ example: ['pdf'], isArray: true, type: String })
   badges!: string[];
+
+  @ApiPropertyOptional({ type: AttachedFileDto, nullable: true })
+  image!: AttachedFileDto | null;
 }
 
 export class CatalogProductSpecDto {
@@ -140,8 +144,11 @@ export class CatalogProductDetailResponseDto extends CatalogProductListItemRespo
   @ApiProperty({ type: CatalogProductSpecDto, isArray: true })
   specs!: CatalogProductSpecDto[];
 
-  @ApiPropertyOptional({ example: '/files/nh00-160a.pdf', nullable: true })
-  pdfHref!: string | null;
+  @ApiProperty({ type: AttachedFileDto, isArray: true })
+  photos!: AttachedFileDto[];
+
+  @ApiProperty({ type: AttachedFileDto, isArray: true })
+  documents!: AttachedFileDto[];
 
   @ApiPropertyOptional({
     example: 'Предохранитель NH00 160A — поставка',

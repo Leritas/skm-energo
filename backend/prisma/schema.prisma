@@ -90,7 +90,6 @@ model Product {
   sku            String       @unique
   description    String
   specs          Json
-  pdfHref        String?
   badges         String[]
   similarSlugs   String[]
   seoTitle       String?

@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import type { AttachedFile } from '@skm/specs';
+import { MediaUrlService } from '../media/media-url.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { parseProductSpecs } from './catalog-specs';
 import {
@@ -9,6 +11,7 @@ import {
   type CatalogCategoryNode,
   type CatalogProductRef,
 } from './catalog-tree';
+import { derivePublicProductBadges } from './product-badges';
 
 export interface CatalogCategoryDto {
   slug: string;
@@ -23,12 +26,14 @@ export interface CatalogProductListItemDto {
   categorySlug: string;
   sku: string;
   badges: string[];
+  image: AttachedFile | null;
 }
 
 export interface CatalogProductDetailDto extends CatalogProductListItemDto {
   description: string;
   specs: Array<{ label: string; value: string }>;
-  pdfHref: string | null;
+  photos: AttachedFile[];
+  documents: AttachedFile[];
   seoTitle: string | null;
   seoDescription: string | null;
 }
@@ -55,9 +60,23 @@ const PUBLIC_PRODUCT_WHERE = {
   category: PUBLIC_CATEGORY_WHERE,
 } as const;
 
+const PRODUCT_MEDIA_INCLUDE = {
+  manufacturer: true,
+  category: true,
+  photos: { orderBy: { sortOrder: 'asc' as const } },
+  documents: { orderBy: { sortOrder: 'asc' as const } },
+} as const;
+
+type ProductWithMedia = Prisma.ProductGetPayload<{
+  include: typeof PRODUCT_MEDIA_INCLUDE;
+}>;
+
 @Injectable()
 export class CatalogService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly urls: MediaUrlService,
+  ) {}
 
   async getCategoryTree(
     manufacturerSlug: string | null,
@@ -110,10 +129,7 @@ export class CatalogService {
         slug: { in: filtered.map((item) => item.slug) },
         ...PUBLIC_PRODUCT_WHERE,
       },
-      include: {
-        manufacturer: true,
-        category: true,
-      },
+      include: PRODUCT_MEDIA_INCLUDE,
       orderBy: { title: 'asc' },
     });
 
@@ -123,24 +139,14 @@ export class CatalogService {
   async getProductBySlug(slug: string): Promise<CatalogProductDetailDto> {
     const product = await this.prisma.product.findUnique({
       where: { slug },
-      include: {
-        manufacturer: true,
-        category: true,
-      },
+      include: PRODUCT_MEDIA_INCLUDE,
     });
 
     if (!product || !this.isPublicProduct(product)) {
       throw new NotFoundException('Product not found');
     }
 
-    return {
-      ...this.toListItem(product),
-      description: product.description,
-      specs: parseProductSpecs(product.specs),
-      pdfHref: product.pdfHref,
-      seoTitle: product.seoTitle,
-      seoDescription: product.seoDescription,
-    };
+    return this.toDetail(product);
   }
 
   async searchProducts(
@@ -173,23 +179,8 @@ export class CatalogService {
       ? Prisma.sql`AND m.slug = ${manufacturerSlug}`
       : Prisma.empty;
 
-    const rows = await this.prisma.$queryRaw<
-      Array<{
-        slug: string;
-        title: string;
-        sku: string;
-        badges: string[];
-        manufacturerSlug: string;
-        categorySlug: string;
-      }>
-    >(Prisma.sql`
-      SELECT
-        p.slug,
-        p.title,
-        p.sku,
-        p.badges,
-        m.slug AS "manufacturerSlug",
-        c.slug AS "categorySlug"
+    const rows = await this.prisma.$queryRaw<Array<{ slug: string }>>(Prisma.sql`
+      SELECT p.slug
       FROM "Product" p
       INNER JOIN "Manufacturer" m ON p."manufacturerId" = m.id
       INNER JOIN "Category" c ON p."categoryId" = c.id
@@ -218,16 +209,23 @@ export class CatalogService {
       LIMIT ${limit}
     `);
 
-    return rows.map((row) =>
-      this.toListItem({
-        slug: row.slug,
-        title: row.title,
-        sku: row.sku,
-        badges: row.badges,
-        manufacturer: { slug: row.manufacturerSlug },
-        category: { slug: row.categorySlug },
-      }),
-    );
+    if (rows.length === 0) {
+      return [];
+    }
+
+    const products = await this.prisma.product.findMany({
+      where: {
+        slug: { in: rows.map((row) => row.slug) },
+        ...PUBLIC_PRODUCT_WHERE,
+      },
+      include: PRODUCT_MEDIA_INCLUDE,
+    });
+
+    const bySlug = new Map(products.map((product) => [product.slug, product]));
+    return rows
+      .map((row) => bySlug.get(row.slug))
+      .filter((product): product is ProductWithMedia => product !== undefined)
+      .map((product) => this.toListItem(product));
   }
 
   async listSimilarProducts(
@@ -236,10 +234,7 @@ export class CatalogService {
   ): Promise<CatalogProductListItemDto[]> {
     const product = await this.prisma.product.findUnique({
       where: { slug },
-      include: {
-        manufacturer: true,
-        category: true,
-      },
+      include: PRODUCT_MEDIA_INCLUDE,
     });
 
     if (!product || !this.isPublicProduct(product)) {
@@ -253,10 +248,7 @@ export class CatalogService {
         slug: { not: slug },
         ...PUBLIC_PRODUCT_WHERE,
       },
-      include: {
-        manufacturer: true,
-        category: true,
-      },
+      include: PRODUCT_MEDIA_INCLUDE,
       orderBy: { title: 'asc' },
       take: limit,
     });
@@ -337,21 +329,33 @@ export class CatalogService {
     }));
   }
 
-  private toListItem(row: {
-    slug: string;
-    title: string;
-    sku: string;
-    badges: string[];
-    manufacturer: { slug: string };
-    category: { slug: string };
-  }): CatalogProductListItemDto {
+  private toListItem(row: ProductWithMedia): CatalogProductListItemDto {
+    const photos = row.photos.map((photo) => this.urls.toAttachedPhoto(photo));
     return {
       slug: row.slug,
       title: row.title,
       sku: row.sku,
-      badges: row.badges,
+      badges: derivePublicProductBadges(row.badges, row.documents.length > 0),
       manufacturerSlug: row.manufacturer.slug,
       categorySlug: row.category.slug,
+      image: photos[0] ?? null,
+    };
+  }
+
+  private toDetail(row: ProductWithMedia): CatalogProductDetailDto {
+    const photos = row.photos.map((photo) => this.urls.toAttachedPhoto(photo));
+    const documents = row.documents.map((document) =>
+      this.urls.toAttachedDocument(document),
+    );
+
+    return {
+      ...this.toListItem(row),
+      description: row.description,
+      specs: parseProductSpecs(row.specs),
+      photos,
+      documents,
+      seoTitle: row.seoTitle,
+      seoDescription: row.seoDescription,
     };
   }
 

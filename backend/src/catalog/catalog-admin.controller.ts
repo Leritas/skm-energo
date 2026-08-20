@@ -1,21 +1,29 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { DocumentFileInterceptor } from '../media/document-file.interceptor';
+import { PhotoFileInterceptor } from '../media/photo-file.interceptor';
 import { Permission, CATALOG_SECTION_PERMISSIONS } from '@skm/specs';
 import {
   CurrentUser,
@@ -27,6 +35,15 @@ import { RequirePermissions } from '../common/permissions/require-permissions.de
 import { CatalogAdminService } from './catalog-admin.service';
 import { CategoryAdminService } from './category-admin.service';
 import { ProductAdminService } from './product-admin.service';
+import { ProductMediaAdminService } from './product-media-admin.service';
+import {
+  AttachedFileItemResponseDto,
+  AttachedFileListResponseDto,
+} from './dto/product-media-response.dto';
+import {
+  ReorderProductDocumentsDto,
+  ReorderProductPhotosDto,
+} from './dto/reorder-product-media.dto';
 import { AdminCategoryDto } from './dto/admin-category.dto';
 import { AdminManufacturerDto } from './dto/admin-manufacturer.dto';
 import {
@@ -66,6 +83,7 @@ export class CatalogAdminController {
     private readonly catalogAdminService: CatalogAdminService,
     private readonly categoryAdminService: CategoryAdminService,
     private readonly productAdminService: ProductAdminService,
+    private readonly productMediaAdminService: ProductMediaAdminService,
     private readonly permissionsService: PermissionsService,
   ) {}
 
@@ -225,5 +243,78 @@ export class CatalogAdminController {
   @ApiOkResponse({ type: AdminProductDto })
   restoreProduct(@Param('id', ParseIntPipe) id: number) {
     return this.productAdminService.restore(id);
+  }
+
+  @Post('products/:productId/photos')
+  @RequirePermissions(Permission.canManageProducts)
+  @UseInterceptors(PhotoFileInterceptor)
+  @ApiCreatedResponse({ type: AttachedFileItemResponseDto })
+  uploadProductPhoto(
+    @Param('productId', ParseIntPipe) productId: number,
+    @UploadedFile() file: Express.Multer.File | undefined,
+  ) {
+    if (!file) {
+      throw new BadRequestException('file is required');
+    }
+    return this.productMediaAdminService.uploadPhoto(productId, file);
+  }
+
+  @Delete('products/:productId/photos/:photoId')
+  @RequirePermissions(Permission.canManageProducts)
+  @HttpCode(204)
+  @ApiNoContentResponse()
+  async deleteProductPhoto(
+    @Param('productId', ParseIntPipe) productId: number,
+    @Param('photoId', ParseIntPipe) photoId: number,
+  ): Promise<void> {
+    await this.productMediaAdminService.deletePhoto(productId, photoId);
+  }
+
+  @Put('products/:productId/photos/order')
+  @RequirePermissions(Permission.canManageProducts)
+  @ApiOkResponse({ type: AttachedFileListResponseDto })
+  reorderProductPhotos(
+    @Param('productId', ParseIntPipe) productId: number,
+    @Body() dto: ReorderProductPhotosDto,
+  ) {
+    return this.productMediaAdminService.reorderPhotos(productId, dto.photoIds);
+  }
+
+  @Post('products/:productId/documents')
+  @RequirePermissions(Permission.canManageProducts)
+  @UseInterceptors(DocumentFileInterceptor)
+  @ApiCreatedResponse({ type: AttachedFileItemResponseDto })
+  uploadProductDocument(
+    @Param('productId', ParseIntPipe) productId: number,
+    @UploadedFile() file: Express.Multer.File | undefined,
+  ) {
+    if (!file) {
+      throw new BadRequestException('file is required');
+    }
+    return this.productMediaAdminService.uploadDocument(productId, file);
+  }
+
+  @Delete('products/:productId/documents/:documentId')
+  @RequirePermissions(Permission.canManageProducts)
+  @HttpCode(204)
+  @ApiNoContentResponse()
+  async deleteProductDocument(
+    @Param('productId', ParseIntPipe) productId: number,
+    @Param('documentId', ParseIntPipe) documentId: number,
+  ): Promise<void> {
+    await this.productMediaAdminService.deleteDocument(productId, documentId);
+  }
+
+  @Put('products/:productId/documents/order')
+  @RequirePermissions(Permission.canManageProducts)
+  @ApiOkResponse({ type: AttachedFileListResponseDto })
+  reorderProductDocuments(
+    @Param('productId', ParseIntPipe) productId: number,
+    @Body() dto: ReorderProductDocumentsDto,
+  ) {
+    return this.productMediaAdminService.reorderDocuments(
+      productId,
+      dto.documentIds,
+    );
   }
 }
