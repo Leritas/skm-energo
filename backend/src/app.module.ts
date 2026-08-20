@@ -14,6 +14,7 @@ import { UsersModule } from './users/users.module';
 import { ProfileModule } from './profile/profile.module';
 import { CatalogModule } from './catalog/catalog.module';
 import { NewsModule } from './news/news.module';
+import { MediaModule } from './media/media.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { NewsModule } from './news/news.module';
     ProfileModule,
     CatalogModule,
     NewsModule,
+    MediaModule,
     UsersModule,
     RolesModule,
     HealthModule,
