@@ -8,6 +8,7 @@ import {
   type CatalogSeedCategory,
 } from './catalog-seed-data';
 import { NEWS_SEED_ARTICLES } from './news-seed-data';
+import { seedProductMedia } from './seed-product-media';
 
 const prisma = new PrismaClient();
 
@@ -68,7 +69,6 @@ async function seedCatalog() {
         sku: product.sku,
         description: product.description,
         specs: product.specs,
-        pdfHref: product.pdfHref ?? null,
         badges: product.badges ?? [],
         similarSlugs: product.similarSlugs ?? [],
         manufacturerId,
@@ -81,7 +81,6 @@ async function seedCatalog() {
         sku: product.sku,
         description: product.description,
         specs: product.specs,
-        pdfHref: product.pdfHref ?? null,
         badges: product.badges ?? [],
         similarSlugs: product.similarSlugs ?? [],
         manufacturerId,
@@ -226,6 +225,7 @@ async function main() {
   await migrateRoleCatalogPermissions();
 
   await seedCatalog();
+  await seedProductMedia(prisma);
   await seedNews();
 
   console.log(`Seeded roles: user(#${userRole.id}), moderator, admin(#${adminRole.id})`);

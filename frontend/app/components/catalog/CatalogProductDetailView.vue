@@ -9,7 +9,7 @@ import type {
   CatalogProductDetail,
   CatalogProductListItem,
 } from '~/types/catalog';
-import { productDocumentFilename } from '~/utils/product-seo';
+import { formatAttachedFileSize } from '~/types/catalog';
 
 const props = defineProps<{
   product: CatalogProductDetail;
@@ -26,8 +26,11 @@ const tabItems = [
   { label: 'Документы', value: 'pdf', content: '' },
 ];
 
-const pdfFilename = computed(() =>
-  productDocumentFilename(props.product.pdfHref),
+const galleryImages = computed(() =>
+  props.product.photos.map((photo) => ({
+    src: photo.url,
+    alt: photo.filename,
+  })),
 );
 </script>
 
@@ -42,7 +45,7 @@ const pdfFilename = computed(() =>
   </SkmPageHeader>
 
   <div class="grid gap-10 lg:grid-cols-2">
-    <SkmProductGallery :images="[]" :alt="product.title" />
+    <SkmProductGallery :images="galleryImages" :alt="product.title" />
 
     <div>
       <div v-if="product.badges?.length" class="mb-4 flex flex-wrap gap-2">
@@ -81,14 +84,18 @@ const pdfFilename = computed(() =>
       <p v-else-if="activeTab === 'specs'" class="text-sm text-neutral-500">
         Характеристики пока не заполнены.
       </p>
-      <div v-else-if="activeTab === 'pdf'">
+      <div v-else-if="activeTab === 'pdf'" class="space-y-3">
         <SkmFileLink
-          v-if="product.pdfHref && pdfFilename"
-          :href="product.pdfHref"
-          :filename="pdfFilename"
-          size-label="PDF"
+          v-for="document in product.documents"
+          :key="document.id"
+          :href="document.url"
+          :filename="document.filename"
+          :size-label="formatAttachedFileSize(document.sizeBytes)"
         />
-        <p v-else class="text-sm text-neutral-500">
+        <p
+          v-if="product.documents.length === 0"
+          class="text-sm text-neutral-500"
+        >
           Документация будет добавлена менеджером при запросе поставки.
         </p>
       </div>
@@ -105,6 +112,7 @@ const pdfFilename = computed(() =>
         :key="item.slug"
         :title="item.title"
         :to="`/product/${item.slug}`"
+        :image-src="item.image?.url ?? null"
         :manufacturer="
           similarManufacturerLabel
             ? similarManufacturerLabel(item.manufacturerSlug)

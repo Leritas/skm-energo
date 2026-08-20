@@ -35,15 +35,6 @@ export class CreateProductDto {
   @Type(() => ProductSpecDto)
   specs?: ProductSpecDto[];
 
-  @ApiPropertyOptional({
-    example: '/files/nh00-160a.pdf',
-    nullable: true,
-  })
-  @IsOptional()
-  @ValidateIf((_, value) => value !== null)
-  @IsString()
-  pdfHref?: string | null;
-
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

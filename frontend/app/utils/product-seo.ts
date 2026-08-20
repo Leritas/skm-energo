@@ -23,13 +23,6 @@ export function formatProductDocumentTitle(
   return `${title} — ${siteName}`;
 }
 
-export function productDocumentFilename(pdfHref: string | null | undefined) {
-  if (!pdfHref) {
-    return undefined;
-  }
-  return pdfHref.split('/').pop() ?? 'datasheet.pdf';
-}
-
 export function buildProductJsonLd(input: {
   product: CatalogProductDetail;
   manufacturerLabel: string;

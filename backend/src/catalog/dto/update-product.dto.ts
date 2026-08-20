@@ -49,12 +49,6 @@ export class UpdateProductDto {
   @IsOptional()
   @ValidateIf((_, value) => value !== null)
   @IsString()
-  pdfHref?: string | null;
-
-  @ApiPropertyOptional({ type: String, nullable: true })
-  @IsOptional()
-  @ValidateIf((_, value) => value !== null)
-  @IsString()
   seoTitle?: string | null;
 
   @ApiPropertyOptional({ type: String, nullable: true })

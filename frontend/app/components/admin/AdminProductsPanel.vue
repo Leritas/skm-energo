@@ -2,7 +2,9 @@
 import type {
   AdminProductAssignmentOptionDto,
   AdminProductDto,
+  AttachedFile,
 } from '@skm/specs';
+import { formatAttachedFileSize } from '~/types/catalog';
 import {
   formatProductDocumentTitle,
   resolveProductSeoDescription,
@@ -21,6 +23,12 @@ const {
   updateProduct,
   archiveProduct,
   restoreProduct,
+  uploadProductPhoto,
+  deleteProductPhoto,
+  reorderProductPhotos,
+  uploadProductDocument,
+  deleteProductDocument,
+  reorderProductDocuments,
 } = useProductsAdmin();
 const { hasAbsoluteControl } = usePermissions();
 const toast = useToast();
@@ -44,13 +52,17 @@ const form = reactive({
   sku: '',
   description: '',
   specs: [{ label: '', value: '' }],
-  pdfHref: '',
   seoTitle: '',
   seoDescription: '',
   manufacturerId: null as number | null,
   categoryId: null as number | null,
   isPublished: false,
 });
+
+const mediaPhotos = ref<AttachedFile[]>([]);
+const mediaDocuments = ref<AttachedFile[]>([]);
+const photoInput = ref<HTMLInputElement | null>(null);
+const documentInput = ref<HTMLInputElement | null>(null);
 
 const isEditing = computed(() => editingProduct.value !== null);
 const canChangeSlug = computed(() => isEditing.value && hasAbsoluteControl());
@@ -146,9 +158,10 @@ function resetForm() {
   form.sku = '';
   form.description = '';
   form.specs = [{ label: '', value: '' }];
-  form.pdfHref = '';
   form.seoTitle = '';
   form.seoDescription = '';
+  mediaPhotos.value = [];
+  mediaDocuments.value = [];
   form.manufacturerId = null;
   form.categoryId = null;
   form.isPublished = false;
@@ -170,9 +183,10 @@ function openEdit(product: AdminProductDto) {
     product.specs.length > 0
       ? product.specs.map((spec) => ({ ...spec }))
       : [{ label: '', value: '' }];
-  form.pdfHref = product.pdfHref ?? '';
   form.seoTitle = product.seoTitle ?? '';
   form.seoDescription = product.seoDescription ?? '';
+  mediaPhotos.value = [...product.photos];
+  mediaDocuments.value = [...product.documents];
   form.manufacturerId = product.manufacturerId;
   form.categoryId = product.categoryId;
   form.isPublished = product.isPublished;
@@ -229,7 +243,6 @@ async function handleSave() {
       sku: form.sku.trim(),
       description: form.description.trim(),
       specs: normalizedSpecs(),
-      pdfHref: form.pdfHref.trim() || null,
       seoTitle: form.seoTitle.trim() || null,
       seoDescription: form.seoDescription.trim() || null,
       manufacturerId: form.manufacturerId,
@@ -290,6 +303,152 @@ async function handleRestore(product: AdminProductDto) {
   } catch (error) {
     toast.add({
       title: 'Не удалось восстановить товар',
+      description: error instanceof Error ? error.message : undefined,
+      color: 'error',
+    });
+  }
+}
+
+async function movePhoto(index: number, direction: -1 | 1) {
+  const productId = editingProduct.value?.id;
+  const targetIndex = index + direction;
+  if (
+    !productId ||
+    targetIndex < 0 ||
+    targetIndex >= mediaPhotos.value.length
+  ) {
+    return;
+  }
+
+  const next = [...mediaPhotos.value];
+  const [item] = next.splice(index, 1);
+  next.splice(targetIndex, 0, item);
+
+  try {
+    const response = await reorderProductPhotos(
+      productId,
+      next.map((photo) => photo.id),
+    );
+    mediaPhotos.value = response.items;
+  } catch (error) {
+    toast.add({
+      title: 'Не удалось изменить порядок фото',
+      description: error instanceof Error ? error.message : undefined,
+      color: 'error',
+    });
+  }
+}
+
+async function moveDocument(index: number, direction: -1 | 1) {
+  const productId = editingProduct.value?.id;
+  const targetIndex = index + direction;
+  if (
+    !productId ||
+    targetIndex < 0 ||
+    targetIndex >= mediaDocuments.value.length
+  ) {
+    return;
+  }
+
+  const next = [...mediaDocuments.value];
+  const [item] = next.splice(index, 1);
+  next.splice(targetIndex, 0, item);
+
+  try {
+    const response = await reorderProductDocuments(
+      productId,
+      next.map((document) => document.id),
+    );
+    mediaDocuments.value = response.items;
+  } catch (error) {
+    toast.add({
+      title: 'Не удалось изменить порядок документов',
+      description: error instanceof Error ? error.message : undefined,
+      color: 'error',
+    });
+  }
+}
+
+async function handlePhotoUpload(event: Event) {
+  const productId = editingProduct.value?.id;
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  input.value = '';
+  if (!productId || !file) {
+    return;
+  }
+
+  try {
+    const response = await uploadProductPhoto(productId, file);
+    mediaPhotos.value = [...mediaPhotos.value, response.item];
+    toast.add({ title: 'Фото загружено', color: 'success' });
+  } catch (error) {
+    toast.add({
+      title: 'Не удалось загрузить фото',
+      description: error instanceof Error ? error.message : undefined,
+      color: 'error',
+    });
+  }
+}
+
+async function handleDocumentUpload(event: Event) {
+  const productId = editingProduct.value?.id;
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  input.value = '';
+  if (!productId || !file) {
+    return;
+  }
+
+  try {
+    const response = await uploadProductDocument(productId, file);
+    mediaDocuments.value = [...mediaDocuments.value, response.item];
+    toast.add({ title: 'Документ загружен', color: 'success' });
+  } catch (error) {
+    toast.add({
+      title: 'Не удалось загрузить документ',
+      description: error instanceof Error ? error.message : undefined,
+      color: 'error',
+    });
+  }
+}
+
+async function handlePhotoDelete(photoId: number) {
+  const productId = editingProduct.value?.id;
+  if (!productId) {
+    return;
+  }
+
+  try {
+    await deleteProductPhoto(productId, photoId);
+    mediaPhotos.value = mediaPhotos.value.filter(
+      (photo) => photo.id !== photoId,
+    );
+    toast.add({ title: 'Фото удалено', color: 'success' });
+  } catch (error) {
+    toast.add({
+      title: 'Не удалось удалить фото',
+      description: error instanceof Error ? error.message : undefined,
+      color: 'error',
+    });
+  }
+}
+
+async function handleDocumentDelete(documentId: number) {
+  const productId = editingProduct.value?.id;
+  if (!productId) {
+    return;
+  }
+
+  try {
+    await deleteProductDocument(productId, documentId);
+    mediaDocuments.value = mediaDocuments.value.filter(
+      (document) => document.id !== documentId,
+    );
+    toast.add({ title: 'Документ удалён', color: 'success' });
+  } catch (error) {
+    toast.add({
+      title: 'Не удалось удалить документ',
       description: error instanceof Error ? error.message : undefined,
       color: 'error',
     });
@@ -599,18 +758,149 @@ onMounted(() => {
             </div>
           </section>
 
-          <section class="space-y-4">
-            <h3 class="text-sm font-semibold text-neutral-900">Документы</h3>
-            <SkmFormField
-              label="Ссылка на PDF"
-              hint="URL или путь, например /files/nh00-160a.pdf. Загрузка файлов — в следующем этапе."
-            >
-              <SkmInput
-                v-model="form.pdfHref"
-                autocomplete="off"
-                placeholder="/files/datasheet.pdf"
-              />
-            </SkmFormField>
+          <section v-if="isEditing" class="space-y-4">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-sm font-semibold text-neutral-900">Фото</h3>
+              <SkmButton
+                type="button"
+                variant="ghost"
+                size="sm"
+                icon="i-lucide-upload"
+                @click="photoInput?.click()"
+              >
+                Загрузить
+              </SkmButton>
+            </div>
+            <input
+              ref="photoInput"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              class="hidden"
+              @change="handlePhotoUpload"
+            />
+            <p class="text-xs text-neutral-500">
+              Первое фото — на карточке каталога. До 15 файлов, jpeg/png/webp.
+            </p>
+            <ul v-if="mediaPhotos.length" class="space-y-2">
+              <li
+                v-for="(photo, index) in mediaPhotos"
+                :key="photo.id"
+                class="flex items-center gap-2 rounded-md border border-neutral-200 px-3 py-2"
+              >
+                <span class="min-w-0 flex-1 truncate text-sm text-neutral-800">
+                  {{ photo.filename }}
+                </span>
+                <SkmButton
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  icon="i-lucide-arrow-up"
+                  aria-label="Поднять"
+                  :disabled="index === 0"
+                  @click="movePhoto(index, -1)"
+                />
+                <SkmButton
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  icon="i-lucide-arrow-down"
+                  aria-label="Опустить"
+                  :disabled="index === mediaPhotos.length - 1"
+                  @click="movePhoto(index, 1)"
+                />
+                <SkmButton
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  icon="i-lucide-trash-2"
+                  aria-label="Удалить фото"
+                  @click="handlePhotoDelete(photo.id)"
+                />
+              </li>
+            </ul>
+            <p v-else class="text-sm text-neutral-500">
+              Фото пока не загружены.
+            </p>
+          </section>
+
+          <section v-if="isEditing" class="space-y-4">
+            <div class="flex items-center justify-between gap-3">
+              <h3 class="text-sm font-semibold text-neutral-900">Документы</h3>
+              <SkmButton
+                type="button"
+                variant="ghost"
+                size="sm"
+                icon="i-lucide-upload"
+                @click="documentInput?.click()"
+              >
+                Загрузить
+              </SkmButton>
+            </div>
+            <input
+              ref="documentInput"
+              type="file"
+              accept="application/pdf,.doc,.docx,.xlsx"
+              class="hidden"
+              @change="handleDocumentUpload"
+            />
+            <p class="text-xs text-neutral-500">
+              PDF и офисные форматы. Бейдж PDF на карточке появится
+              автоматически.
+            </p>
+            <ul v-if="mediaDocuments.length" class="space-y-2">
+              <li
+                v-for="(document, index) in mediaDocuments"
+                :key="document.id"
+                class="flex items-center gap-2 rounded-md border border-neutral-200 px-3 py-2"
+              >
+                <span class="min-w-0 flex-1 truncate text-sm text-neutral-800">
+                  {{ document.filename }}
+                  <span class="text-neutral-500">
+                    ({{ formatAttachedFileSize(document.sizeBytes) }})
+                  </span>
+                </span>
+                <SkmButton
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  icon="i-lucide-arrow-up"
+                  aria-label="Поднять"
+                  :disabled="index === 0"
+                  @click="moveDocument(index, -1)"
+                />
+                <SkmButton
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  icon="i-lucide-arrow-down"
+                  aria-label="Опустить"
+                  :disabled="index === mediaDocuments.length - 1"
+                  @click="moveDocument(index, 1)"
+                />
+                <SkmButton
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  icon="i-lucide-trash-2"
+                  aria-label="Удалить документ"
+                  @click="handleDocumentDelete(document.id)"
+                />
+              </li>
+            </ul>
+            <p v-else class="text-sm text-neutral-500">
+              Документы пока не загружены.
+            </p>
+          </section>
+
+          <section
+            v-else
+            class="space-y-2 rounded-md border border-dashed border-neutral-200 p-4"
+          >
+            <h3 class="text-sm font-semibold text-neutral-900">Файлы</h3>
+            <p class="text-sm text-neutral-500">
+              Сначала сохраните товар, затем загрузите фото и документы в режиме
+              редактирования.
+            </p>
           </section>
 
           <section

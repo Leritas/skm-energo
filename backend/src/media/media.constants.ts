@@ -17,6 +17,12 @@ export type DocumentMimeType = (typeof DOCUMENT_MIME_TYPES)[number];
 export const PHOTO_MAX_BYTES = 25 * 1024 * 1024;
 export const DOCUMENT_MAX_BYTES = 50 * 1024 * 1024;
 
+export const MAX_PHOTOS_PER_PRODUCT = 15;
+export const MAX_DOCUMENTS_PER_PRODUCT = 15;
+
+export const PRODUCT_MARKETING_BADGES = ['new', 'onRequest'] as const;
+export type ProductMarketingBadge = (typeof PRODUCT_MARKETING_BADGES)[number];
+
 const PHOTO_MIME_SET = new Set<string>(PHOTO_MIME_TYPES);
 const DOCUMENT_MIME_SET = new Set<string>(DOCUMENT_MIME_TYPES);
 

@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { hasAbsoluteControl, type Permission } from '@skm/specs';
+import { MediaUrlService } from '../media/media-url.service';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   normalizeProductSpecs,
@@ -18,17 +19,22 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { nextUniqueProductSlug, slugifyProductTitle } from './product-slug';
 
 type ProductRow = Prisma.ProductGetPayload<{
-  include: { manufacturer: true; category: true };
+  include: typeof PRODUCT_RELATIONS;
 }>;
 
 const PRODUCT_RELATIONS = {
   manufacturer: true,
   category: true,
+  photos: { orderBy: { sortOrder: 'asc' as const } },
+  documents: { orderBy: { sortOrder: 'asc' as const } },
 } as const;
 
 @Injectable()
 export class ProductAdminService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly urls: MediaUrlService,
+  ) {}
 
   async listProducts(includeArchived: boolean): Promise<AdminProductDto[]> {
     const rows = await this.prisma.product.findMany({
@@ -73,7 +79,6 @@ export class ProductAdminService {
         sku: dto.sku.trim(),
         description: dto.description.trim(),
         specs: normalizeProductSpecs(dto.specs) as unknown as Prisma.InputJsonValue,
-        pdfHref: this.normalizeText(dto.pdfHref ?? null),
         badges: [],
         similarSlugs: [],
         seoTitle: this.normalizeText(dto.seoTitle ?? null),
@@ -127,7 +132,6 @@ export class ProductAdminService {
           dto.specs === undefined
             ? undefined
             : (normalizeProductSpecs(dto.specs) as unknown as Prisma.InputJsonValue),
-        pdfHref: this.optionalText(dto.pdfHref),
         seoTitle: this.optionalText(dto.seoTitle),
         seoDescription: this.optionalText(dto.seoDescription),
         manufacturerId: dto.manufacturerId,
@@ -270,7 +274,10 @@ export class ProductAdminService {
       sku: row.sku,
       description: row.description,
       specs: parseProductSpecs(row.specs),
-      pdfHref: row.pdfHref,
+      photos: row.photos.map((photo) => this.urls.toAttachedPhoto(photo)),
+      documents: row.documents.map((document) =>
+        this.urls.toAttachedDocument(document),
+      ),
       badges: row.badges,
       seoTitle: row.seoTitle,
       seoDescription: row.seoDescription,

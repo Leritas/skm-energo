@@ -1,6 +1,7 @@
 import type {
   AdminProductAssignmentOptionsDto,
   AdminProductDto,
+  AttachedFile,
   CreateProductRequest,
   UpdateProductRequest,
 } from '@skm/specs';
@@ -50,6 +51,65 @@ export function useProductsAdmin() {
     });
   }
 
+  function uploadProductPhoto(productId: number, file: File) {
+    const body = new FormData();
+    body.append('file', file);
+    return api<{ item: AttachedFile }>(
+      `/admin/catalog/products/${productId}/photos`,
+      {
+        method: 'POST',
+        body,
+      },
+    );
+  }
+
+  function deleteProductPhoto(productId: number, photoId: number) {
+    return api<void>(`/admin/catalog/products/${productId}/photos/${photoId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  function reorderProductPhotos(productId: number, photoIds: number[]) {
+    return api<{ items: AttachedFile[] }>(
+      `/admin/catalog/products/${productId}/photos/order`,
+      {
+        method: 'PUT',
+        body: { photoIds },
+      },
+    );
+  }
+
+  function uploadProductDocument(productId: number, file: File) {
+    const body = new FormData();
+    body.append('file', file);
+    return api<{ item: AttachedFile }>(
+      `/admin/catalog/products/${productId}/documents`,
+      {
+        method: 'POST',
+        body,
+      },
+    );
+  }
+
+  function deleteProductDocument(productId: number, documentId: number) {
+    return api<void>(
+      `/admin/catalog/products/${productId}/documents/${documentId}`,
+      {
+        method: 'DELETE',
+      },
+    );
+  }
+
+  function reorderProductDocuments(productId: number, documentIds: number[]) {
+    return api<{ items: AttachedFile[] }>(
+      `/admin/catalog/products/${productId}/documents/order`,
+      {
+        method: 'PUT',
+        body: { documentIds },
+      },
+    );
+  }
+
   return {
     listProducts,
     listAssignmentOptions,
@@ -58,5 +118,11 @@ export function useProductsAdmin() {
     updateProduct,
     archiveProduct,
     restoreProduct,
+    uploadProductPhoto,
+    deleteProductPhoto,
+    reorderProductPhotos,
+    uploadProductDocument,
+    deleteProductDocument,
+    reorderProductDocuments,
   };
 }

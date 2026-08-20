@@ -175,6 +175,7 @@ async function handleSearchSubmit(value: string) {
                 :key="product.slug"
                 :title="product.title"
                 :to="`/product/${product.slug}`"
+                :image-src="product.image?.url ?? null"
                 :manufacturer="manufacturerLabel(product.manufacturerSlug)"
                 :sku="product.sku"
                 :badges="toProductCardBadges(product.badges)"

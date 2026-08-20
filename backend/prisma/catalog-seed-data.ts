@@ -12,7 +12,6 @@ export interface CatalogSeedProduct {
   sku: string;
   description: string;
   specs: Array<{ label: string; value: string }>;
-  pdfHref?: string;
   badges?: string[];
   similarSlugs?: string[];
 }
@@ -92,8 +91,6 @@ export const CATALOG_SEED_PRODUCTS: CatalogSeedProduct[] = [
       { label: 'Напряжение', value: '690 V AC' },
       { label: 'Серия', value: 'NH00' },
     ],
-    pdfHref: '/files/nh00-160a.pdf',
-    badges: ['pdf'],
     similarSlugs: ['fuse-link-6kv'],
   },
   {
@@ -107,8 +104,6 @@ export const CATALOG_SEED_PRODUCTS: CatalogSeedProduct[] = [
       { label: 'Номинальный ток', value: '250 A' },
       { label: 'Напряжение', value: '690 V AC' },
     ],
-    pdfHref: '/files/nh1-250a.pdf',
-    badges: ['pdf'],
   },
   {
     slug: 'holder-nh1',
@@ -118,7 +113,6 @@ export const CATALOG_SEED_PRODUCTS: CatalogSeedProduct[] = [
     sku: 'H-NH1',
     description: 'Держатель для плавких вставок серии NH1.',
     specs: [{ label: 'Серия', value: 'NH1' }],
-    badges: ['pdf'],
   },
   {
     slug: 'fuse-link-10kv',
@@ -129,7 +123,7 @@ export const CATALOG_SEED_PRODUCTS: CatalogSeedProduct[] = [
     description:
       'Высоковольтный плавкий предохранитель для распределительных сетей 10 kV.',
     specs: [{ label: 'Напряжение', value: '10 kV' }],
-    badges: ['pdf', 'onRequest'],
+    badges: ['onRequest'],
     similarSlugs: ['fuse-link-6kv'],
   },
   {
@@ -161,8 +155,6 @@ export const CATALOG_SEED_PRODUCTS: CatalogSeedProduct[] = [
     sku: 'SPD-T1-25',
     description: 'Устройство защиты от перенапряжений класса T1.',
     specs: [{ label: 'Ток', value: '25 kA' }],
-    pdfHref: '/files/spd-t1-25.pdf',
-    badges: ['pdf'],
     similarSlugs: ['spd-t2-40'],
   },
   {
@@ -173,7 +165,7 @@ export const CATALOG_SEED_PRODUCTS: CatalogSeedProduct[] = [
     sku: 'SW-250-3P',
     description: 'Трёхполюсный рубильник на 250 A для силовых щитов.',
     specs: [{ label: 'Номинальный ток', value: '250 A' }],
-    badges: ['pdf', 'onRequest'],
+    badges: ['onRequest'],
   },
   {
     slug: 'switch-400-hiitio',

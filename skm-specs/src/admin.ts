@@ -1,3 +1,4 @@
+import type { AttachedFile } from './media';
 import type { Permission } from './permissions';
 
 export interface AdminUserRoleDto {
@@ -129,7 +130,8 @@ export interface AdminProductDto {
   sku: string;
   description: string;
   specs: AdminProductSpecDto[];
-  pdfHref: string | null;
+  photos: AttachedFile[];
+  documents: AttachedFile[];
   badges: string[];
   seoTitle: string | null;
   seoDescription: string | null;
@@ -148,7 +150,6 @@ export interface CreateProductRequest {
   sku: string;
   description: string;
   specs?: AdminProductSpecDto[];
-  pdfHref?: string | null;
   seoTitle?: string;
   seoDescription?: string;
   manufacturerId: number;
@@ -162,7 +163,6 @@ export interface UpdateProductRequest {
   sku?: string;
   description?: string;
   specs?: AdminProductSpecDto[];
-  pdfHref?: string | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
   manufacturerId?: number;
