@@ -17,7 +17,7 @@ const expandedCatalog = ref(false);
 const activeManufacturerSlug = ref<string | null>(null);
 
 const { data: manufacturers } = await useCatalogManufacturers();
-const { data: visibleCategories } = await useCatalogCategories(
+const { tree: visibleCategories } = await useCatalogTaxonomy(
   activeManufacturerSlug,
 );
 

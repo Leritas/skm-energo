@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getCategoryBreadcrumbs, getManufacturerLabel } from '~/utils/catalog';
+import { getManufacturerLabel } from '~/utils/catalog';
 import { SITE } from '~/constants/site';
 import {
   buildProductJsonLd,
@@ -14,7 +14,10 @@ const slug = computed(() => String(route.params.slug ?? ''));
 
 const { data: product, error: productError } = await useCatalogProduct(slug);
 const { data: manufacturers } = await useCatalogManufacturers();
-const { data: allCategories } = await useCatalogAllCategories();
+const { breadcrumbs: categoryBreadcrumbs } = await useCatalogTaxonomy(
+  computed(() => null),
+  computed(() => product.value?.categorySlug ?? null),
+);
 
 if (productError.value) {
   throw createError({
@@ -42,11 +45,7 @@ const canonicalUrl = computed(
   () => `${config.public.siteUrl}/product/${product.value!.slug}`,
 );
 const categoryLabel = computed(() => {
-  const trail = getCategoryBreadcrumbs(
-    product.value!.categorySlug,
-    null,
-    allCategories.value ?? [],
-  );
+  const trail = categoryBreadcrumbs.value;
   return trail[trail.length - 1]?.label ?? product.value!.categorySlug;
 });
 
@@ -86,14 +85,7 @@ useHead({
 
 const breadcrumbs = computed(() => {
   const item = product.value!;
-  return [
-    ...getCategoryBreadcrumbs(
-      item.categorySlug,
-      null,
-      allCategories.value ?? [],
-    ),
-    { label: item.title },
-  ];
+  return [...categoryBreadcrumbs.value, { label: item.title }];
 });
 </script>
 

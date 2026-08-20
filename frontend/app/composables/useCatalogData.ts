@@ -1,5 +1,4 @@
 import type {
-  CatalogCategory,
   CatalogManufacturer,
   CatalogProductDetail,
   CatalogProductListItem,
@@ -23,30 +22,6 @@ export async function useCatalogManufacturers() {
 
   return await useAsyncData('catalog-manufacturers', () =>
     api<CatalogManufacturer[]>('/catalog/manufacturers', { auth: false }),
-  );
-}
-
-export async function useCatalogAllCategories() {
-  const { api } = useApi();
-
-  return await useAsyncData('catalog-all-categories', () =>
-    api<CatalogCategory[]>('/catalog/categories', { auth: false }),
-  );
-}
-
-export async function useCatalogCategories(
-  manufacturerSlug: MaybeRefOrGetter<string | null>,
-) {
-  const { api } = useApi();
-
-  return await useAsyncData(
-    () => `catalog-categories-${toValue(manufacturerSlug) ?? 'all'}`,
-    () =>
-      api<CatalogCategory[]>(
-        `/catalog/categories${buildCatalogQuery({ manufacturer: toValue(manufacturerSlug) ?? undefined })}`,
-        { auth: false },
-      ),
-    { watch: [() => toValue(manufacturerSlug)] },
   );
 }
 
