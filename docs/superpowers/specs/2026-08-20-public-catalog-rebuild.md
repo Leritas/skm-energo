@@ -24,7 +24,7 @@ Rebuild the public catalog end-to-end on admin-sourced PostgreSQL data and Stage
 2. As a **guest**, I want to open `/catalog/{slug}` for a visible category and see its subcategories and products, so that I can drill down without dead ends.
 3. As a **guest**, I want a flat URL `/catalog/{slug}` even when the category is nested in the taxonomy, so that links stay clean while breadcrumbs show hierarchy.
 4. As a **guest**, I want a 404 when I open an unknown, unpublished, or pruned category slug, so that I am not shown empty catalog shells for non-existent public categories.
-5. As a **guest**, I want subcategory tiles and product tiles to look visually distinct (landscape category covers vs square product photos), so that I can tell navigation from purchasable items at a glance.
+5. As a **guest**, I want subcategory tiles and product tiles to look visually distinct (4:3 category covers vs inset square product photos), so that I can tell navigation from purchasable items at a glance.
 6. As a **guest**, I want category tiles to show cover photos when staff attached them in admin, so that browsing feels visual and current.
 7. As a **guest**, I want product cards to show the first attached photo or a neutral placeholder, so that cards are consistent when media is missing.
 8. As a **guest**, I want to filter the catalog by Manufacturer via `?manufacturer=`, so that I see only relevant brands without manufacturer-first navigation.
@@ -82,10 +82,11 @@ Rebuild the public catalog end-to-end on admin-sourced PostgreSQL data and Stage
 ### Category page layout
 
 - Two stacked sections (not one mixed grid):
-  1. **Subcategories** — Domain UI catalog category tiles (landscape/wide cover treatment).
-  2. **Products** — Domain UI catalog product tiles (square product media).
-- Visual design follows verdict from prototype #70 before production tiles ship.
-- Data layer (#67) may land before prototype verdict; tile components swap in after.
+  1. **Subcategories** — Domain UI `SkmCatalogCategoryTile` (4:3 cover, title below).
+  2. **Products** — Domain UI `SkmCatalogProductTile` (inset 1:1 media, compact density).
+- **Visual design:** prototype **A2** verdict ([#70](https://github.com/Leritas/skm-energo/issues/70)) — full rules in [catalog category page visual spec](./2026-08-20-catalog-category-page-visual.md).
+- Empty subcategory section omitted when no visible children; product section omitted when no products (search mode unchanged).
+- Data layer (#67) may land before tiles; production tiles follow A2 spec above.
 
 ### Header and mobile navigation
 
@@ -107,8 +108,8 @@ Rebuild the public catalog end-to-end on admin-sourced PostgreSQL data and Stage
 
 ### Workflow
 
-1. Prototypes #70 (category tiles) and #71 (PDP) may run in parallel with #67 data layer.
-2. Category tile visuals blocked on #70 verdict; PDP implementation blocked on #71 verdict.
+1. Prototype #70 (category tiles) — **done:** variant **A2** approved 2026-08-20. Prototype #71 (PDP) may run in parallel with #67 data layer.
+2. Category tile visuals in #67 follow [catalog category page visual spec](./2026-08-20-catalog-category-page-visual.md); PDP implementation blocked on #71 verdict.
 3. #72 nav after #67 composable; #68 search after #67; #69 similar after #73.
 
 ### Testing seam (preferred)

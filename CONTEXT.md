@@ -57,11 +57,11 @@ Public category address `/catalog/{categorySlug}` — one slug segment, globally
 _Avoid_: Nested catalog path, category path segments
 
 **Catalog category tile**:
-Domain UI card for a subcategory on catalog pages — landscape/wide cover treatment, links deeper into the visible category tree.
-_Avoid_: Category card (ambiguous with UI Kit primitive)
+Domain UI card for a subcategory (or root category on `/catalog`) — **4:3 cover photo** (Stage 4b category cover), title below media; links deeper into the visible category tree. Grid: `sm:2` / `xl:3` columns. See [catalog category page visual spec](docs/superpowers/specs/2026-08-20-catalog-category-page-visual.md) (prototype **A2**).
+_Avoid_: Category card (ambiguous with UI Kit primitive), landscape/wide-only tile (superseded by A2 verdict)
 
 **Catalog product tile**:
-Domain UI card for a product in catalog grids — square product media, manufacturer label, SKU, badges.
+Domain UI card for a product in catalog grids — **inset square (1:1)** product media, manufacturer label, SKU, badges; denser grid (`sm:2` / `lg:3` / `xl:4`). Distinct from UI Kit `SkmProductCard` default grid density. See [catalog category page visual spec](docs/superpowers/specs/2026-08-20-catalog-category-page-visual.md) (prototype **A2**).
 _Avoid_: Product card (ambiguous with UI Kit `SkmProductCard` primitive)
 
 **Manufacturer catalog entry**:
