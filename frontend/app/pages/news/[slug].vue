@@ -38,6 +38,16 @@ const breadcrumbs = computed(() => [
     <SkmContainer>
       <SkmBreadcrumbs :items="breadcrumbs" />
       <article class="mx-auto max-w-3xl">
+        <div
+          v-if="article!.coverPhoto?.url"
+          class="mb-8 overflow-hidden rounded-xl bg-neutral-100"
+        >
+          <img
+            :src="article!.coverPhoto.url"
+            :alt="article!.title"
+            class="aspect-[16/9] w-full object-cover"
+          />
+        </div>
         <p class="text-sm text-neutral-500">
           {{ formatNewsDate(article!.publishDate) }}
         </p>

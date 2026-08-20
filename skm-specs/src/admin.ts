@@ -181,6 +181,7 @@ export interface AdminNewsArticleDto {
   seoTitle: string | null;
   seoDescription: string | null;
   deletedAt: string | null;
+  coverPhoto: AttachedFile | null;
 }
 
 export interface CreateNewsArticleRequest {

@@ -30,21 +30,39 @@ function articleRow(overrides: Record<string, unknown> = {}) {
     seoTitle: null,
     seoDescription: null,
     deletedAt: null,
+    photos: [],
     ...overrides,
   };
 }
+
+function createUrlsMock() {
+  return {
+    toAttachedPhoto: jest.fn((photo: { id: number }) => ({
+      id: photo.id,
+      url: `http://localhost:3001/photos/${photo.id}`,
+      filename: 'cover.jpg',
+      sizeBytes: 100,
+      mimeType: 'image/jpeg',
+    })),
+  };
+}
+
+const NEWS_COVER_INCLUDE = {
+  photos: { orderBy: { sortOrder: 'asc' as const }, take: 1 },
+} as const;
 
 describe('NewsAdminService', () => {
   it('lists active articles by default', async () => {
     const prisma = createPrismaMock();
     prisma.newsArticle.findMany.mockResolvedValue([articleRow()]);
 
-    const service = new NewsAdminService(prisma as never);
+    const service = new NewsAdminService(prisma as never, createUrlsMock() as never);
     const result = await service.listArticles(false);
 
     expect(prisma.newsArticle.findMany).toHaveBeenCalledWith({
       where: { deletedAt: null },
       orderBy: [{ publishDate: 'desc' }, { id: 'desc' }],
+      include: NEWS_COVER_INCLUDE,
     });
     expect(result).toEqual([
       {
@@ -58,6 +76,7 @@ describe('NewsAdminService', () => {
         seoTitle: null,
         seoDescription: null,
         deletedAt: null,
+        coverPhoto: null,
       },
     ]);
   });
@@ -66,7 +85,7 @@ describe('NewsAdminService', () => {
     const prisma = createPrismaMock();
     prisma.newsArticle.findMany.mockResolvedValue([]);
 
-    const service = new NewsAdminService(prisma as never);
+    const service = new NewsAdminService(prisma as never, createUrlsMock() as never);
     await service.listArticles(true);
 
     expect(prisma.newsArticle.findMany).toHaveBeenCalledWith(
@@ -91,7 +110,7 @@ describe('NewsAdminService', () => {
       }),
     );
 
-    const service = new NewsAdminService(prisma as never);
+    const service = new NewsAdminService(prisma as never, createUrlsMock() as never);
     const result = await service.create({
       slug: 'august-hours',
       title: 'График работы',
@@ -113,6 +132,7 @@ describe('NewsAdminService', () => {
         seoTitle: 'График августа',
         seoDescription: 'Летние часы работы.',
       },
+      include: NEWS_COVER_INCLUDE,
     });
     expect(result.published).toBe(false);
     expect(result.slug).toBe('august-hours');
@@ -122,7 +142,7 @@ describe('NewsAdminService', () => {
     const prisma = createPrismaMock();
     prisma.newsArticle.findUnique.mockResolvedValue(articleRow());
 
-    const service = new NewsAdminService(prisma as never);
+    const service = new NewsAdminService(prisma as never, createUrlsMock() as never);
 
     await expect(
       service.create({
@@ -140,7 +160,7 @@ describe('NewsAdminService', () => {
     const prisma = createPrismaMock();
     prisma.newsArticle.findUnique.mockResolvedValue(articleRow());
 
-    const service = new NewsAdminService(prisma as never);
+    const service = new NewsAdminService(prisma as never, createUrlsMock() as never);
 
     await expect(
       service.update(1, { slug: 'renamed' }, [Permission.canManageNews]),
@@ -157,7 +177,7 @@ describe('NewsAdminService', () => {
       articleRow({ slug: 'renamed' }),
     );
 
-    const service = new NewsAdminService(prisma as never);
+    const service = new NewsAdminService(prisma as never, createUrlsMock() as never);
     const result = await service.update(1, { slug: 'renamed' }, [
       Permission.hasAbsoluteControl,
     ]);
@@ -180,7 +200,7 @@ describe('NewsAdminService', () => {
       }),
     );
 
-    const service = new NewsAdminService(prisma as never);
+    const service = new NewsAdminService(prisma as never, createUrlsMock() as never);
     const result = await service.softDelete(1);
 
     expect(prisma.newsArticle.update).toHaveBeenCalledWith({
@@ -189,6 +209,7 @@ describe('NewsAdminService', () => {
         deletedAt: expect.any(Date),
         published: false,
       },
+      include: NEWS_COVER_INCLUDE,
     });
     expect(result.published).toBe(false);
     expect(result.deletedAt).toBe('2026-08-18T10:00:00.000Z');
@@ -203,7 +224,7 @@ describe('NewsAdminService', () => {
       }),
     );
 
-    const service = new NewsAdminService(prisma as never);
+    const service = new NewsAdminService(prisma as never, createUrlsMock() as never);
 
     await expect(service.softDelete(1)).rejects.toBeInstanceOf(
       BadRequestException,
@@ -223,12 +244,13 @@ describe('NewsAdminService', () => {
       articleRow({ published: false, deletedAt: null }),
     );
 
-    const service = new NewsAdminService(prisma as never);
+    const service = new NewsAdminService(prisma as never, createUrlsMock() as never);
     const result = await service.restore(1);
 
     expect(prisma.newsArticle.update).toHaveBeenCalledWith({
       where: { id: 1 },
       data: { deletedAt: null },
+      include: NEWS_COVER_INCLUDE,
     });
     expect(result.deletedAt).toBeNull();
   });
@@ -242,7 +264,7 @@ describe('NewsAdminService', () => {
       }),
     );
 
-    const service = new NewsAdminService(prisma as never);
+    const service = new NewsAdminService(prisma as never, createUrlsMock() as never);
 
     await expect(
       service.update(1, { published: true }, [Permission.canManageNews]),
@@ -254,7 +276,7 @@ describe('NewsAdminService', () => {
     const prisma = createPrismaMock();
     prisma.newsArticle.findUnique.mockResolvedValue(null);
 
-    const service = new NewsAdminService(prisma as never);
+    const service = new NewsAdminService(prisma as never, createUrlsMock() as never);
 
     await expect(
       service.update(99, { title: 'Missing' }, [Permission.canManageNews]),

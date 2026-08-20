@@ -46,6 +46,7 @@ const breadcrumbs = [{ label: 'Главная', to: '/' }, { label: 'Новос�
           :to="`/news/${item.slug}`"
           :date-label="formatNewsDate(item.publishDate)"
           :excerpt="item.excerpt"
+          :cover="item.coverPhoto?.url ?? null"
         />
       </div>
     </SkmContainer>
