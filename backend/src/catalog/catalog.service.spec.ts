@@ -301,6 +301,115 @@ describe('CatalogService', () => {
     });
   });
 
+  it('returns visible tree pruned by product presence', async () => {
+    const prisma = createPrismaMock({});
+    prisma.category.findMany.mockResolvedValue([
+      {
+        id: 1,
+        slug: 'predohraniteli',
+        name: 'Предохранители',
+        parentId: null,
+        photos: [],
+      },
+      {
+        id: 2,
+        slug: 'nizkovoltnye-predohraniteli',
+        name: 'Низковольтные',
+        parentId: 1,
+        photos: [],
+      },
+      {
+        id: 3,
+        slug: 'empty-leaf',
+        name: 'Пустой раздел',
+        parentId: null,
+        photos: [],
+      },
+    ]);
+    prisma.product.findMany.mockResolvedValue([
+      {
+        slug: 'nh00-160a',
+        category: { slug: 'nizkovoltnye-predohraniteli' },
+        manufacturer: { slug: 'mersen' },
+      },
+    ]);
+
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
+    const tree = await service.getCategoryTree(null);
+
+    expect(tree.map((item) => item.slug)).toEqual(['predohraniteli']);
+    expect(tree[0]?.children?.map((child) => child.slug)).toEqual([
+      'nizkovoltnye-predohraniteli',
+    ]);
+  });
+
+  it('scopes visible tree by manufacturer filter', async () => {
+    const prisma = createPrismaMock({});
+    prisma.manufacturer.findFirst.mockResolvedValue({
+      slug: 'mersen',
+      isPublished: true,
+      deletedAt: null,
+    });
+    prisma.category.findMany.mockResolvedValue([
+      {
+        id: 1,
+        slug: 'predohraniteli',
+        name: 'Предохранители',
+        parentId: null,
+        photos: [],
+      },
+      {
+        id: 2,
+        slug: 'nizkovoltnye-predohraniteli',
+        name: 'Низковольтные',
+        parentId: 1,
+        photos: [],
+      },
+      {
+        id: 3,
+        slug: 'ibp-i-elektropitanie',
+        name: 'ИБП',
+        parentId: null,
+        photos: [],
+      },
+      {
+        id: 4,
+        slug: 'akkumulyatory',
+        name: 'АКБ',
+        parentId: 3,
+        photos: [],
+      },
+    ]);
+    prisma.product.findMany.mockResolvedValue([
+      {
+        slug: 'nh00-160a',
+        category: { slug: 'nizkovoltnye-predohraniteli' },
+        manufacturer: { slug: 'mersen' },
+      },
+      {
+        slug: 'battery-12v100',
+        category: { slug: 'akkumulyatory' },
+        manufacturer: { slug: 'hiitio' },
+      },
+    ]);
+
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
+    const tree = await service.getCategoryTree('mersen');
+
+    expect(tree.map((item) => item.slug)).toEqual(['predohraniteli']);
+  });
+
+  it('throws when manufacturer slug is unknown', async () => {
+    const prisma = createPrismaMock({});
+    prisma.manufacturer.findFirst.mockResolvedValue(null);
+
+    const service = new CatalogService(prisma as never, createUrlsMock() as never);
+
+    await expect(service.getCategoryTree('unknown')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+  });
+
   it('hides an unpublished product from the public PDP', async () => {
     const prisma = {
       product: {

@@ -9,8 +9,7 @@ const manufacturerSlug = computed(() =>
   parseManufacturerQuery(route.query.manufacturer, manufacturers.value),
 );
 
-const { data: visibleCategories } =
-  await useCatalogCategories(manufacturerSlug);
+const { tree: visibleCategories } = await useCatalogTaxonomy(manufacturerSlug);
 
 function isManufacturerActive(slug: string) {
   return manufacturerSlug.value === slug;

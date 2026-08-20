@@ -1,16 +1,13 @@
 import {
   buildCatalogUrl,
-  getCategoryBreadcrumbs,
   getManufacturerLabel,
   parseManufacturerQuery,
   parseSearchQuery,
-  resolveCategoryFromPath,
 } from '~/utils/catalog';
 
 export async function useCatalog() {
   const route = useRoute();
   const { data: manufacturers } = await useCatalogManufacturers();
-  const { data: allCategories } = await useCatalogAllCategories();
 
   const categoryPath = computed(() => {
     const slug = route.params.slug;
@@ -20,32 +17,37 @@ export async function useCatalog() {
     return Array.isArray(slug) ? slug : [slug];
   });
 
-  const categoryResolution = computed(() =>
-    resolveCategoryFromPath(categoryPath.value, allCategories.value ?? []),
-  );
-
-  const categorySlug = computed(() => categoryResolution.value.categorySlug);
-  const isValidCategory = computed(() => categoryResolution.value.isValid);
-
   const manufacturerSlug = computed(() =>
     parseManufacturerQuery(route.query.manufacturer, manufacturers.value),
   );
 
   const searchQuery = computed(() => parseSearchQuery(route.query.q));
 
-  const { data: visibleCategories } =
-    await useCatalogCategories(manufacturerSlug);
+  const categorySlugFromRoute = computed(() => {
+    const segments = categoryPath.value;
+    if (!segments.length) {
+      return null;
+    }
+    return segments[segments.length - 1] ?? null;
+  });
+
+  const {
+    tree: visibleCategories,
+    breadcrumbs,
+    childCategories,
+    resolveFromPath,
+  } = await useCatalogTaxonomy(manufacturerSlug, categorySlugFromRoute);
+
+  const categoryResolution = computed(() =>
+    resolveFromPath(categoryPath.value),
+  );
+
+  const categorySlug = computed(() => categoryResolution.value.categorySlug);
+  const isValidCategory = computed(() => categoryResolution.value.isValid);
+
   const { data: products } = await useCatalogProducts(
     categorySlug,
     manufacturerSlug,
-  );
-
-  const breadcrumbs = computed(() =>
-    getCategoryBreadcrumbs(
-      categorySlug.value,
-      manufacturerSlug.value,
-      allCategories.value ?? [],
-    ),
   );
 
   function catalogUrl(
@@ -64,11 +66,7 @@ export async function useCatalog() {
 
   async function setManufacturer(nextManufacturerSlug: string | null) {
     await navigateTo(
-      buildCatalogUrl(
-        categorySlug.value,
-        nextManufacturerSlug,
-        searchQuery.value,
-      ),
+      buildCatalogUrl(null, nextManufacturerSlug, searchQuery.value),
     );
   }
 
@@ -84,6 +82,7 @@ export async function useCatalog() {
     manufacturerSlug,
     searchQuery,
     visibleCategories,
+    childCategories,
     products,
     breadcrumbs,
     catalogUrl,

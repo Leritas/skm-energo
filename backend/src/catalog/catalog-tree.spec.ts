@@ -77,6 +77,30 @@ describe('filterVisibleCategoryTree', () => {
       'nizkovoltnye-predohraniteli',
     ]);
   });
+
+  it('prunes empty leaf categories with no matching products', () => {
+    const tree = filterVisibleCategoryTree(categories, products, null);
+    const ibp = tree.find((item) => item.slug === 'ibp-i-elektropitanie');
+    expect(ibp?.children?.map((child) => child.slug)).toEqual(['akkumulyatory']);
+    expect(
+      categories
+        .find((item) => item.slug === 'ibp-i-elektropitanie')
+        ?.children?.map((child) => child.slug),
+    ).toEqual(['akkumulyatory', 'ibp', 'solnechnye-invertory']);
+  });
+
+  it('keeps parent when products exist only in a child category', () => {
+    const tree = filterVisibleCategoryTree(categories, products, 'hiitio');
+    expect(tree.map((item) => item.slug)).toEqual(['ibp-i-elektropitanie']);
+    expect(tree[0]?.children?.map((child) => child.slug)).toEqual([
+      'akkumulyatory',
+    ]);
+  });
+
+  it('returns empty tree when manufacturer has no products', () => {
+    const tree = filterVisibleCategoryTree(categories, products, 'unknown-mfr');
+    expect(tree).toEqual([]);
+  });
 });
 
 describe('filterProductsByCatalogFilter', () => {
