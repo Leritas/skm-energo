@@ -41,12 +41,20 @@ Active catalog state: optional category slug (path) + optional manufacturer slug
 _Avoid_: Search params, catalog query
 
 **Primary manufacturer**:
-The single manufacturer of a product card. One product = one manufacturer = one SKU + PDF set.
+The single manufacturer of a product card. One product = one manufacturer = one SKU + Document set.
 _Avoid_: Vendor, supplier (in code)
 
 **Similar product**:
 A product from another manufacturer shown on PDP as a cross-brand alternative. Separate card, not a shared listing.
 _Avoid_: Analogue, cross-sell
+
+**Document**:
+A downloadable file attached to a catalog entity (technical documentation, certificate, …). A Product holds an ordered Document set — many Documents, not one link. People tell Documents apart by the original filename, not a separate kind. Sequence is manager-set, not alphabetical. In v1 a Document exists only while attached; there is no unattached pool. Display images are Photos, not Documents.
+_Avoid_: MediaFile, pdfHref, file (when meaning this), PDF set, Document kind / type enum
+
+**Photo**:
+A display image attached to a catalog entity: an ordered Product gallery (the first Photo is the listing image), a News cover, or a Category image. Not a downloadable Document. In v1 a Photo exists only while attached; there is no unattached pool.
+_Avoid_: MediaFile, image URL / path as the stored concept, cover as a raw path, product cover, primary Photo
 
 ## Auth & profile
 
