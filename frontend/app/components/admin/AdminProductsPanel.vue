@@ -4,7 +4,6 @@ import type {
   AdminProductDto,
   AttachedFile,
 } from '@skm/specs';
-import { formatAttachedFileSize } from '~/types/catalog';
 import {
   formatProductDocumentTitle,
   resolveProductSeoDescription,
@@ -61,8 +60,6 @@ const form = reactive({
 
 const mediaPhotos = ref<AttachedFile[]>([]);
 const mediaDocuments = ref<AttachedFile[]>([]);
-const photoInput = ref<HTMLInputElement | null>(null);
-const documentInput = ref<HTMLInputElement | null>(null);
 
 const isEditing = computed(() => editingProduct.value !== null);
 const canChangeSlug = computed(() => isEditing.value && hasAbsoluteControl());
@@ -309,6 +306,36 @@ async function handleRestore(product: AdminProductDto) {
   }
 }
 
+async function makePhotoFirst(photoId: number) {
+  const productId = editingProduct.value?.id;
+  if (!productId) {
+    return;
+  }
+
+  const index = mediaPhotos.value.findIndex((photo) => photo.id === photoId);
+  if (index <= 0) {
+    return;
+  }
+
+  const next = [...mediaPhotos.value];
+  const [item] = next.splice(index, 1);
+  next.unshift(item);
+
+  try {
+    const response = await reorderProductPhotos(
+      productId,
+      next.map((photo) => photo.id),
+    );
+    mediaPhotos.value = response.items;
+  } catch (error) {
+    toast.add({
+      title: 'Не удалось сделать фото обложкой',
+      description: error instanceof Error ? error.message : undefined,
+      color: 'error',
+    });
+  }
+}
+
 async function movePhoto(index: number, direction: -1 | 1) {
   const productId = editingProduct.value?.id;
   const targetIndex = index + direction;
@@ -369,12 +396,9 @@ async function moveDocument(index: number, direction: -1 | 1) {
   }
 }
 
-async function handlePhotoUpload(event: Event) {
+async function handlePhotoUpload(file: File) {
   const productId = editingProduct.value?.id;
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-  input.value = '';
-  if (!productId || !file) {
+  if (!productId) {
     return;
   }
 
@@ -391,12 +415,9 @@ async function handlePhotoUpload(event: Event) {
   }
 }
 
-async function handleDocumentUpload(event: Event) {
+async function handleDocumentUpload(file: File) {
   const productId = editingProduct.value?.id;
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-  input.value = '';
-  if (!productId || !file) {
+  if (!productId) {
     return;
   }
 
@@ -660,248 +681,136 @@ onMounted(() => {
     >
       <template #body>
         <form class="space-y-6" @submit.prevent="handleSave">
-          <section class="space-y-4">
-            <h3 class="text-sm font-semibold text-neutral-900">Основное</h3>
-            <SkmFormField
-              v-if="isEditing"
-              label="Slug"
-              :hint="
-                canChangeSlug
-                  ? 'kebab-case, часть URL страницы товара'
-                  : 'Сменить slug может только пользователь с абсолютным контролем'
-              "
+          <div class="grid gap-6 lg:grid-cols-2">
+            <div class="space-y-6">
+              <section class="space-y-4">
+                <h3 class="text-sm font-semibold text-neutral-900">Основное</h3>
+                <SkmFormField
+                  v-if="isEditing"
+                  label="Slug"
+                  :hint="
+                    canChangeSlug
+                      ? 'kebab-case, часть URL страницы товара'
+                      : 'Сменить slug может только пользователь с абсолютным контролем'
+                  "
+                >
+                  <SkmInput
+                    v-model="form.slug"
+                    autocomplete="off"
+                    :disabled="!canChangeSlug"
+                  />
+                </SkmFormField>
+                <SkmFormField label="Название" required>
+                  <SkmInput v-model="form.title" autocomplete="off" />
+                </SkmFormField>
+                <SkmFormField label="Артикул" required>
+                  <SkmInput v-model="form.sku" autocomplete="off" />
+                </SkmFormField>
+                <SkmFormField label="Производитель" required>
+                  <USelectMenu
+                    v-model="form.manufacturerId"
+                    :items="manufacturerOptions"
+                    value-key="value"
+                    placeholder="Выберите производителя"
+                  />
+                </SkmFormField>
+                <SkmFormField label="Категория" required>
+                  <USelectMenu
+                    v-model="form.categoryId"
+                    :items="categoryOptions"
+                    value-key="value"
+                    placeholder="Выберите категорию"
+                  />
+                </SkmFormField>
+                <SkmFormField label="Опубликован">
+                  <label
+                    class="flex items-center gap-2 text-sm text-neutral-700"
+                  >
+                    <UCheckbox v-model="form.isPublished" />
+                    Показывать на публичной странице товара
+                  </label>
+                </SkmFormField>
+              </section>
+
+              <section class="space-y-4">
+                <h3 class="text-sm font-semibold text-neutral-900">Описание</h3>
+                <SkmFormField
+                  label="Описание товара"
+                  required
+                  hint="Попадает на страницу товара и в meta description, если SEO-поле пустое"
+                >
+                  <SkmTextarea
+                    v-model="form.description"
+                    :rows="5"
+                    placeholder="Назначение, серия, типичные применения"
+                  />
+                </SkmFormField>
+              </section>
+
+              <section class="space-y-4">
+                <div class="flex items-center justify-between gap-3">
+                  <h3 class="text-sm font-semibold text-neutral-900">
+                    Характеристики
+                  </h3>
+                  <SkmButton
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    icon="i-lucide-plus"
+                    @click="addSpec"
+                  >
+                    Строка
+                  </SkmButton>
+                </div>
+                <p class="text-xs text-neutral-500">
+                  Ключ и значение. Пустые строки при сохранении отбрасываются.
+                </p>
+                <div
+                  v-for="(spec, index) in form.specs"
+                  :key="index"
+                  class="grid grid-cols-[1fr_1fr_auto] gap-2"
+                >
+                  <SkmInput v-model="spec.label" placeholder="Параметр" />
+                  <SkmInput v-model="spec.value" placeholder="Значение" />
+                  <SkmButton
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    icon="i-lucide-trash-2"
+                    aria-label="Удалить характеристику"
+                    @click="removeSpec(index)"
+                  />
+                </div>
+              </section>
+            </div>
+
+            <div v-if="isEditing" class="space-y-4">
+              <AdminProductPhotoStrip
+                :photos="mediaPhotos"
+                @upload="handlePhotoUpload"
+                @delete="handlePhotoDelete"
+                @move="movePhoto"
+                @make-first="makePhotoFirst"
+              />
+              <AdminProductDocumentList
+                :documents="mediaDocuments"
+                @upload="handleDocumentUpload"
+                @delete="handleDocumentDelete"
+                @move="moveDocument"
+              />
+            </div>
+
+            <section
+              v-else
+              class="space-y-2 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-5"
             >
-              <SkmInput
-                v-model="form.slug"
-                autocomplete="off"
-                :disabled="!canChangeSlug"
-              />
-            </SkmFormField>
-            <SkmFormField label="Название" required>
-              <SkmInput v-model="form.title" autocomplete="off" />
-            </SkmFormField>
-            <SkmFormField label="Артикул" required>
-              <SkmInput v-model="form.sku" autocomplete="off" />
-            </SkmFormField>
-            <SkmFormField label="Производитель" required>
-              <USelectMenu
-                v-model="form.manufacturerId"
-                :items="manufacturerOptions"
-                value-key="value"
-                placeholder="Выберите производителя"
-              />
-            </SkmFormField>
-            <SkmFormField label="Категория" required>
-              <USelectMenu
-                v-model="form.categoryId"
-                :items="categoryOptions"
-                value-key="value"
-                placeholder="Выберите категорию"
-              />
-            </SkmFormField>
-            <SkmFormField label="Опубликован">
-              <label class="flex items-center gap-2 text-sm text-neutral-700">
-                <UCheckbox v-model="form.isPublished" />
-                Показывать на публичной странице товара
-              </label>
-            </SkmFormField>
-          </section>
-
-          <section class="space-y-4">
-            <h3 class="text-sm font-semibold text-neutral-900">Описание</h3>
-            <SkmFormField
-              label="Описание товара"
-              required
-              hint="Попадает на страницу товара и в meta description, если SEO-поле пустое"
-            >
-              <SkmTextarea
-                v-model="form.description"
-                :rows="5"
-                placeholder="Назначение, серия, типичные применения"
-              />
-            </SkmFormField>
-          </section>
-
-          <section class="space-y-4">
-            <div class="flex items-center justify-between gap-3">
-              <h3 class="text-sm font-semibold text-neutral-900">
-                Характеристики
-              </h3>
-              <SkmButton
-                type="button"
-                variant="ghost"
-                size="sm"
-                icon="i-lucide-plus"
-                @click="addSpec"
-              >
-                Строка
-              </SkmButton>
-            </div>
-            <p class="text-xs text-neutral-500">
-              Ключ и значение. Пустые строки при сохранении отбрасываются.
-            </p>
-            <div
-              v-for="(spec, index) in form.specs"
-              :key="index"
-              class="grid grid-cols-[1fr_1fr_auto] gap-2"
-            >
-              <SkmInput v-model="spec.label" placeholder="Параметр" />
-              <SkmInput v-model="spec.value" placeholder="Значение" />
-              <SkmButton
-                type="button"
-                variant="ghost"
-                size="sm"
-                icon="i-lucide-trash-2"
-                aria-label="Удалить характеристику"
-                @click="removeSpec(index)"
-              />
-            </div>
-          </section>
-
-          <section v-if="isEditing" class="space-y-4">
-            <div class="flex items-center justify-between gap-3">
-              <h3 class="text-sm font-semibold text-neutral-900">Фото</h3>
-              <SkmButton
-                type="button"
-                variant="ghost"
-                size="sm"
-                icon="i-lucide-upload"
-                @click="photoInput?.click()"
-              >
-                Загрузить
-              </SkmButton>
-            </div>
-            <input
-              ref="photoInput"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              class="hidden"
-              @change="handlePhotoUpload"
-            />
-            <p class="text-xs text-neutral-500">
-              Первое фото — на карточке каталога. До 15 файлов, jpeg/png/webp.
-            </p>
-            <ul v-if="mediaPhotos.length" class="space-y-2">
-              <li
-                v-for="(photo, index) in mediaPhotos"
-                :key="photo.id"
-                class="flex items-center gap-2 rounded-md border border-neutral-200 px-3 py-2"
-              >
-                <span class="min-w-0 flex-1 truncate text-sm text-neutral-800">
-                  {{ photo.filename }}
-                </span>
-                <SkmButton
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  icon="i-lucide-arrow-up"
-                  aria-label="Поднять"
-                  :disabled="index === 0"
-                  @click="movePhoto(index, -1)"
-                />
-                <SkmButton
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  icon="i-lucide-arrow-down"
-                  aria-label="Опустить"
-                  :disabled="index === mediaPhotos.length - 1"
-                  @click="movePhoto(index, 1)"
-                />
-                <SkmButton
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  icon="i-lucide-trash-2"
-                  aria-label="Удалить фото"
-                  @click="handlePhotoDelete(photo.id)"
-                />
-              </li>
-            </ul>
-            <p v-else class="text-sm text-neutral-500">
-              Фото пока не загружены.
-            </p>
-          </section>
-
-          <section v-if="isEditing" class="space-y-4">
-            <div class="flex items-center justify-between gap-3">
-              <h3 class="text-sm font-semibold text-neutral-900">Документы</h3>
-              <SkmButton
-                type="button"
-                variant="ghost"
-                size="sm"
-                icon="i-lucide-upload"
-                @click="documentInput?.click()"
-              >
-                Загрузить
-              </SkmButton>
-            </div>
-            <input
-              ref="documentInput"
-              type="file"
-              accept="application/pdf,.doc,.docx,.xlsx"
-              class="hidden"
-              @change="handleDocumentUpload"
-            />
-            <p class="text-xs text-neutral-500">
-              PDF и офисные форматы. Бейдж PDF на карточке появится
-              автоматически.
-            </p>
-            <ul v-if="mediaDocuments.length" class="space-y-2">
-              <li
-                v-for="(document, index) in mediaDocuments"
-                :key="document.id"
-                class="flex items-center gap-2 rounded-md border border-neutral-200 px-3 py-2"
-              >
-                <span class="min-w-0 flex-1 truncate text-sm text-neutral-800">
-                  {{ document.filename }}
-                  <span class="text-neutral-500">
-                    ({{ formatAttachedFileSize(document.sizeBytes) }})
-                  </span>
-                </span>
-                <SkmButton
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  icon="i-lucide-arrow-up"
-                  aria-label="Поднять"
-                  :disabled="index === 0"
-                  @click="moveDocument(index, -1)"
-                />
-                <SkmButton
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  icon="i-lucide-arrow-down"
-                  aria-label="Опустить"
-                  :disabled="index === mediaDocuments.length - 1"
-                  @click="moveDocument(index, 1)"
-                />
-                <SkmButton
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  icon="i-lucide-trash-2"
-                  aria-label="Удалить документ"
-                  @click="handleDocumentDelete(document.id)"
-                />
-              </li>
-            </ul>
-            <p v-else class="text-sm text-neutral-500">
-              Документы пока не загружены.
-            </p>
-          </section>
-
-          <section
-            v-else
-            class="space-y-2 rounded-md border border-dashed border-neutral-200 p-4"
-          >
-            <h3 class="text-sm font-semibold text-neutral-900">Файлы</h3>
-            <p class="text-sm text-neutral-500">
-              Сначала сохраните товар, затем загрузите фото и документы в режиме
-              редактирования.
-            </p>
-          </section>
+              <h3 class="text-sm font-semibold text-neutral-900">Файлы</h3>
+              <p class="text-sm text-neutral-500">
+                Сначала сохраните товар, затем загрузите фото и документы в
+                режиме редактирования.
+              </p>
+            </section>
+          </div>
 
           <section
             class="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4"

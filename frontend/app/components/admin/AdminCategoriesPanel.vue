@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AdminCategoryDto } from '@skm/specs';
+import type { AdminCategoryDto, AttachedFile } from '@skm/specs';
 import {
   buildAdminCategoryForest,
   collectExpandableCategoryIds,
@@ -20,6 +20,8 @@ const {
   updateCategory,
   archiveCategory,
   restoreCategory,
+  replaceCoverPhoto,
+  deleteCoverPhoto,
 } = useCategoriesAdmin();
 const { hasAbsoluteControl } = usePermissions();
 const toast = useToast();
@@ -44,6 +46,8 @@ const form = reactive({
   parentKey: 'root' as number | 'root',
   isPublished: false,
 });
+
+const coverPhoto = ref<AttachedFile | null>(null);
 
 const isEditing = computed(() => editingCategory.value !== null);
 const canChangeSlug = computed(() => !isEditing.value || hasAbsoluteControl());
@@ -114,6 +118,7 @@ function resetForm(parentId: number | null = null) {
   form.seoDescription = '';
   form.parentKey = parentId ?? 'root';
   form.isPublished = false;
+  coverPhoto.value = null;
 }
 
 function openCreate(parentId: number | null = null) {
@@ -131,6 +136,7 @@ function openEdit(category: AdminCategoryDto) {
   form.seoDescription = category.seoDescription ?? '';
   form.parentKey = category.parentId ?? 'root';
   form.isPublished = category.isPublished;
+  coverPhoto.value = category.coverPhoto;
   formOpen.value = true;
 }
 
@@ -235,6 +241,44 @@ async function handleRestore(category: AdminCategoryDto) {
   } catch (error) {
     toast.add({
       title: 'Не удалось восстановить категорию',
+      description: error instanceof Error ? error.message : undefined,
+      color: 'error',
+    });
+  }
+}
+
+async function handleCoverReplace(file: File) {
+  const categoryId = editingCategory.value?.id;
+  if (!categoryId) {
+    return;
+  }
+
+  try {
+    const response = await replaceCoverPhoto(categoryId, file);
+    coverPhoto.value = response.photo;
+    toast.add({ title: 'Обложка обновлена', color: 'success' });
+  } catch (error) {
+    toast.add({
+      title: 'Не удалось загрузить обложку',
+      description: error instanceof Error ? error.message : undefined,
+      color: 'error',
+    });
+  }
+}
+
+async function handleCoverDelete() {
+  const categoryId = editingCategory.value?.id;
+  if (!categoryId) {
+    return;
+  }
+
+  try {
+    await deleteCoverPhoto(categoryId);
+    coverPhoto.value = null;
+    toast.add({ title: 'Обложка удалена', color: 'success' });
+  } catch (error) {
+    toast.add({
+      title: 'Не удалось удалить обложку',
       description: error instanceof Error ? error.message : undefined,
       color: 'error',
     });
@@ -399,6 +443,23 @@ onMounted(() => {
               Показывать в публичном каталоге
             </label>
           </SkmFormField>
+
+          <AdminCoverPhotoSlot
+            v-if="isEditing"
+            :cover-photo="coverPhoto"
+            @replace="handleCoverReplace"
+            @delete="handleCoverDelete"
+          />
+          <section
+            v-else
+            class="space-y-2 rounded-xl border border-dashed border-neutral-300 bg-neutral-50 p-5"
+          >
+            <h3 class="text-sm font-semibold text-neutral-900">Обложка</h3>
+            <p class="text-sm text-neutral-500">
+              Сначала сохраните категорию, затем загрузите обложку в режиме
+              редактирования.
+            </p>
+          </section>
 
           <div
             class="space-y-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4"
