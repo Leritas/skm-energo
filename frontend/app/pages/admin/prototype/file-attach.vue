@@ -45,9 +45,13 @@ const proto = useFileAttachPrototype();
     <div
       class="border-b border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950"
     >
-      <strong>PROTOTYPE #54</strong> — admin attach UX (throwaway). Mock state
-      in memory. Переключайте варианты: <code>?variant=A|B|C</code> или стрелки
-      ← → внизу.
+      <strong>PROTOTYPE #54 — FINAL: Variant A</strong> (B/C on this branch for
+      reference). Mock state in memory. Production:
+      <a
+        href="https://github.com/Leritas/skm-energo/issues/60"
+        class="font-medium underline"
+        >#60</a
+      >. Variants: <code>?variant=A|B|C</code> or ← → below.
     </div>
 
     <div class="mx-auto max-w-6xl px-4 py-8">
