@@ -247,6 +247,24 @@ describe('Product photos and documents (integration)', () => {
     expect(detailResponse.body).not.toHaveProperty('pdfHref');
   });
 
+  it('rejects derived pdf badge on product update', async () => {
+    await request(app.getHttpServer())
+      .patch(`/api/admin/catalog/products/${productId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ badges: ['pdf', 'new'] })
+      .expect(400);
+  });
+
+  it('updates marketing badges without accepting pdf', async () => {
+    const response = await request(app.getHttpServer())
+      .patch(`/api/admin/catalog/products/${productId}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ badges: ['onRequest'] })
+      .expect(200);
+
+    expect(response.body.badges).toEqual(['onRequest']);
+  });
+
   it('deletes photos and documents', async () => {
     const photos = await prisma.photo.findMany({ where: { productId } });
     for (const photo of photos) {
@@ -268,6 +286,6 @@ describe('Product photos and documents (integration)', () => {
     expect(detailResponse.body.photos).toEqual([]);
     expect(detailResponse.body.documents).toEqual([]);
     expect(detailResponse.body.image).toBeNull();
-    expect(detailResponse.body.badges).toEqual(['new']);
+    expect(detailResponse.body.badges).toEqual(['onRequest']);
   });
 });

@@ -249,6 +249,22 @@ describe('Media byte routes (integration)', () => {
       );
   });
 
+  it('returns Cyrillic filenames using RFC 5987 encoding', async () => {
+    const cyrillicFilename = 'Паспорт.pdf';
+    const cyrillicDocumentId = await seedDocument(
+      publicProductId,
+      cyrillicFilename,
+    );
+
+    await request(app.getHttpServer())
+      .get(`/documents/${cyrillicDocumentId}`)
+      .expect(200)
+      .expect(
+        'Content-Disposition',
+        `attachment; filename*=UTF-8''${encodeURIComponent(cyrillicFilename)}`,
+      );
+  });
+
   it('returns 404 for guests when the document owner is unpublished', async () => {
     await request(app.getHttpServer())
       .get(`/documents/${archivedDocumentId}`)
