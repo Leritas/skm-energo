@@ -68,10 +68,7 @@ onMounted(async () => {
                 :class="{ 'rotate-180': expandedCatalog }"
               />
             </button>
-            <div
-              v-if="expandedCatalog"
-              class="overflow-hidden rounded-lg border border-neutral-200"
-            >
+            <div v-if="expandedCatalog" class="mt-1 overflow-hidden rounded-xl">
               <SkmCatalogNavPanel
                 v-model:selected-manufacturer-slug="activeManufacturerSlug"
                 :manufacturers="manufacturers ?? []"

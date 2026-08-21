@@ -64,10 +64,16 @@ function collapseAll() {
   expandedSlugs.value = new Set();
 }
 
+const shellClass = computed(() =>
+  props.variant === 'dropdown'
+    ? 'w-[40rem] rounded-xl shadow-[0_12px_40px_-10px_rgba(17,24,39,0.28)]'
+    : 'rounded-xl shadow-sm ring-1 ring-neutral-200/50',
+);
+
 const panelClass = computed(() =>
   props.variant === 'dropdown'
-    ? 'flex w-[40rem] overflow-hidden'
-    : 'flex flex-col overflow-hidden',
+    ? 'flex overflow-hidden rounded-xl bg-white'
+    : 'flex flex-col overflow-hidden rounded-xl bg-white',
 );
 
 const sidebarClass = computed(() =>
@@ -78,86 +84,92 @@ const sidebarClass = computed(() =>
 </script>
 
 <template>
-  <div :class="panelClass">
-    <aside class="bg-brand-purple-950" :class="sidebarClass">
-      <p class="text-[10px] font-semibold uppercase tracking-wide text-white">
-        Производители
-      </p>
-      <ul class="mt-2 space-y-0.5" role="radiogroup" aria-label="Производители">
-        <li
-          v-for="manufacturer in manufacturers"
-          :key="manufacturer.slug"
-          class="flex items-center gap-2 py-1"
+  <div :class="shellClass">
+    <div :class="panelClass">
+      <aside class="bg-brand-purple-950" :class="sidebarClass">
+        <p class="text-[10px] font-semibold uppercase tracking-wide text-white">
+          Производители
+        </p>
+        <ul
+          class="mt-2 space-y-0.5"
+          role="radiogroup"
+          aria-label="Производители"
         >
-          <button
-            type="button"
-            role="radio"
-            :aria-checked="isManufacturerSelected(manufacturer.slug)"
-            class="min-w-0 flex-1 px-0.5 text-left text-xs transition"
-            :class="
-              isManufacturerSelected(manufacturer.slug)
-                ? 'font-semibold text-accent-500'
-                : 'font-medium text-white hover:text-white/90'
-            "
-            @click="toggleManufacturer(manufacturer.slug)"
+          <li
+            v-for="manufacturer in manufacturers"
+            :key="manufacturer.slug"
+            class="flex items-center gap-2 py-1"
           >
-            {{ manufacturer.label }}
-          </button>
+            <button
+              type="button"
+              role="radio"
+              :aria-checked="isManufacturerSelected(manufacturer.slug)"
+              class="min-w-0 flex-1 px-0.5 text-left text-xs transition"
+              :class="
+                isManufacturerSelected(manufacturer.slug)
+                  ? 'font-semibold text-accent-500'
+                  : 'font-medium text-white hover:text-white/90'
+              "
+              @click="toggleManufacturer(manufacturer.slug)"
+            >
+              {{ manufacturer.label }}
+            </button>
+            <NuxtLink
+              :to="manufacturerCatalogUrl(manufacturer.slug)"
+              class="shrink-0 text-accent-500 transition hover:text-accent-400"
+              :aria-label="`Перейти в каталог ${manufacturer.label}`"
+              :title="`Каталог ${manufacturer.label}`"
+              @click="emit('navigate')"
+            >
+              <UIcon name="i-lucide-arrow-up-right" class="size-3.5" />
+            </NuxtLink>
+          </li>
+        </ul>
+      </aside>
+
+      <div class="flex min-w-0 flex-1 flex-col bg-white">
+        <div
+          class="flex items-center justify-between border-b border-neutral-100 px-3 py-2"
+        >
           <NuxtLink
-            :to="manufacturerCatalogUrl(manufacturer.slug)"
-            class="shrink-0 text-accent-500 transition hover:text-accent-400"
-            :aria-label="`Перейти в каталог ${manufacturer.label}`"
-            :title="`Каталог ${manufacturer.label}`"
+            :to="catalogRootUrl()"
+            class="text-xs font-semibold text-accent-600 hover:underline"
             @click="emit('navigate')"
           >
-            <UIcon name="i-lucide-arrow-up-right" class="size-3.5" />
+            {{ catalogLinkLabel }}
           </NuxtLink>
-        </li>
-      </ul>
-    </aside>
-
-    <div class="flex min-w-0 flex-1 flex-col bg-white">
-      <div
-        class="flex items-center justify-between border-b border-neutral-100 px-3 py-2"
-      >
-        <NuxtLink
-          :to="catalogRootUrl()"
-          class="text-xs font-semibold text-accent-600 hover:underline"
-          @click="emit('navigate')"
-        >
-          {{ catalogLinkLabel }}
-        </NuxtLink>
-        <div class="flex gap-1">
-          <button
-            type="button"
-            class="rounded px-2 py-1 text-[10px] font-medium text-neutral-600 transition hover:bg-brand-purple-50"
-            @click="expandAll"
-          >
-            Развернуть всё
-          </button>
-          <button
-            type="button"
-            class="rounded px-2 py-1 text-[10px] font-medium text-neutral-600 transition hover:bg-brand-purple-50"
-            @click="collapseAll"
-          >
-            Свернуть
-          </button>
+          <div class="flex gap-1">
+            <button
+              type="button"
+              class="rounded px-2 py-1 text-[10px] font-medium text-neutral-600 transition hover:bg-neutral-100"
+              @click="expandAll"
+            >
+              Развернуть всё
+            </button>
+            <button
+              type="button"
+              class="rounded px-2 py-1 text-[10px] font-medium text-neutral-600 transition hover:bg-neutral-100"
+              @click="collapseAll"
+            >
+              Свернуть
+            </button>
+          </div>
         </div>
-      </div>
-      <div
-        class="max-h-[20rem] overflow-y-auto p-2"
-        :class="variant === 'stacked' ? 'max-h-[16rem]' : undefined"
-      >
-        <SkmCatalogFolderTree
-          v-if="categories.length"
-          v-model:expanded-slugs="expandedSlugs"
-          :categories="categories"
-          :build-url="categoryUrl"
-          @navigate="emit('navigate')"
-        />
-        <p v-else class="px-2 py-6 text-center text-sm text-neutral-500">
-          Нет категорий для выбранного производителя.
-        </p>
+        <div
+          class="max-h-[20rem] overflow-y-auto p-2"
+          :class="variant === 'stacked' ? 'max-h-[16rem]' : undefined"
+        >
+          <SkmCatalogFolderTree
+            v-if="categories.length"
+            v-model:expanded-slugs="expandedSlugs"
+            :categories="categories"
+            :build-url="categoryUrl"
+            @navigate="emit('navigate')"
+          />
+          <p v-else class="px-2 py-6 text-center text-sm text-neutral-500">
+            Нет категорий для выбранного производителя.
+          </p>
+        </div>
       </div>
     </div>
   </div>

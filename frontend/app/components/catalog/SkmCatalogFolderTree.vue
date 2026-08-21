@@ -58,13 +58,13 @@ function folderIcon(row: CatalogCategoryTreeRow) {
       :aria-level="row.depth + 1"
     >
       <div
-        class="group flex items-center gap-1 py-1.5 pr-2 transition-colors hover:bg-brand-purple-50/60"
+        class="group flex items-center gap-1.5 py-1.5 pr-2 transition-colors hover:bg-neutral-50"
         :style="{ paddingLeft: `${8 + row.depth * 20}px` }"
       >
         <button
           v-if="row.hasChildren"
           type="button"
-          class="flex size-6 shrink-0 items-center justify-center rounded text-brand-purple-400 transition hover:bg-brand-purple-100/80"
+          class="flex size-6 shrink-0 items-center justify-center rounded text-neutral-500 transition hover:bg-neutral-200/70"
           :aria-label="
             isExpanded(row.category.slug) ? 'Свернуть' : 'Развернуть'
           "
@@ -78,15 +78,14 @@ function folderIcon(row: CatalogCategoryTreeRow) {
         </button>
         <span v-else class="size-6 shrink-0" />
 
-        <span
-          class="flex size-6 shrink-0 items-center justify-center rounded-md bg-brand-purple-100 text-brand-purple-700"
-        >
-          <UIcon :name="folderIcon(row)" class="size-3" />
-        </span>
+        <UIcon
+          :name="folderIcon(row)"
+          class="size-3.5 shrink-0 text-neutral-400"
+        />
 
         <NuxtLink
           :to="buildUrl(row.category.slug)"
-          class="min-w-0 flex-1 truncate text-sm text-neutral-900 transition hover:text-brand-purple-700"
+          class="min-w-0 flex-1 truncate text-sm text-neutral-900 transition hover:text-accent-600"
           :class="row.depth === 0 ? 'font-semibold' : 'font-normal'"
           @click="emit('navigate')"
         >
