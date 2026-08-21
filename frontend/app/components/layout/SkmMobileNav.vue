@@ -2,7 +2,6 @@
 import { Permission } from '@skm/specs';
 import { MAIN_NAV } from '~/constants/navigation';
 import { SITE } from '~/constants/site';
-import { buildCatalogUrl } from '~/utils/catalog';
 
 const open = defineModel<boolean>('open', { default: false });
 
@@ -23,11 +22,6 @@ const { tree: visibleCategories } = await useCatalogTaxonomy(
 
 function toggleCatalog() {
   expandedCatalog.value = !expandedCatalog.value;
-}
-
-function toggleManufacturer(slug: string) {
-  activeManufacturerSlug.value =
-    activeManufacturerSlug.value === slug ? null : slug;
 }
 
 function close() {
@@ -76,63 +70,15 @@ onMounted(async () => {
             </button>
             <div
               v-if="expandedCatalog"
-              class="ml-3 space-y-3 border-l border-neutral-200 pl-3"
+              class="overflow-hidden rounded-lg border border-neutral-200"
             >
-              <NuxtLink
-                :to="buildCatalogUrl(null, activeManufacturerSlug)"
-                class="block rounded-md px-3 py-2 text-sm font-medium text-accent-600"
-                @click="close"
-              >
-                Весь каталог
-              </NuxtLink>
-
-              <div class="flex flex-wrap gap-2 px-3">
-                <button
-                  v-for="manufacturer in manufacturers ?? []"
-                  :key="manufacturer.slug"
-                  type="button"
-                  @click="toggleManufacturer(manufacturer.slug)"
-                >
-                  <SkmBadge
-                    :label="manufacturer.label"
-                    :tone="
-                      activeManufacturerSlug === manufacturer.slug
-                        ? 'accent'
-                        : 'neutral'
-                    "
-                    size="sm"
-                  />
-                </button>
-              </div>
-
-              <div
-                v-for="category in visibleCategories ?? []"
-                :key="category.slug"
-                class="py-1"
-              >
-                <NuxtLink
-                  :to="buildCatalogUrl(category.slug, activeManufacturerSlug)"
-                  class="block px-3 py-1 text-sm font-semibold text-neutral-800"
-                  @click="close"
-                >
-                  {{ category.label }}
-                </NuxtLink>
-                <ul v-if="category.children?.length" class="pl-3">
-                  <li
-                    v-for="child in category.children"
-                    :key="child.slug"
-                    class="py-0.5"
-                  >
-                    <NuxtLink
-                      :to="buildCatalogUrl(child.slug, activeManufacturerSlug)"
-                      class="text-xs text-neutral-500"
-                      @click="close"
-                    >
-                      {{ child.label }}
-                    </NuxtLink>
-                  </li>
-                </ul>
-              </div>
+              <SkmCatalogNavPanel
+                v-model:selected-manufacturer-slug="activeManufacturerSlug"
+                :manufacturers="manufacturers ?? []"
+                :categories="visibleCategories ?? []"
+                variant="stacked"
+                @navigate="close"
+              />
             </div>
           </div>
           <NuxtLink
