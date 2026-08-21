@@ -17,6 +17,7 @@ const { data: manufacturers } = await useCatalogManufacturers();
 const { breadcrumbs: categoryBreadcrumbs } = await useCatalogTaxonomy(
   computed(() => null),
   computed(() => product.value?.categorySlug ?? null),
+  { linkLeafCategory: true },
 );
 
 if (productError.value) {
@@ -92,7 +93,7 @@ const breadcrumbs = computed(() => {
 <template>
   <SkmSection>
     <SkmContainer>
-      <CatalogProductDetailView
+      <SkmCatalogProductDetailView
         :product="product!"
         :manufacturer-label="manufacturerLabel(product!.manufacturerSlug)"
         :breadcrumbs="breadcrumbs"

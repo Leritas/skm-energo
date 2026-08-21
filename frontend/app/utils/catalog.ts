@@ -87,6 +87,7 @@ export function getCategoryBreadcrumbs(
   categorySlug: string | null,
   manufacturerSlug: string | null,
   categories: CatalogCategory[],
+  options?: { linkLeaf?: boolean },
 ): CatalogBreadcrumb[] {
   const items: CatalogBreadcrumb[] = [
     { label: 'Главная', to: '/' },
@@ -106,7 +107,10 @@ export function getCategoryBreadcrumbs(
     const isLast = category.slug === categorySlug;
     items.push({
       label: category.label,
-      to: isLast ? undefined : buildCatalogUrl(category.slug, manufacturerSlug),
+      to:
+        !isLast || options?.linkLeaf
+          ? buildCatalogUrl(category.slug, manufacturerSlug)
+          : undefined,
     });
   }
 

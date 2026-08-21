@@ -21,6 +21,7 @@ function buildCatalogQuery(
 export async function useCatalogTaxonomy(
   manufacturerSlug: MaybeRefOrGetter<string | null>,
   categorySlug?: MaybeRefOrGetter<string | null>,
+  options?: { linkLeafCategory?: boolean },
 ) {
   const { api } = useApi();
 
@@ -43,6 +44,7 @@ export async function useCatalogTaxonomy(
       toValue(categorySlug) ?? null,
       toValue(manufacturerSlug),
       tree.value ?? [],
+      { linkLeaf: options?.linkLeafCategory },
     ),
   );
 
