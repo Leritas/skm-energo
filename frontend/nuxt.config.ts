@@ -1,5 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { fileURLToPath, URL } from 'node:url'
+import { fileURLToPath, URL } from 'node:url';
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -7,7 +7,9 @@ export default defineNuxtConfig({
   ssr: true,
   css: ['~/assets/css/main.css'],
   alias: {
-    '@skm/components': fileURLToPath(new URL('./app/components', import.meta.url)),
+    '@skm/components': fileURLToPath(
+      new URL('./app/components', import.meta.url),
+    ),
   },
   colorMode: {
     preference: 'light',
@@ -36,7 +38,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:3001/api',
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://127.0.0.1:3001/api',
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://skmenergo.ru',
     },
   },
@@ -77,4 +79,4 @@ export default defineNuxtConfig({
       link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
     },
   },
-})
+});
