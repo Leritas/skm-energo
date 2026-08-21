@@ -17,6 +17,7 @@ const { data: manufacturers } = await useCatalogManufacturers();
 const { breadcrumbs: categoryBreadcrumbs } = await useCatalogTaxonomy(
   computed(() => null),
   computed(() => product.value?.categorySlug ?? null),
+  { linkLeafCategory: true },
 );
 
 if (productError.value) {
