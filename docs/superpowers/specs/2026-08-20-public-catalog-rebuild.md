@@ -5,7 +5,7 @@
 **Scope:** Roadmap Stage 5 — public catalog on PostgreSQL + Stage 4b media; admin CRUD as source of truth  
 **Epic:** [#14](https://github.com/Leritas/skm-energo/issues/14)  
 **Implementation:** [#67](https://github.com/Leritas/skm-energo/issues/67) (taxonomy + category pages), [#72](https://github.com/Leritas/skm-energo/issues/72) (nav), [#73](https://github.com/Leritas/skm-energo/issues/73) (PDP), [#68](https://github.com/Leritas/skm-energo/issues/68) (search), [#69](https://github.com/Leritas/skm-energo/issues/69) (similar)  
-**Prototypes (design gate):** [#70](https://github.com/Leritas/skm-energo/issues/70), [#71](https://github.com/Leritas/skm-energo/issues/71)  
+**Prototypes (design gate):** [#70](https://github.com/Leritas/skm-energo/issues/70), [#71](https://github.com/Leritas/skm-energo/issues/71), [#72](https://github.com/Leritas/skm-energo/issues/72) (header dropdown — **D3P** approved 2026-08-21)  
 **ADR:** [docs/adr/0001-visible-catalog-taxonomy.md](../adr/0001-visible-catalog-taxonomy.md)
 
 ---
@@ -91,7 +91,8 @@ Rebuild the public catalog end-to-end on admin-sourced PostgreSQL data and Stage
 ### Header and mobile navigation
 
 - **`SkmCatalogMenu`** and mobile catalog nav consume `useCatalogTaxonomy`.
-- Manufacturer chips in dropdown = catalog entry (`/catalog?manufacturer=`).
+- **Visual design:** prototype **D3P** verdict ([#72](https://github.com/Leritas/skm-energo/issues/72)) — [catalog header dropdown visual spec](./2026-08-21-catalog-header-dropdown-visual.md): purple manufacturer sidebar (radio filter + `arrow-up-right` catalog entry), folder tree + expand/collapse toolbar.
+- Manufacturer selected in dropdown filters the in-panel tree; `arrow-up-right` navigates to `/catalog?manufacturer=` (entry point).
 - Filter bar on catalog page = in-context manufacturer toggle; both paths use the same setter and redirect rules.
 
 ### PDP
@@ -111,7 +112,8 @@ Rebuild the public catalog end-to-end on admin-sourced PostgreSQL data and Stage
 
 1. Prototype #70 (category tiles) — **done:** variant **A2** approved 2026-08-20.
 2. Prototype #71 (PDP) — **done:** final classic layout approved 2026-08-20. Category tiles in #67 follow [catalog category page visual spec](./2026-08-20-catalog-category-page-visual.md); PDP in #73 follows [PDP visual spec](./2026-08-20-pdp-visual.md).
-3. #72 nav after #67 composable; #68 search after #67; #69 similar after #73.
+3. Prototype #72 (header dropdown) — **done:** variant **D3P** approved 2026-08-21. Nav in #72 follows [catalog header dropdown visual spec](./2026-08-21-catalog-header-dropdown-visual.md).
+4. #72 nav implementation after #67 composable; #68 search after #67; #69 similar after #73.
 
 ### Testing seam (preferred)
 

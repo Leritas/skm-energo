@@ -132,7 +132,7 @@ Pagination (`itemsPerPage`) — out of scope for this visual spec; keep current 
 - Sidebar layout changes
 - Subcategory filtering without navigation (B variants)
 - PDP tile treatment ([#73](https://github.com/Leritas/skm-energo/issues/73) / [#71](https://github.com/Leritas/skm-energo/issues/71))
-- Header dropdown visuals ([#72](https://github.com/Leritas/skm-energo/issues/72))
+- Header dropdown visuals — see [catalog header dropdown visual spec](./2026-08-21-catalog-header-dropdown-visual.md) (**D3P**, #72)
 
 ---
 
