@@ -101,6 +101,6 @@ const searchModalOpen = ref(false);
       @call-order="callModalOpen = true"
     />
     <SkmCallOrderModal v-model:open="callModalOpen" />
-    <SkmSearchModal v-model:open="searchModalOpen" />
+    <SkmCatalogSearchSpotlight v-model:open="searchModalOpen" />
   </header>
 </template>
