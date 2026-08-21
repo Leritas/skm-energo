@@ -92,7 +92,7 @@ const breadcrumbs = computed(() => {
 <template>
   <SkmSection>
     <SkmContainer>
-      <CatalogProductDetailView
+      <SkmCatalogProductDetailView
         :product="product!"
         :manufacturer-label="manufacturerLabel(product!.manufacturerSlug)"
         :breadcrumbs="breadcrumbs"

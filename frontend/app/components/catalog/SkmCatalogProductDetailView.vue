@@ -1,8 +1,4 @@
 <script setup lang="ts">
-/**
- * Legacy PDP layout — kept for admin preview and easy rollback.
- * Public route uses SkmCatalogProductDetailView (#73).
- */
 import {
   productBadgeLabel,
   productBadgeTone,
@@ -13,7 +9,6 @@ import type {
   CatalogProductDetail,
   CatalogProductListItem,
 } from '~/types/catalog';
-import { formatAttachedFileSize } from '~/types/catalog';
 
 const props = defineProps<{
   product: CatalogProductDetail;
@@ -24,6 +19,7 @@ const props = defineProps<{
 }>();
 
 const activeTab = ref('desc');
+
 const tabItems = [
   { label: 'Описание', value: 'desc', content: '' },
   { label: 'Характеристики', value: 'specs', content: '' },
@@ -36,6 +32,8 @@ const galleryImages = computed(() =>
     alt: photo.filename,
   })),
 );
+
+const hasPhotos = computed(() => props.product.photos.length > 0);
 </script>
 
 <template>
@@ -48,10 +46,19 @@ const galleryImages = computed(() =>
     </template>
   </SkmPageHeader>
 
-  <div class="grid gap-10 lg:grid-cols-2">
-    <SkmProductGallery :images="galleryImages" :alt="product.title" />
-
+  <section class="mt-8 grid gap-10 lg:grid-cols-2 lg:items-start">
     <div>
+      <SkmProductGallery
+        v-if="hasPhotos"
+        :images="galleryImages"
+        :alt="product.title"
+      />
+      <SkmProductMedia v-else :src="null" :alt="product.title" aspect="4/3" />
+    </div>
+
+    <div
+      class="flex flex-col rounded-xl border border-neutral-100 bg-neutral-50/60 p-6 lg:p-8"
+    >
       <div v-if="product.badges?.length" class="mb-4 flex flex-wrap gap-2">
         <SkmBadge
           v-for="badge in toProductCardBadges(product.badges)"
@@ -61,26 +68,30 @@ const galleryImages = computed(() =>
           size="sm"
         />
       </div>
-      <p class="text-sm leading-relaxed text-neutral-600">
+
+      <p class="whitespace-pre-line text-sm leading-relaxed text-neutral-600">
         {{ product.description }}
       </p>
+
       <div class="mt-6">
         <SkmButton variant="primary" to="/contacts">
           Запросить поставку
         </SkmButton>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="mt-12">
+  <section class="mt-12">
     <SkmTabs v-model="activeTab" :items="tabItems" />
+
     <div class="mt-6">
       <p
         v-if="activeTab === 'desc'"
-        class="text-sm leading-relaxed text-neutral-600 whitespace-pre-line"
+        class="whitespace-pre-line text-sm leading-relaxed text-neutral-600"
       >
         {{ product.description }}
       </p>
+
       <SkmSpecList
         v-else-if="activeTab === 'specs' && product.specs.length > 0"
         :items="product.specs"
@@ -88,26 +99,23 @@ const galleryImages = computed(() =>
       <p v-else-if="activeTab === 'specs'" class="text-sm text-neutral-500">
         Характеристики пока не заполнены.
       </p>
-      <div v-else-if="activeTab === 'pdf'" class="space-y-3">
-        <SkmFileLink
-          v-for="document in product.documents"
-          :key="document.id"
-          :href="document.url"
-          :filename="document.filename"
-          :size-label="formatAttachedFileSize(document.sizeBytes)"
-        />
-        <p
-          v-if="product.documents.length === 0"
-          class="text-sm text-neutral-500"
-        >
-          Документация будет добавлена менеджером при запросе поставки.
-        </p>
-      </div>
-    </div>
-  </div>
 
-  <div v-if="similarProducts?.length" class="mt-16">
-    <h2 class="text-xl font-semibold text-neutral-900">
+      <SkmCatalogDocumentList
+        v-else-if="activeTab === 'pdf'"
+        :documents="product.documents"
+      />
+    </div>
+  </section>
+
+  <section
+    v-if="similarProducts?.length"
+    class="mt-16"
+    aria-labelledby="similar-products-heading"
+  >
+    <h2
+      id="similar-products-heading"
+      class="text-xl font-semibold text-neutral-900"
+    >
       Похожие товары других производителей
     </h2>
     <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -126,5 +134,5 @@ const galleryImages = computed(() =>
         :badges="toProductCardBadges(item.badges)"
       />
     </div>
-  </div>
+  </section>
 </template>
