@@ -11,11 +11,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "prototype:catalog-category": "node -e \"console.log('\\n→ http://localhost:3000/prototype/catalog-category?variant=A1\\n   Keys: A1–A3 (секции), B1–B3 (сайдбар)\\n')\" && nuxt dev",
-    "prototype:product-detail": "node -e \"console.log('\\n→ http://localhost:3000/prototype/product-detail\\n   Final PDP layout (classic + document rows in tab)\\n')\" && nuxt dev",
-    "prototype:catalog-dropdown": "node -e \"console.log('\\n→ http://localhost:3000/prototype/catalog-dropdown\\n   D3P — purple sidebar + orange brand pills\\n')\" && nuxt dev",
-    "prototype:header-search": "node -e \"console.log('\\n→ http://localhost:3000/prototype/header-search\\n   Final: purple header + manufacturer · category · artikul · badges\\n')\" && nuxt dev"
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@nuxt/ui": "^4.9.0",
