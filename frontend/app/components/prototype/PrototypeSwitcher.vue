@@ -63,7 +63,7 @@ onUnmounted(() => {
 <template>
   <div
     v-if="isDev"
-    class="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-full border border-neutral-800 bg-neutral-950 px-2 py-2 text-sm text-white shadow-2xl"
+    class="fixed bottom-6 left-1/2 z-[110] flex -translate-x-1/2 items-center gap-2 rounded-full border border-neutral-800 bg-neutral-950 px-2 py-2 text-sm text-white shadow-2xl"
     role="toolbar"
     aria-label="Переключатель вариантов прототипа"
   >

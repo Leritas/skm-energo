@@ -1,0 +1,85 @@
+import type { PrototypeSearchProduct } from './types';
+
+/** PROTOTYPE — static catalog slice for /prototype/header-search */
+export const PROTOTYPE_SEARCH_PRODUCTS: PrototypeSearchProduct[] = [
+  {
+    slug: 'nh00-160a',
+    title: 'Предохранитель NH00 160A',
+    manufacturer: 'MERSEN',
+    sku: 'NH00-160',
+    categoryLabel: 'Низковольтные предохранители',
+    badges: ['pdf'],
+    imageUrl: 'https://picsum.photos/seed/nh00/400/400',
+  },
+  {
+    slug: 'nh1-250a',
+    title: 'Предохранитель NH1 250A',
+    manufacturer: 'MERSEN',
+    sku: 'NH1-250',
+    categoryLabel: 'Низковольтные предохранители',
+    badges: [],
+    imageUrl: 'https://picsum.photos/seed/nh1/400/400',
+  },
+  {
+    slug: 'nh2-400a',
+    title: 'Предохранитель NH2 400A',
+    manufacturer: 'MERSEN',
+    sku: 'NH2-400',
+    categoryLabel: 'Низковольтные предохранители',
+    badges: ['new'],
+    imageUrl: 'https://picsum.photos/seed/nh2/400/400',
+  },
+  {
+    slug: 'holder-nh1',
+    title: 'Держатель NH1',
+    manufacturer: 'MERSEN',
+    sku: 'H-NH1',
+    categoryLabel: 'Держатели и аксессуары',
+    badges: ['onRequest'],
+    imageUrl: null,
+  },
+  {
+    slug: 'fuse-link-10kv',
+    title: 'Плавкий предохранитель 10 kV',
+    manufacturer: 'CASRAM',
+    sku: 'FL-10KV',
+    categoryLabel: 'Плавкие ВН',
+    badges: ['pdf', 'new'],
+    imageUrl: 'https://picsum.photos/seed/fl10/400/400',
+  },
+  {
+    slug: 'fuse-link-6kv',
+    title: 'Плавкий предохранитель 6 kV',
+    manufacturer: 'CASRAM',
+    sku: 'FL-6KV',
+    categoryLabel: 'Плавкие ВН',
+    badges: [],
+    imageUrl: 'https://picsum.photos/seed/fl6/400/400',
+  },
+  {
+    slug: 'lampar-nh00',
+    title: 'Предохранитель NH00 125A',
+    manufacturer: 'Lampar',
+    sku: 'LP-NH00-125',
+    categoryLabel: 'Низковольтные предохранители',
+    badges: [],
+    imageUrl: 'https://picsum.photos/seed/lpnh/400/400',
+  },
+  {
+    slug: 'mersen-busbar',
+    title: 'Шина распределительная MERSEN',
+    manufacturer: 'MERSEN',
+    sku: 'MB-400',
+    categoryLabel: 'Держатели и аксессуары',
+    badges: ['pdf'],
+    imageUrl: 'https://picsum.photos/seed/mb/400/400',
+  },
+];
+
+export const PROTOTYPE_SEARCH_SUGGESTIONS = [
+  'NH00',
+  'MERSEN',
+  'предохранитель',
+  'CASRAM',
+  'держатель',
+];
