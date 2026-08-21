@@ -197,9 +197,15 @@ function handleManufacturerToggle(slug: string | null) {
 
 async function handleSearchSubmit(value: string) {
   await navigateTo(
-    catalogUrl(categorySlug.value, manufacturerSlug.value, value),
+    buildCatalogUrl(null, manufacturerSlug.value, value.trim() || null),
   );
 }
+
+watch(query, async (value) => {
+  if (!value.trim() && searchQuery.value) {
+    await navigateTo(buildCatalogUrl(null, manufacturerSlug.value, null));
+  }
+});
 
 provide(catalogCategoryPageKey, {
   categorySlug,
