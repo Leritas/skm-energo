@@ -45,8 +45,12 @@ The single manufacturer of a product card. One product = one manufacturer = one 
 _Avoid_: Vendor, supplier (in code)
 
 **Similar product**:
-A product from another manufacturer shown on PDP as a cross-brand alternative. Separate card, not a shared listing.
+A product from another manufacturer shown on PDP as a cross-brand alternative. Separate card, not a shared listing. Similar strip: 3-column `SkmProductCard` grid below PDP content (see [PDP visual spec](docs/superpowers/specs/2026-08-20-pdp-visual.md)).
 _Avoid_: Analogue, cross-sell
+
+**Catalog document list**:
+Domain UI row list for product PDFs on PDP — bordered stack, file icon, filename, size, download affordance; lives in tab «Документы». Component: `SkmCatalogDocumentList`. See [PDP visual spec](docs/superpowers/specs/2026-08-20-pdp-visual.md).
+_Avoid_: Plain link stack (`SkmFileLink` only) on PDP
 
 **Visible category tree**:
 The public catalog taxonomy after publish rules and product-subtree prune: only published categories that contain ≥1 matching published product in their subtree (scoped by active Manufacturer filter when set). Single source for dropdown, sidebar, breadcrumbs, and slug validation.

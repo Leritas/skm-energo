@@ -12,7 +12,8 @@
     "build-storybook": "storybook build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "prototype:catalog-category": "node -e \"console.log('\\n→ http://localhost:3000/prototype/catalog-category?variant=A1\\n   Keys: A1–A3 (секции), B1–B3 (сайдбар)\\n')\" && nuxt dev"
+    "prototype:catalog-category": "node -e \"console.log('\\n→ http://localhost:3000/prototype/catalog-category?variant=A1\\n   Keys: A1–A3 (секции), B1–B3 (сайдбар)\\n')\" && nuxt dev",
+    "prototype:product-detail": "node -e \"console.log('\\n→ http://localhost:3000/prototype/product-detail\\n   Final PDP layout (classic + document rows in tab)\\n')\" && nuxt dev"
   },
   "dependencies": {
     "@nuxt/ui": "^4.9.0",

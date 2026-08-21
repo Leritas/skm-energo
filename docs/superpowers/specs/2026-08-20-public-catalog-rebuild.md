@@ -96,8 +96,9 @@ Rebuild the public catalog end-to-end on admin-sourced PostgreSQL data and Stage
 
 ### PDP
 
-- Retire legacy PDP layout; full rebuild per prototype #71 verdict (#73).
-- Gallery from `photos[]`, documents tab/section from `documents[]`, specs, description, CTA, similar strip integrated in new layout.
+- Retire legacy PDP layout; full rebuild per prototype **#71** verdict ([#73](https://github.com/Leritas/skm-energo/issues/73)).
+- **Visual design:** classic hero + tabs; document row list in tab «Документы» — [PDP visual spec](./2026-08-20-pdp-visual.md).
+- Gallery from `photos[]`, documents via `SkmCatalogDocumentList`, specs, description, CTA, similar strip (`SkmProductCard` 3-col grid).
 - Breadcrumbs via taxonomy composable.
 
 ### Search
@@ -108,8 +109,8 @@ Rebuild the public catalog end-to-end on admin-sourced PostgreSQL data and Stage
 
 ### Workflow
 
-1. Prototype #70 (category tiles) — **done:** variant **A2** approved 2026-08-20. Prototype #71 (PDP) may run in parallel with #67 data layer.
-2. Category tile visuals in #67 follow [catalog category page visual spec](./2026-08-20-catalog-category-page-visual.md); PDP implementation blocked on #71 verdict.
+1. Prototype #70 (category tiles) — **done:** variant **A2** approved 2026-08-20.
+2. Prototype #71 (PDP) — **done:** final classic layout approved 2026-08-20. Category tiles in #67 follow [catalog category page visual spec](./2026-08-20-catalog-category-page-visual.md); PDP in #73 follows [PDP visual spec](./2026-08-20-pdp-visual.md).
 3. #72 nav after #67 composable; #68 search after #67; #69 similar after #73.
 
 ### Testing seam (preferred)
