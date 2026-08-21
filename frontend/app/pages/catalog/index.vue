@@ -8,6 +8,7 @@ import {
 import {
   buildCatalogUrl,
   getManufacturerLabel,
+  isCatalogSearchActive,
   parseManufacturerQuery,
   parseSearchQuery,
 } from '~/utils/catalog';
@@ -58,7 +59,7 @@ const { data: products } = await useCatalogProducts(
   manufacturerSlug,
 );
 
-const isSearchActive = computed(() => searchQuery.value.length > 0);
+const isSearchActive = computed(() => isCatalogSearchActive(searchQuery.value));
 const query = ref(searchQuery.value);
 
 watch(searchQuery, (value) => {
@@ -196,8 +197,12 @@ function handleManufacturerToggle(slug: string | null) {
 }
 
 async function handleSearchSubmit(value: string) {
+  const trimmed = value.trim();
+  if (trimmed && !isCatalogSearchActive(trimmed)) {
+    return;
+  }
   await navigateTo(
-    buildCatalogUrl(null, manufacturerSlug.value, value.trim() || null),
+    buildCatalogUrl(null, manufacturerSlug.value, trimmed || null),
   );
 }
 

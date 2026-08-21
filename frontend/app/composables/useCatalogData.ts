@@ -1,8 +1,10 @@
 import type {
+  CatalogCategory,
   CatalogManufacturer,
   CatalogProductDetail,
   CatalogProductListItem,
 } from '~/types/catalog';
+import { isCatalogSearchActive } from '~/utils/catalog';
 
 function buildCatalogQuery(
   params: Record<string, string | null | undefined>,
@@ -22,6 +24,14 @@ export async function useCatalogManufacturers() {
 
   return await useAsyncData('catalog-manufacturers', () =>
     api<CatalogManufacturer[]>('/catalog/manufacturers', { auth: false }),
+  );
+}
+
+export async function useCatalogCategories() {
+  const { api } = useApi();
+
+  return await useAsyncData('catalog-categories-all', () =>
+    api<CatalogCategory[]>('/catalog/categories', { auth: false }),
   );
 }
 
@@ -75,7 +85,7 @@ export async function useCatalogSearch(
     },
     () => {
       const q = toValue(searchQuery).trim();
-      if (!q) {
+      if (!q || !isCatalogSearchActive(q)) {
         return Promise.resolve([] as CatalogProductListItem[]);
       }
 

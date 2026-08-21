@@ -4,6 +4,37 @@ import type {
   CatalogManufacturer,
 } from '~/types/catalog';
 
+export const MIN_CATALOG_SEARCH_LENGTH = 2;
+
+export function isCatalogSearchActive(query: string): boolean {
+  return query.trim().length >= MIN_CATALOG_SEARCH_LENGTH;
+}
+
+export function findCategoryBySlug(
+  categories: CatalogCategory[],
+  targetSlug: string,
+): CatalogCategory | null {
+  for (const category of categories) {
+    if (category.slug === targetSlug) {
+      return category;
+    }
+    if (category.children?.length) {
+      const found = findCategoryBySlug(category.children, targetSlug);
+      if (found) {
+        return found;
+      }
+    }
+  }
+  return null;
+}
+
+export function getCategoryLabel(
+  slug: string,
+  categories: CatalogCategory[] | null | undefined,
+): string {
+  return findCategoryBySlug(categories ?? [], slug)?.label ?? slug;
+}
+
 export function findCategoryPath(
   categories: CatalogCategory[],
   targetSlug: string,
