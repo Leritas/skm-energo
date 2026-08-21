@@ -1,7 +1,7 @@
-import type { FormFieldProps } from '@nuxt/ui'
+import type { FormFieldProps } from '@nuxt/ui';
 
-export type SkmFormTone = 'light' | 'brand'
-export type SkmFieldVariant = 'default' | 'onBrand'
+export type SkmFormTone = 'light' | 'brand';
+export type SkmFieldVariant = 'default' | 'onBrand';
 
 export const skmInputUi = {
   default: {
@@ -10,7 +10,7 @@ export const skmInputUi = {
   onBrand: {
     base: 'bg-white text-neutral-900 placeholder:text-neutral-400 ring-brand-purple-200/40',
   },
-} as const
+} as const;
 
 export const skmFormFieldUi: Record<
   SkmFormTone,
@@ -24,9 +24,9 @@ export const skmFormFieldUi: Record<
     help: 'text-brand-purple-200',
     error: 'text-red-200',
   },
-} as const
+} as const;
 
-export type SkmPopoverVariant = 'default' | 'catalog'
+export type SkmPopoverVariant = 'default' | 'catalog';
 
 export const skmPopoverContent = {
   default: {
@@ -35,11 +35,14 @@ export const skmPopoverContent = {
   },
   catalog: {
     align: 'start' as const,
-    class: '!bg-white p-0 shadow-lg ring-1 ring-neutral-100/80',
+    alignOffset: -15,
+    sideOffset: 8,
+    class:
+      '!overflow-visible !rounded-xl !bg-transparent p-0 !shadow-none !ring-0',
   },
-} as const
+} as const;
 
-export type SkmButtonTone = 'light' | 'brand'
+export type SkmButtonTone = 'light' | 'brand';
 
 /** Extra `:ui.base` classes for buttons on brand-purple surfaces */
 export const skmButtonBrandUi = {
@@ -55,4 +58,4 @@ export const skmButtonBrandUi = {
   ghost: {
     base: '!bg-transparent !text-white hover:!bg-white/10',
   },
-} as const
+} as const;
