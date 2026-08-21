@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { toProductCardBadges } from '~/components/ui/SkmProductCard/badgeDisplay';
 import { SITE } from '~/constants/site';
 
 const {
@@ -9,6 +8,7 @@ const {
   manufacturerSlug,
   searchQuery,
   visibleCategories,
+  childCategories,
   products,
   breadcrumbs,
   catalogUrl,
@@ -78,15 +78,46 @@ const pagedProducts = computed(() => {
   return displayedProducts.value.slice(start, start + itemsPerPage);
 });
 
+const categoryTiles = computed(() => {
+  if (isSearchActive.value) {
+    return [];
+  }
+  return childCategories.value ?? [];
+});
+
+const categorySectionTitle = computed(() =>
+  categorySlug.value ? 'Подкатегории' : 'Категории',
+);
+
+const showCategorySection = computed(() => categoryTiles.value.length > 0);
+
+const showProductSection = computed(() => {
+  if (isSearchActive.value) {
+    return displayedProducts.value.length > 0;
+  }
+  if (!categorySlug.value) {
+    return false;
+  }
+  return displayedProducts.value.length > 0;
+});
+
+const showEmptyState = computed(() => {
+  if (isSearchActive.value) {
+    return displayedProducts.value.length === 0;
+  }
+  if (!categorySlug.value) {
+    return categoryTiles.value.length === 0;
+  }
+  return !showCategorySection.value && !showProductSection.value;
+});
+
+const firstSectionMargin = computed(() =>
+  manufacturerSlug.value ? 'mt-8' : 'mt-10',
+);
+
 const emptyTitle = computed(() =>
   isSearchActive.value ? 'Ничего не найдено' : 'Нет товаров',
 );
-
-const showCategoryTiles = computed(
-  () => !categorySlug.value && !isSearchActive.value,
-);
-
-const rootCategories = computed(() => visibleCategories.value ?? []);
 
 const emptyDescription = computed(() => {
   if (isSearchActive.value) {
@@ -161,41 +192,36 @@ async function handleSearchSubmit(value: string) {
             </button>
           </div>
 
-          <h2
-            class="mt-8 text-sm font-semibold uppercase tracking-wide text-neutral-900"
+          <section v-if="showCategorySection" :class="firstSectionMargin">
+            <h2
+              class="text-sm font-semibold uppercase tracking-wide text-neutral-900"
+            >
+              {{ categorySectionTitle }}
+            </h2>
+            <div class="mt-4 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              <SkmCatalogCategoryTile
+                v-for="category in categoryTiles"
+                :key="category.slug"
+                :title="category.label"
+                :to="catalogUrl(category.slug, manufacturerSlug)"
+                :cover-url="category.coverPhoto?.url ?? null"
+              />
+            </div>
+          </section>
+
+          <section
+            v-if="showProductSection"
+            :class="showCategorySection ? 'mt-10' : firstSectionMargin"
           >
-            {{
-              isSearchActive
-                ? 'Результаты поиска'
-                : categorySlug
-                  ? 'Товары'
-                  : 'Категории'
-            }}
-          </h2>
-
-          <div
-            v-if="showCategoryTiles && rootCategories.length"
-            class="mt-4 grid gap-6 sm:grid-cols-2 xl:grid-cols-3"
-          >
-            <SkmCategoryCard
-              v-for="category in rootCategories"
-              :key="category.slug"
-              :title="category.label"
-              :to="catalogUrl(category.slug, manufacturerSlug)"
-              :image="category.coverPhoto?.url ?? null"
-            />
-          </div>
-
-          <SkmEmpty
-            v-else-if="!displayedProducts.length"
-            :title="emptyTitle"
-            :description="emptyDescription"
-            class="mt-4"
-          />
-
-          <template v-else-if="displayedProducts.length">
-            <div class="mt-4 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              <SkmProductCard
+            <h2
+              class="text-sm font-semibold uppercase tracking-wide text-neutral-900"
+            >
+              {{ isSearchActive ? 'Результаты поиска' : 'Товары' }}
+            </h2>
+            <div
+              class="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            >
+              <SkmCatalogProductTile
                 v-for="product in pagedProducts"
                 :key="product.slug"
                 :title="product.title"
@@ -203,7 +229,7 @@ async function handleSearchSubmit(value: string) {
                 :image-src="product.image?.url ?? null"
                 :manufacturer="manufacturerLabel(product.manufacturerSlug)"
                 :sku="product.sku"
-                :badges="toProductCardBadges(product.badges)"
+                :badges="product.badges"
               />
             </div>
             <div
@@ -216,7 +242,14 @@ async function handleSearchSubmit(value: string) {
                 :items-per-page="itemsPerPage"
               />
             </div>
-          </template>
+          </section>
+
+          <SkmEmpty
+            v-else-if="showEmptyState"
+            :title="emptyTitle"
+            :description="emptyDescription"
+            :class="firstSectionMargin"
+          />
         </div>
       </div>
     </SkmContainer>
