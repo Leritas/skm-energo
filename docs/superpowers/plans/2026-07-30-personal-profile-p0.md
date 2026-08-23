@@ -1,6 +1,6 @@
 # Personal Profile P0 (Shell) Implementation Plan
 
-> **Status (2026-08-17):** P0 shell ✅ delivered. P1 profile API ✅ delivered separately (see profile design spec). Remaining polish: #21 on GitHub.
+> **Status (2026-08-23):** P0 shell ✅ complete. P1 profile API ✅ shipped separately (see profile design spec). Plan tasks below are checked off; orders/favorites/reviews remain on mocks until P2–P4.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -25,71 +25,78 @@
 
 ## File map
 
-| Path | Responsibility |
-|------|----------------|
-| `frontend/app/constants/profile-mocks.ts` | Typed mock orders, purchased products, favorites |
-| `frontend/app/components/ui/SkmReviewCard/SkmReviewCard.vue` | Read + `editMode` |
-| `frontend/app/components/ui/SkmReviewCard/SkmReviewCard.stories.ts` | EditMode story |
-| `frontend/app/pages/profile.vue` | Shell: header name/email, nav, logout, `<NuxtPage />`, middleware auth |
-| `frontend/app/pages/profile/index.vue` | Redirect → `/profile/info` |
-| `frontend/app/pages/profile/info.vue` | B2B form + password form |
-| `frontend/app/pages/profile/orders.vue` | Secondary tabs + `<NuxtPage />` |
-| `frontend/app/pages/profile/orders/index.vue` | Redirect → `/profile/orders/active` |
-| `frontend/app/pages/profile/orders/active.vue` | Active order cards |
-| `frontend/app/pages/profile/orders/completed.vue` | Completed order cards |
-| `frontend/app/pages/profile/orders/purchased.vue` | Products + reviews |
-| `frontend/app/pages/profile/favorite.vue` | Favorite product grid |
-| `frontend/app/pages/account/index.vue` | Redirect → `/profile` |
-| `SkmUserMenu.vue`, `SkmMobileNav.vue`, login/register | `/profile` links |
-| `nuxt.config.ts` sitemap exclude | `/profile/**` |
-| Docs: frontend README, design status | Mark P0 in progress / done when finished |
+| Path                                                                | Responsibility                                                         |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `frontend/app/constants/profile-mocks.ts`                           | Typed mock orders, purchased products, favorites                       |
+| `frontend/app/components/ui/SkmReviewCard/SkmReviewCard.vue`        | Read + `editMode`                                                      |
+| `frontend/app/components/ui/SkmReviewCard/SkmReviewCard.stories.ts` | EditMode story                                                         |
+| `frontend/app/pages/profile.vue`                                    | Shell: header name/email, nav, logout, `<NuxtPage />`, middleware auth |
+| `frontend/app/pages/profile/index.vue`                              | Redirect → `/profile/info`                                             |
+| `frontend/app/pages/profile/info.vue`                               | B2B form + password form                                               |
+| `frontend/app/pages/profile/orders.vue`                             | Secondary tabs + `<NuxtPage />`                                        |
+| `frontend/app/pages/profile/orders/index.vue`                       | Redirect → `/profile/orders/active`                                    |
+| `frontend/app/pages/profile/orders/active.vue`                      | Active order cards                                                     |
+| `frontend/app/pages/profile/orders/completed.vue`                   | Completed order cards                                                  |
+| `frontend/app/pages/profile/orders/purchased.vue`                   | Products + reviews                                                     |
+| `frontend/app/pages/profile/favorite.vue`                           | Favorite product grid                                                  |
+| `frontend/app/pages/account/index.vue`                              | Redirect → `/profile`                                                  |
+| `SkmUserMenu.vue`, `SkmMobileNav.vue`, login/register               | `/profile` links                                                       |
+| `nuxt.config.ts` sitemap exclude                                    | `/profile/**`                                                          |
+| Docs: frontend README, design status                                | P0 ✅ + P1 note; mock scope through P2–P4                              |
 
 ---
 
 ### Task 1: Profile mocks
 
 **Files:**
+
 - Create: `frontend/app/constants/profile-mocks.ts`
 
 **Interfaces:**
+
 - Produces: `PROFILE_ACTIVE_ORDERS`, `PROFILE_COMPLETED_ORDERS`, `PROFILE_PURCHASED_ITEMS`, `PROFILE_FAVORITES` and types `ProfileOrderMock`, `ProfilePurchasedItem`, `ProfileFavoriteItem`
 
-- [ ] **Step 1: Add mock module**
+- [x] **Step 1: Add mock module**
 
 ```ts
-import type { SkmOrderStatus } from '~/components/ui/SkmOrderStatusBadge/types'
+import type { SkmOrderStatus } from '~/components/ui/SkmOrderStatusBadge/types';
 
 export type ProfileOrderMock = {
-  number: string
-  dateLabel: string
-  status: SkmOrderStatus
-  totalLabel?: string
-}
+  number: string;
+  dateLabel: string;
+  status: SkmOrderStatus;
+  totalLabel?: string;
+};
 
 export type ProfilePurchasedItem = {
-  id: string
-  name: string
-  description: string
-  to: string
-  review: null | { rating: number; text: string; dateLabel: string }
-}
+  id: string;
+  name: string;
+  description: string;
+  to: string;
+  review: null | { rating: number; text: string; dateLabel: string };
+};
 
 export type ProfileFavoriteItem = {
-  id: string
-  name: string
-  description: string
-  to: string
-}
+  id: string;
+  name: string;
+  description: string;
+  to: string;
+};
 
 export const PROFILE_ACTIVE_ORDERS: ProfileOrderMock[] = [
   { number: 'SKM-1042', dateLabel: '18 июля 2026', status: 'processing' },
-  { number: 'SKM-1045', dateLabel: '22 июля 2026', status: 'processing', totalLabel: 'по запросу' },
-]
+  {
+    number: 'SKM-1045',
+    dateLabel: '22 июля 2026',
+    status: 'processing',
+    totalLabel: 'по запросу',
+  },
+];
 
 export const PROFILE_COMPLETED_ORDERS: ProfileOrderMock[] = [
   { number: 'SKM-1038', dateLabel: '5 июля 2026', status: 'completed' },
   { number: 'SKM-1021', dateLabel: '12 июня 2026', status: 'completed' },
-]
+];
 
 export const PROFILE_PURCHASED_ITEMS: ProfilePurchasedItem[] = [
   {
@@ -110,7 +117,7 @@ export const PROFILE_PURCHASED_ITEMS: ProfilePurchasedItem[] = [
     to: '/product/hiitio-250a',
     review: null,
   },
-]
+];
 
 export const PROFILE_FAVORITES: ProfileFavoriteItem[] = [
   {
@@ -125,12 +132,12 @@ export const PROFILE_FAVORITES: ProfileFavoriteItem[] = [
     description: 'Силовой разъединитель',
     to: '/product/lampar-400a',
   },
-]
+];
 ```
 
 Adjust import path for `SkmOrderStatus` to match project (`~/components/ui/...` or relative). If types are not exported from a clean path, inline union `'processing' | 'completed' | ...` matching `SkmOrderStatus`.
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add frontend/app/constants/profile-mocks.ts
@@ -146,14 +153,16 @@ EOF
 ### Task 2: SkmReviewCard editMode
 
 **Files:**
+
 - Modify: `frontend/app/components/ui/SkmReviewCard/SkmReviewCard.vue`
 - Modify: `frontend/app/components/ui/SkmReviewCard/SkmReviewCard.stories.ts`
 
 **Interfaces:**
+
 - Consumes: `SkmTextarea`, `SkmButton` from kit
 - Produces: props `editMode?: boolean`; when editMode, optional `author`/`dateLabel`/`text` unused for display; emit `submit: [{ rating: number; text: string }]`
 
-- [ ] **Step 1: Implement editMode UI**
+- [x] **Step 1: Implement editMode UI**
 
 Replace component with dual-mode version:
 
@@ -161,11 +170,11 @@ Replace component with dual-mode version:
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    author?: string
-    dateLabel?: string
-    text?: string
-    rating?: number
-    editMode?: boolean
+    author?: string;
+    dateLabel?: string;
+    text?: string;
+    rating?: number;
+    editMode?: boolean;
   }>(),
   {
     author: undefined,
@@ -174,27 +183,27 @@ const props = withDefaults(
     rating: undefined,
     editMode: false,
   },
-)
+);
 
 const emit = defineEmits<{
-  submit: [{ rating: number; text: string }]
-}>()
+  submit: [{ rating: number; text: string }];
+}>();
 
-const draftText = ref(props.text ?? '')
-const draftRating = ref(props.rating ?? 0)
+const draftText = ref(props.text ?? '');
+const draftRating = ref(props.rating ?? 0);
 
 function setRating(value: number) {
-  draftRating.value = value
+  draftRating.value = value;
 }
 
 function handleSubmit() {
   if (draftRating.value < 1 || !draftText.value.trim()) {
-    return
+    return;
   }
   emit('submit', {
     rating: draftRating.value,
     text: draftText.value.trim(),
-  })
+  });
 }
 </script>
 
@@ -222,9 +231,7 @@ function handleSubmit() {
     </template>
 
     <template v-else>
-      <p class="mb-3 text-sm font-semibold text-neutral-900">
-        Оцените товар
-      </p>
+      <p class="mb-3 text-sm font-semibold text-neutral-900">Оцените товар</p>
       <SkmFormField label="Отзыв">
         <SkmTextarea
           v-model="draftText"
@@ -233,11 +240,7 @@ function handleSubmit() {
         />
       </SkmFormField>
       <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
-        <div
-          class="flex gap-1"
-          role="group"
-          aria-label="Оценка от 1 до 5"
-        >
+        <div class="flex gap-1" role="group" aria-label="Оценка от 1 до 5">
           <button
             v-for="star in 5"
             :key="star"
@@ -265,7 +268,7 @@ function handleSubmit() {
 
 Keep read-mode required usage sites passing `author`, `dateLabel`, `text` as before.
 
-- [ ] **Step 2: Add EditMode story**
+- [x] **Step 2: Add EditMode story**
 
 ```ts
 export const EditMode: Story = {
@@ -275,21 +278,21 @@ export const EditMode: Story = {
     setup: () => ({
       args,
       onSubmit: (payload: { rating: number; text: string }) => {
-        console.log('submit', payload)
+        console.log('submit', payload);
       },
     }),
     template:
       '<div class="max-w-md p-4"><SkmReviewCard v-bind="args" @submit="onSubmit" /></div>',
   }),
-}
+};
 ```
 
-- [ ] **Step 3: Lint ReviewCard files**
+- [x] **Step 3: Lint ReviewCard files**
 
 Run: `cd frontend && npx eslint app/components/ui/SkmReviewCard --max-warnings 0`  
 Expected: exit 0
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add frontend/app/components/ui/SkmReviewCard
@@ -305,6 +308,7 @@ EOF
 ### Task 3: Profile shell + redirects
 
 **Files:**
+
 - Create: `frontend/app/pages/profile.vue`
 - Create: `frontend/app/pages/profile/index.vue`
 - Modify: `frontend/app/pages/account/index.vue` (replace with redirect)
@@ -315,46 +319,46 @@ EOF
 - Modify: `frontend/nuxt.config.ts` — sitemap exclude `/profile/**`
 
 **Interfaces:**
+
 - Produces: parent route `/profile` with auth middleware and nav links to `info` | `orders` | `favorite`
 
-- [ ] **Step 1: Create `profile.vue` shell**
+- [x] **Step 1: Create `profile.vue` shell**
 
 ```vue
 <script setup lang="ts">
 definePageMeta({
   middleware: 'auth',
-})
+});
 
-const auth = useAuthStore()
-const route = useRoute()
+const auth = useAuthStore();
+const route = useRoute();
 
 const nav = [
   { label: 'Данные', to: '/profile/info', match: '/profile/info' },
   { label: 'Заказы', to: '/profile/orders', match: '/profile/orders' },
   { label: 'Избранное', to: '/profile/favorite', match: '/profile/favorite' },
-] as const
+] as const;
 
 function isActive(match: string) {
-  return route.path === match || route.path.startsWith(`${match}/`)
+  return route.path === match || route.path.startsWith(`${match}/`);
 }
 
 async function handleLogout() {
-  await auth.logout()
-  await navigateTo('/')
+  await auth.logout();
+  await navigateTo('/');
 }
 
 onMounted(async () => {
-  if (!auth.hydrated) auth.hydrate()
+  if (!auth.hydrated) auth.hydrate();
   if (auth.accessToken) {
     try {
-      await auth.fetchMe()
-    }
-    catch {
-      auth.clearSession()
-      await navigateTo('/login')
+      await auth.fetchMe();
+    } catch {
+      auth.clearSession();
+      await navigateTo('/login');
     }
   }
-})
+});
 </script>
 
 <template>
@@ -364,10 +368,7 @@ onMounted(async () => {
         <h1 class="text-3xl font-bold text-neutral-900 md:text-4xl">
           Личный кабинет
         </h1>
-        <p
-          v-if="auth.user"
-          class="mt-2 text-neutral-600"
-        >
+        <p v-if="auth.user" class="mt-2 text-neutral-600">
           {{ auth.user.name }}
           <span class="text-neutral-400">·</span>
           {{ auth.user.email }}
@@ -376,7 +377,9 @@ onMounted(async () => {
 
       <div class="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
         <aside class="space-y-1">
-          <nav class="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible">
+          <nav
+            class="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible"
+          >
             <NuxtLink
               v-for="item in nav"
               :key="item.to"
@@ -408,11 +411,11 @@ onMounted(async () => {
 </template>
 ```
 
-- [ ] **Step 2: `profile/index.vue` redirect**
+- [x] **Step 2: `profile/index.vue` redirect**
 
 ```vue
 <script setup lang="ts">
-await navigateTo('/profile/info', { replace: true })
+await navigateTo('/profile/info', { replace: true });
 </script>
 
 <template>
@@ -420,11 +423,11 @@ await navigateTo('/profile/info', { replace: true })
 </template>
 ```
 
-- [ ] **Step 3: Replace `account/index.vue` with redirect**
+- [x] **Step 3: Replace `account/index.vue` with redirect**
 
 ```vue
 <script setup lang="ts">
-await navigateTo('/profile', { replace: true })
+await navigateTo('/profile', { replace: true });
 </script>
 
 <template>
@@ -432,17 +435,17 @@ await navigateTo('/profile', { replace: true })
 </template>
 ```
 
-- [ ] **Step 4: Update links + sitemap**
+- [x] **Step 4: Update links + sitemap**
 
 In `SkmUserMenu.vue` and `SkmMobileNav.vue`: `to="/account"` → `to="/profile"`.  
 In `login.vue` / `register.vue`: default navigate `/profile`.  
 In `nuxt.config.ts` sitemap exclude: replace `/account/**` with `/profile/**` (keep `/account` excluded too if desired).
 
-- [ ] **Step 5: Manual smoke**
+- [x] **Step 5: Manual smoke**
 
 Run frontend (`npm run dev`). Login → header «Личный кабинет» opens `/profile` → lands on `/profile/info` (after Task 4). `/account` redirects. Logout from sidebar works.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add frontend/app/pages/profile.vue frontend/app/pages/profile/index.vue frontend/app/pages/account frontend/app/components/layout frontend/app/pages/login.vue frontend/app/pages/register.vue frontend/nuxt.config.ts
@@ -458,25 +461,29 @@ EOF
 ### Task 4: `/profile/info` page
 
 **Files:**
+
 - Create: `frontend/app/pages/profile/info.vue`
 
 **Interfaces:**
+
 - Consumes: `useAuthStore()` for name/email; toast via `useToast()`
 
-- [ ] **Step 1: Implement info form page**
+> **P1 follow-up (2026-08):** info form now calls live `PATCH /profile` and `POST /profile/change-password` — no longer mock toasts.
+
+- [x] **Step 1: Implement info form page**
 
 Two `SkmCard` blocks:
 
-1. Fields: email (disabled + hint), name, phone, company, inn, position — `SkmFormField` + `SkmInput`. Prefill name from `auth.user`. Save → `toast.add({ title: 'Сохранение появится после API', color: 'neutral' })`.
-2. Password: current, new, confirm — same toast on submit.
+1. Fields: email (disabled + hint), name, phone, company, inn, position — `SkmFormField` + `SkmInput`. Prefill from `auth.user`. Save → live API (P1).
+2. Password: current, new, confirm — live change-password API (P1); re-login after success.
 
-Use local `ref` state; no API.
+Use local `ref` state synced from auth store; API on submit.
 
-- [ ] **Step 2: Visually check at `/profile/info`**
+- [x] **Step 2: Visually check at `/profile/info`**
 
 Expected: forms render; email not editable; toasts on buttons.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add frontend/app/pages/profile/info.vue
@@ -492,6 +499,7 @@ EOF
 ### Task 5: Orders nested routes
 
 **Files:**
+
 - Create: `frontend/app/pages/profile/orders.vue`
 - Create: `frontend/app/pages/profile/orders/index.vue`
 - Create: `frontend/app/pages/profile/orders/active.vue`
@@ -499,25 +507,28 @@ EOF
 - Create: `frontend/app/pages/profile/orders/purchased.vue`
 
 **Interfaces:**
+
 - Consumes: mocks from Task 1; `SkmReviewCard` editMode from Task 2
 - Produces: secondary nav tabs Active / Completed / Purchased
 
-- [ ] **Step 1: `orders.vue` with secondary tabs**
+- [x] **Step 1: `orders.vue` with secondary tabs**
 
 ```vue
 <script setup lang="ts">
-const route = useRoute()
+const route = useRoute();
 
 const tabs = [
   { label: 'Активные', to: '/profile/orders/active' },
   { label: 'Завершённые', to: '/profile/orders/completed' },
   { label: 'Вы покупали', to: '/profile/orders/purchased' },
-] as const
+] as const;
 </script>
 
 <template>
   <div>
-    <nav class="mb-6 flex gap-1 overflow-x-auto border-b border-neutral-100 pb-2">
+    <nav
+      class="mb-6 flex gap-1 overflow-x-auto border-b border-neutral-100 pb-2"
+    >
       <NuxtLink
         v-for="tab in tabs"
         :key="tab.to"
@@ -539,27 +550,28 @@ const tabs = [
 
 Note: nested `orders.vue` under `profile.vue` — Nuxt nests both parents; ensure only one NuxtPage chain (profile → orders → leaf).
 
-- [ ] **Step 2: Redirect `orders/index.vue` → active**
+- [x] **Step 2: Redirect `orders/index.vue` → active**
 
 Same pattern as profile index.
 
-- [ ] **Step 3: `active.vue` / `completed.vue`**
+- [x] **Step 3: `active.vue` / `completed.vue`**
 
 Map mocks to `SkmOrderCard` grid. Empty-state: «Пока нет заказов» if array empty.
 
-- [ ] **Step 4: `purchased.vue`**
+- [x] **Step 4: `purchased.vue`**
 
 For each item: product title/description/link + below:
+
 - if `review` → `<SkmReviewCard :author="auth.user?.name" ... />`
 - else → `<SkmReviewCard edit-mode @submit="onSubmit(item.id, $event)" />`
 
 On submit: toast + update local reactive copy of list (set review) so card flips to read mode.
 
-- [ ] **Step 5: Smoke tabs**
+- [x] **Step 5: Smoke tabs**
 
-Visit each orders URL; purchased edit submit flips to read locally.
+Visit each orders URL; purchased edit submit shows success toast and flips card to read mode.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add frontend/app/pages/profile/orders
@@ -575,34 +587,35 @@ EOF
 ### Task 6: Favorites page + docs polish
 
 **Files:**
+
 - Create: `frontend/app/pages/profile/favorite.vue`
 - Modify: `frontend/README.md` routes (if not already matching)
 - Modify: `docs/superpowers/specs/2026-07-30-personal-profile-design.md` — Status: P0 implemented when done
 
-- [ ] **Step 1: `favorite.vue`**
+- [x] **Step 1: `favorite.vue`**
 
 Reactive copy of `PROFILE_FAVORITES`. Grid of `SkmCard` with name, description, `NuxtLink`, button «Убрать из избранного» (filter out of local list). Empty-state: text + link to `/catalog`.
 
-- [ ] **Step 2: Lint changed pages**
+- [x] **Step 2: Lint changed pages**
 
 Run: `cd frontend && npx eslint app/pages/profile app/pages/account app/constants/profile-mocks.ts app/components/ui/SkmReviewCard --max-warnings 0`
 
-- [ ] **Step 3: End-to-end manual checklist**
+- [x] **Step 3: End-to-end manual checklist**
 
-- [ ] Login → `/profile` → `/profile/info`
-- [ ] Sidebar: Данные / Заказы / Избранное
-- [ ] Orders secondary tabs work
-- [ ] Purchased: edit review → toast → read card
-- [ ] Favorite remove works locally
-- [ ] `/account` → `/profile`
-- [ ] Header menu → `/profile`
-- [ ] No avatar anywhere
+- [x] Login → `/profile` → `/profile/info`
+- [x] Sidebar: Данные / Заказы / Избранное
+- [x] Orders secondary tabs work
+- [x] Purchased: edit review → toast → read card
+- [x] Favorite remove updates list in UI (mock until P4)
+- [x] `/account` → `/profile`
+- [x] Header menu → `/profile`
+- [x] No avatar anywhere
 
-- [ ] **Step 4: Update design status line**
+- [x] **Step 4: Update design status line**
 
 In spec frontmatter/status: `P0 shell implemented` (date).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add frontend/app/pages/profile/favorite.vue frontend/README.md docs/superpowers/specs/2026-07-30-personal-profile-design.md
@@ -617,6 +630,6 @@ EOF
 
 ## Self-review
 
-1. **Spec coverage:** P0 routes, layout, info, orders×3, favorite, ReviewCard editMode, redirects, no email change, no avatars — all tasked.  
-2. **No placeholders:** concrete files and code.  
+1. **Spec coverage:** P0 routes, layout, info, orders×3, favorite, ReviewCard editMode, redirects, no email change, no avatars — all tasked.
+2. **No placeholders:** concrete files and code.
 3. **Types:** mock types shared by orders/favorite pages; ReviewCard emit matches purchased handler.
