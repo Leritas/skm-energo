@@ -13,6 +13,7 @@ import { RolesModule } from './roles/roles.module';
 import { UsersModule } from './users/users.module';
 import { ProfileModule } from './profile/profile.module';
 import { CatalogModule } from './catalog/catalog.module';
+import { CartModule } from './cart/cart.module';
 import { NewsModule } from './news/news.module';
 import { MediaModule } from './media/media.module';
 
@@ -26,6 +27,7 @@ import { MediaModule } from './media/media.module';
     AuthModule,
     ProfileModule,
     CatalogModule,
+    CartModule,
     NewsModule,
     MediaModule,
     UsersModule,

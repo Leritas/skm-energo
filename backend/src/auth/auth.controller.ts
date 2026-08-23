@@ -1,8 +1,10 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import type { Request, Response } from 'express';
 import type { JwtPayloadUser } from '../common/auth/current-user.decorator';
 import { CurrentUser } from '../common/auth/current-user.decorator';
 import { Public } from '../common/auth/public.decorator';
+import { CART_SESSION_COOKIE } from '../cart/cart.constants';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { LogoutDto } from './dto/logout.dto';
@@ -16,14 +18,28 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  register(@Body() dto: RegisterDto) {
-    return this.authService.register(dto);
+  register(
+    @Body() dto: RegisterDto,
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const guestSessionId = request.cookies?.[CART_SESSION_COOKIE] as
+      | string
+      | undefined;
+    return this.authService.register(dto, guestSessionId, response);
   }
 
   @Public()
   @Post('login')
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+  login(
+    @Body() dto: LoginDto,
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const guestSessionId = request.cookies?.[CART_SESSION_COOKIE] as
+      | string
+      | undefined;
+    return this.authService.login(dto, guestSessionId, response);
   }
 
   @Public()
