@@ -88,7 +88,7 @@ Parent epics для этапов 1–10: [#10](https://github.com/Leritas/skm-en
 | 3    | [#12](https://github.com/Leritas/skm-energo/issues/12) ✅                                                     | —                                                                                                                                                                                                                            |
 | 4    | [#13](https://github.com/Leritas/skm-energo/issues/13)                                                        | (slices TBD)                                                                                                                                                                                                                 |
 | 5    | [#14](https://github.com/Leritas/skm-energo/issues/14)                                                        | [#70](https://github.com/Leritas/skm-energo/issues/70)–[#73](https://github.com/Leritas/skm-energo/issues/73), [#67](https://github.com/Leritas/skm-energo/issues/67)–[#69](https://github.com/Leritas/skm-energo/issues/69) |
-| 6    | [#15](https://github.com/Leritas/skm-energo/issues/15)                                                        | (slices TBD)                                                                                                                                                                                                                 |
+| 6    | [#15](https://github.com/Leritas/skm-energo/issues/15)                                                        | [#81](https://github.com/Leritas/skm-energo/issues/81)–[#85](https://github.com/Leritas/skm-energo/issues/85)                                                                                                                |
 | 7    | [#16](https://github.com/Leritas/skm-energo/issues/16)                                                        | [#21](https://github.com/Leritas/skm-energo/issues/21)–[#24](https://github.com/Leritas/skm-energo/issues/24)                                                                                                                |
 | 8–10 | [#17](https://github.com/Leritas/skm-energo/issues/17)–[#19](https://github.com/Leritas/skm-energo/issues/19) | [#20](https://github.com/Leritas/skm-energo/issues/20) SSR auth → #19                                                                                                                                                        |
 
@@ -241,6 +241,19 @@ Parent epics для этапов 1–10: [#10](https://github.com/Leritas/skm-en
 - Оплата v1: `pending_manual`
 - Email-уведомления
 - Админка: управление заказами
+
+**Grilling (2026-08-23):** full Order + optional `Product.price`; type `purchase` \| `request-products`; guest cart cookie 7d; submit auth-required; contact snapshot; PDP dual CTA (both → cart). See [2026-08-23-cart-checkout-design.md](./superpowers/specs/2026-08-23-cart-checkout-design.md) and [#15 comment](https://github.com/Leritas/skm-energo/issues/15#issuecomment-5386127520).
+
+**Scope (этап 6):**
+
+| Slice                              | Issues                                                                                 |
+| ---------------------------------- | -------------------------------------------------------------------------------------- |
+| Cart schema + API + merge          | [#81](https://github.com/Leritas/skm-energo/issues/81)                                 |
+| Public cart UI (PDP, /cart, badge) | [#82](https://github.com/Leritas/skm-energo/issues/82) ← #81                           |
+| Order API + minimal email          | [#83](https://github.com/Leritas/skm-energo/issues/83) ← #81                           |
+| Checkout frontend + success        | [#84](https://github.com/Leritas/skm-energo/issues/84) ← #81, #82, #83                 |
+| Admin orders CRUD                  | [#85](https://github.com/Leritas/skm-energo/issues/85) ← #83                           |
+| TD: MailService                    | [#86](https://github.com/Leritas/skm-energo/issues/86) ← #83 (TD4 — not stage blocker) |
 
 **GitHub:** [#15](https://github.com/Leritas/skm-energo/issues/15) — blocks profile P2 ([#22](https://github.com/Leritas/skm-energo/issues/22))
 

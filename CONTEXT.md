@@ -93,3 +93,53 @@ _Avoid_: Anonymous user role
 **Profile (UI)**:
 The authenticated `/profile/*` area: info, orders, favorites. Distinct from User management in admin.
 _Avoid_: Account area, ЛК as code identifier
+
+## Commerce
+
+**Cart**:
+A persisted list of products and quantities a visitor is assembling before checkout. Owned by either a Guest session or an authenticated User.
+_Avoid_: Basket, request list (in domain docs)
+
+**Guest cart session**:
+An anonymous cart identity keyed by `cartSessionId` in an HttpOnly cookie, stored server-side until login merge or expiry.
+_Avoid_: Anonymous user, localStorage cart (as canonical identity)
+
+**Order**:
+A committed supply request or purchase record with line items, fulfillment status, and payment status. Created at checkout by an authenticated User.
+_Avoid_: Lead, quote (as separate v1 entity)
+
+**Order type**:
+Discriminator on Order: `purchase` (all lines have unit prices) vs `request-products` (any line without price — «пo запросу»). Set automatically at submit; admin may override.
+_Avoid_: Order kind, order mode (in code identifiers)
+
+**Order line**:
+One product + quantity on an Order, with an optional unit price snapshot copied from `Product.price` at checkout. Null unit price means «пo запросу» for that line.
+_Avoid_: CartItem (after checkout), OrderItem (OK in code/DB)
+
+**Order contact snapshot**:
+Copy of User B2B fields frozen on Order at submit (company, phone, inn, position, name, email) so documents reflect details at order time.
+_Avoid_: Shipping address (v1 uses B2B requisites, not delivery address)
+
+**Order number**:
+Public identifier formatted `SKM-{id}` from the Order database id.
+_Avoid_: Order code, reference number (in user-facing copy without SKM prefix)
+
+**Add to cart (PDP)**:
+Primary commerce action on product detail. If `Product.price` is set — show price and button «В корзину»; if not — show «пo запросу» and button «Запросить поставку». Both labels add the product to Cart the same way.
+_Avoid_: Separate quote flow (v1 — same Cart path)
+
+**Fulfillment status**:
+Order lifecycle for delivery/handling: `pending` → `processing` → `shipped` → `completed`, or `cancelled`.
+_Avoid_: Order state (ambiguous with payment)
+
+**Payment status**:
+Separate from fulfillment: `pending_manual`, `paid_manual`, or `not_required`. v1 has no online payment. On submit: `purchase` → `pending_manual`; `request-products` → `not_required`.
+_Avoid_: Payment state (without qualifier)
+
+**Active order (profile)**:
+An Order shown under `/profile/orders/active` — fulfillment status is `pending`, `processing`, or `shipped`.
+_Avoid_: Open order, in-progress order (in code identifiers)
+
+**Completed order (profile)**:
+An Order shown under `/profile/orders/completed` — fulfillment status is `completed`. Cancelled orders are excluded from profile lists in v1.
+_Avoid_: Closed order, delivered order (in user-facing copy)
