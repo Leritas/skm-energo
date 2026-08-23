@@ -128,20 +128,20 @@ frontend/
 
 ## Маршруты
 
-| Путь              | Описание                                                             | SSR        |
-| ----------------- | -------------------------------------------------------------------- | ---------- |
-| `/`               | Главная (hero, направления, about-teaser)                            | ✅         |
-| `/about`          | О компании                                                           | ✅         |
-| `/services`       | Услуги                                                               | ✅         |
-| `/contacts`       | Контакты + форма (UI)                                                | ✅         |
-| `/catalog/**`     | Category-first каталог (live catalog API, #6 ✅)                     | ✅         |
-| `/product/[slug]` | Карточка товара (live catalog API, #6 ✅)                            | ✅         |
-| `/news/**`        | Список + detail (live news API, #7 ✅)                               | ✅         |
-| `/login`          | Вход                                                                 | ✅         |
-| `/register`       | Регистрация покупателя                                               | ✅         |
-| `/profile/**`     | Личный кабинет — P0 shell ✅, P1 info API ✅; orders/favorites mocks | ✅ partial |
-| `/account`        | Redirect → `/profile`                                                | ✅         |
-| `/admin`          | Админ-панель (заглушка, `hasAccessToAdmin`)                          | —          |
+| Путь              | Описание                                                                                 | SSR        |
+| ----------------- | ---------------------------------------------------------------------------------------- | ---------- |
+| `/`               | Главная (hero, направления, about-teaser)                                                | ✅         |
+| `/about`          | О компании                                                                               | ✅         |
+| `/services`       | Услуги                                                                                   | ✅         |
+| `/contacts`       | Контакты + форма (UI)                                                                    | ✅         |
+| `/catalog/**`     | Category-first каталог (live catalog API, #6 ✅)                                         | ✅         |
+| `/product/[slug]` | Карточка товара (live catalog API, #6 ✅)                                                | ✅         |
+| `/news/**`        | Список + detail (live news API, #7 ✅)                                                   | ✅         |
+| `/login`          | Вход                                                                                     | ✅         |
+| `/register`       | Регистрация покупателя                                                                   | ✅         |
+| `/profile/**`     | Личный кабинет — P0 shell ✅, P1 info API ✅; orders/favorites/reviews mocks until P2–P4 | ✅ partial |
+| `/account`        | Redirect → `/profile`                                                                    | ✅         |
+| `/admin`          | Админ-панель (заглушка, `hasAccessToAdmin`)                                              | —          |
 
 ## Auth & профиль
 
