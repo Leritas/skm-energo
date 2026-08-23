@@ -1,15 +1,19 @@
 import { createHash, randomBytes } from 'node:crypto';
 import {
   ConflictException,
+  Inject,
   Injectable,
   UnauthorizedException,
+  forwardRef,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import type { Response } from 'express';
 import type { AuthSessionResponse, AuthUserDto } from '@skm/specs';
 import { assertPermissions } from '@skm/specs';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
+import { CartMergeService } from '../cart/cart-merge.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
@@ -21,9 +25,15 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    @Inject(forwardRef(() => CartMergeService))
+    private readonly cartMergeService: CartMergeService,
   ) {}
 
-  async register(dto: RegisterDto): Promise<AuthSessionResponse> {
+  async register(
+    dto: RegisterDto,
+    guestSessionId: string | undefined,
+    response: Response,
+  ): Promise<AuthSessionResponse> {
     const existing = await this.prisma.user.findUnique({
       where: { email: dto.email.toLowerCase() },
     });
@@ -50,10 +60,20 @@ export class AuthService {
       },
     });
 
+    await this.cartMergeService.mergeGuestCartIntoUser(
+      guestSessionId,
+      user.id,
+      response,
+    );
+
     return this.issueSession(user.id);
   }
 
-  async login(dto: LoginDto): Promise<AuthSessionResponse> {
+  async login(
+    dto: LoginDto,
+    guestSessionId: string | undefined,
+    response: Response,
+  ): Promise<AuthSessionResponse> {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email.toLowerCase() },
     });
@@ -65,6 +85,12 @@ export class AuthService {
     if (!valid) {
       throw new UnauthorizedException('Invalid credentials');
     }
+
+    await this.cartMergeService.mergeGuestCartIntoUser(
+      guestSessionId,
+      user.id,
+      response,
+    );
 
     return this.issueSession(user.id);
   }

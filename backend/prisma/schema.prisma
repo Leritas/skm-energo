@@ -15,6 +15,25 @@ model HealthCheck {
   checkedAt DateTime @default(now())
 }
 
+enum OrderType {
+  purchase
+  request_products
+}
+
+enum OrderStatus {
+  pending
+  processing
+  shipped
+  completed
+  cancelled
+}
+
+enum PaymentStatus {
+  pending_manual
+  paid_manual
+  not_required
+}
+
 model User {
   id            Int            @id @default(autoincrement())
   email         String         @unique
@@ -28,6 +47,8 @@ model User {
   updatedAt     DateTime       @updatedAt
   roles         UserRole[]
   refreshTokens RefreshToken[]
+  cart          Cart?
+  orders        Order[]
 }
 
 model Role {
@@ -92,6 +113,7 @@ model Product {
   specs          Json
   badges         String[]
   similarSlugs   String[]
+  price          Decimal?     @db.Decimal(10, 2)
   seoTitle       String?
   seoDescription String?
   isPublished    Boolean      @default(true)
@@ -102,6 +124,59 @@ model Product {
   category       Category     @relation(fields: [categoryId], references: [id])
   photos         Photo[]
   documents      Document[]
+  cartItems      CartItem[]
+  orderLines     OrderLine[]
+}
+
+model Cart {
+  id             Int        @id @default(autoincrement())
+  guestSessionId String?    @unique
+  userId         Int?       @unique
+  expiresAt      DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  user           User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items          CartItem[]
+}
+
+model CartItem {
+  id        Int     @id @default(autoincrement())
+  cartId    Int
+  productId Int
+  quantity  Int
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId])
+}
+
+model Order {
+  id             Int           @id @default(autoincrement())
+  userId         Int
+  type           OrderType
+  status         OrderStatus   @default(pending)
+  paymentStatus  PaymentStatus
+  customerName   String
+  customerEmail  String
+  customerPhone  String?
+  customerCompany String?
+  customerInn    String?
+  customerPosition String?
+  customerNote   String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  user           User          @relation(fields: [userId], references: [id])
+  lines          OrderLine[]
+}
+
+model OrderLine {
+  id        Int      @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  unitPrice Decimal? @db.Decimal(10, 2)
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id])
 }
 
 model NewsArticle {

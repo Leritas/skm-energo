@@ -3,3 +3,4 @@ export * from './catalog-permissions';
 export * from './auth';
 export * from './admin';
 export * from './media';
+export * from './commerce';

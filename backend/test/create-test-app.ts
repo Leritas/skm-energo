@@ -2,6 +2,7 @@ import { ValidationPipe, RequestMethod } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import cookieParser from 'cookie-parser';
 import { AppModule } from '../src/app.module';
 
 export async function createTestApp(): Promise<INestApplication> {
@@ -24,6 +25,7 @@ export async function createTestApp(): Promise<INestApplication> {
       transform: true,
     }),
   );
+  app.use(cookieParser());
 
   app.enableCors({
     origin: configService.get<string>('CORS_ORIGIN', 'http://localhost:3000'),

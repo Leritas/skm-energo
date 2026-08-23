@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { DocumentsController } from './documents.controller';
 import { MediaStorageService } from './media-storage.service';
@@ -12,7 +12,7 @@ import { PhotoFileInterceptor } from './photo-file.interceptor';
 import { PhotosController } from './photos.controller';
 
 @Module({
-  imports: [AuthModule],
+  imports: [forwardRef(() => AuthModule)],
   controllers: [PhotosController, DocumentsController],
   providers: [
     MediaStorageService,
@@ -29,6 +29,7 @@ import { PhotosController } from './photos.controller';
     MediaUrlService,
     MediaUploadService,
     MediaStreamService,
+    OptionalJwtAuthGuard,
     PhotoFileInterceptor,
     DocumentFileInterceptor,
   ],
