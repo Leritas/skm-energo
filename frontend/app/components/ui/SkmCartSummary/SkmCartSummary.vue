@@ -1,27 +1,25 @@
 <script setup lang="ts">
-import SkmButton from '../SkmButton/SkmButton.vue'
+import SkmButton from '../SkmButton/SkmButton.vue';
 
 withDefaults(
   defineProps<{
-    linesCount: number
-    totalLabel?: string
-    checkoutTo?: string
+    linesCount: number;
+    totalLabel?: string;
+    checkoutTo?: string;
+    checkoutDisabled?: boolean;
   }>(),
   {
-    totalLabel: 'по запросу',
+    totalLabel: 'По запросу',
     checkoutTo: '/checkout',
+    checkoutDisabled: false,
   },
-)
+);
 </script>
 
 <template>
   <aside class="rounded-xl border border-neutral-100 bg-neutral-50 p-6">
-    <h2 class="text-lg font-semibold text-neutral-950">
-      Итого
-    </h2>
-    <p class="mt-2 text-sm text-neutral-600">
-      Позиций: {{ linesCount }}
-    </p>
+    <h2 class="text-lg font-semibold text-neutral-950">Итого</h2>
+    <p class="mt-2 text-sm text-neutral-600">Позиций: {{ linesCount }}</p>
     <p class="mt-4 text-base font-medium text-neutral-950">
       {{ totalLabel }}
     </p>
@@ -30,7 +28,8 @@ withDefaults(
         <SkmButton
           class="w-full justify-center"
           variant="primary"
-          :to="checkoutTo"
+          :to="checkoutDisabled ? undefined : checkoutTo"
+          :disabled="checkoutDisabled"
         >
           Оформить
         </SkmButton>

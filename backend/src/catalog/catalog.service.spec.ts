@@ -83,9 +83,11 @@ describe('CatalogService', () => {
     const prisma = {
       product: {
         findUnique: jest.fn().mockResolvedValue({
+          id: 42,
           slug: 'nh00-160a',
           title: 'Предохранитель NH00 160A',
           sku: 'NH00-160',
+          price: null,
           description: 'Низковольтный предохранитель серии NH00.',
           specs: [{ label: 'Номинальный ток', value: '160 A' }],
           badges: [],
@@ -124,9 +126,11 @@ describe('CatalogService', () => {
     const result = await service.getProductBySlug('nh00-160a');
 
     expect(result).toEqual({
+      id: 42,
       slug: 'nh00-160a',
       title: 'Предохранитель NH00 160A',
       sku: 'NH00-160',
+      price: null,
       description: 'Низковольтный предохранитель серии NH00.',
       specs: [{ label: 'Номинальный ток', value: '160 A' }],
       photos: [

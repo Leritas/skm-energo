@@ -1,3 +1,5 @@
+<script setup lang="ts"></script>
+
 <template>
   <div class="flex min-h-screen flex-col bg-white text-neutral-900">
     <SkmHeader />
@@ -5,5 +7,6 @@
       <slot />
     </main>
     <SkmFooter />
+    <SkmCartFab />
   </div>
 </template>

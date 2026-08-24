@@ -9,6 +9,9 @@ type ApiOptions = {
 export function useApi() {
   const config = useRuntimeConfig();
   const auth = useAuthStore();
+  const requestHeaders = import.meta.server
+    ? useRequestHeaders(['cookie'])
+    : {};
 
   async function api<T>(path: string, options: ApiOptions = {}): Promise<T> {
     const {
@@ -26,7 +29,11 @@ export function useApi() {
           'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | undefined,
         body,
         query,
+        credentials: 'include',
         headers: {
+          ...(import.meta.server && requestHeaders.cookie
+            ? { cookie: requestHeaders.cookie }
+            : {}),
           ...headers,
           ...(useAuthHeader && auth.accessToken
             ? { Authorization: `Bearer ${auth.accessToken}` }
