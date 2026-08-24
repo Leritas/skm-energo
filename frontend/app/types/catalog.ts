@@ -25,6 +25,8 @@ export interface CatalogProductListItem {
 }
 
 export interface CatalogProductDetail extends CatalogProductListItem {
+  id: number;
+  price: string | null;
   description: string;
   specs: Array<{ label: string; value: string }>;
   photos: AttachedFile[];

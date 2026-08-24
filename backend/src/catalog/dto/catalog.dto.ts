@@ -141,6 +141,12 @@ export class CatalogProductSpecDto {
 }
 
 export class CatalogProductDetailResponseDto extends CatalogProductListItemResponseDto {
+  @ApiProperty({ example: 42 })
+  id!: number;
+
+  @ApiPropertyOptional({ example: '12450.00', nullable: true })
+  price!: string | null;
+
   @ApiProperty()
   description!: string;
 

@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import {
-  productBadgeLabel,
-  productBadgeTone,
-  toProductCardBadges,
-} from '~/components/ui/SkmProductCard/badgeDisplay';
+import { storeToRefs } from 'pinia';
 import type {
   CatalogBreadcrumb,
   CatalogProductDetail,
   CatalogProductListItem,
 } from '~/types/catalog';
+import {
+  productBadgeLabel,
+  productBadgeTone,
+  toProductCardBadges,
+} from '~/components/ui/SkmProductCard/badgeDisplay';
+import { formatCartPriceLabel } from '~/utils/cart';
 
 const props = defineProps<{
   product: CatalogProductDetail;
@@ -18,7 +20,21 @@ const props = defineProps<{
   similarManufacturerLabel?: (slug: string) => string;
 }>();
 
+const cartStore = useCartStore();
+const { items, hydrated } = storeToRefs(cartStore);
+const cart = useCart();
+const toast = useToast();
+
 const activeTab = ref('desc');
+const qty = ref(1);
+const adding = ref(false);
+
+const cartReady = computed(() => hydrated.value);
+
+const cartLine = computed(() =>
+  items.value.find((item) => item.productId === props.product.id),
+);
+const inCart = computed(() => cartLine.value != null);
 
 const tabItems = [
   { label: 'Описание', value: 'desc', content: '' },
@@ -34,6 +50,49 @@ const galleryImages = computed(() =>
 );
 
 const hasPhotos = computed(() => props.product.photos.length > 0);
+
+const priceLabel = computed(() => formatCartPriceLabel(props.product.price));
+
+const hasPrice = computed(() => props.product.price != null);
+
+const ctaLabel = computed(() =>
+  hasPrice.value ? 'В корзину' : 'Запросить поставку',
+);
+
+async function addToCart() {
+  if (adding.value) {
+    return;
+  }
+
+  adding.value = true;
+  try {
+    await cart.addItem(props.product.id, qty.value);
+    toast.add({
+      title: 'Добавлено в корзину',
+      color: 'success',
+    });
+  } catch {
+    toast.add({
+      title: 'Не удалось добавить в корзину',
+      color: 'error',
+    });
+  } finally {
+    adding.value = false;
+  }
+}
+
+function handleCartAction() {
+  if (inCart.value) {
+    cart.openDrawer();
+    return;
+  }
+
+  void addToCart();
+}
+
+onMounted(() => {
+  void cartStore.ensureHydrated();
+});
 </script>
 
 <template>
@@ -69,14 +128,31 @@ const hasPhotos = computed(() => props.product.photos.length > 0);
         />
       </div>
 
-      <p class="whitespace-pre-line text-sm leading-relaxed text-neutral-600">
+      <p class="text-2xl font-semibold text-neutral-950">
+        {{ priceLabel }}
+      </p>
+
+      <p
+        class="mt-4 whitespace-pre-line text-sm leading-relaxed text-neutral-600"
+      >
         {{ product.description }}
       </p>
 
-      <div class="mt-6">
-        <SkmButton variant="primary" to="/contacts">
-          Запросить поставку
-        </SkmButton>
+      <div class="mt-6 flex min-h-10 flex-wrap items-center gap-4">
+        <template v-if="cartReady">
+          <SkmQtyInput v-if="!inCart" v-model="qty" />
+          <SkmButton
+            :variant="inCart ? 'outline' : 'primary'"
+            :disabled="adding"
+            @click="handleCartAction"
+          >
+            {{ inCart ? 'Уже в корзине' : ctaLabel }}
+          </SkmButton>
+        </template>
+        <template v-else>
+          <SkmSkeleton class="h-10 w-[7.25rem] rounded-lg" />
+          <SkmSkeleton class="h-10 w-36 rounded-lg" />
+        </template>
       </div>
     </div>
   </section>

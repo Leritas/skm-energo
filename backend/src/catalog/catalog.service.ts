@@ -31,6 +31,8 @@ export interface CatalogProductListItemDto {
 }
 
 export interface CatalogProductDetailDto extends CatalogProductListItemDto {
+  id: number;
+  price: string | null;
   description: string;
   specs: Array<{ label: string; value: string }>;
   photos: AttachedFile[];
@@ -358,6 +360,8 @@ export class CatalogService {
 
     return {
       ...this.toListItem(row),
+      id: row.id,
+      price: row.price?.toString() ?? null,
       description: row.description,
       specs: parseProductSpecs(row.specs),
       photos,

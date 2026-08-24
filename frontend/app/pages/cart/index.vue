@@ -1,87 +1,90 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { SITE } from '~/constants/site'
+import { SITE } from '~/constants/site';
+import { formatCartPriceLabel, formatCartTotalLabel } from '~/utils/cart';
 
 useSeoMeta({
   title: `Корзина — ${SITE.name}`,
-  description: 'Корзина запроса поставки (stub).',
-})
+  description: 'Корзина запроса поставки.',
+});
 
-const breadcrumbs = [
-  { label: 'Главная', to: '/' },
-  { label: 'Корзина' },
-]
+const breadcrumbs = [{ label: 'Главная', to: '/' }, { label: 'Корзина' }];
 
-const lines = ref([
-  {
-    id: '1',
-    title: 'Предохранитель NH00 160A',
-    to: '/product/nh00-160a',
-    sku: 'NH00-160',
-    quantity: 2,
-  },
-  {
-    id: '2',
-    title: 'Контактор C09 220V',
-    to: '/product/c09-220',
-    sku: 'C09-220',
-    quantity: 1,
-  },
-])
+const cart = useCart();
 
-const confirmOpen = ref(false)
-const pendingRemoveId = ref<string | null>(null)
+await cart.ensureHydrated();
 
-function askRemove(id: string) {
-  pendingRemoveId.value = id
-  confirmOpen.value = true
+const confirmOpen = ref(false);
+const pendingRemoveId = ref<number | null>(null);
+
+function askRemove(productId: number) {
+  pendingRemoveId.value = productId;
+  confirmOpen.value = true;
 }
 
-function confirmRemove() {
-  if (pendingRemoveId.value) {
-    lines.value = lines.value.filter((line) => line.id !== pendingRemoveId.value)
+async function confirmRemove() {
+  if (pendingRemoveId.value != null) {
+    await cart.removeItem(pendingRemoveId.value);
   }
-  pendingRemoveId.value = null
+  pendingRemoveId.value = null;
 }
+
+async function onQuantityChange(productId: number, quantity: number) {
+  await cart.updateQuantity(productId, quantity);
+}
+
+const totalLabel = computed(() => formatCartTotalLabel(cart.items.value));
 </script>
 
 <template>
   <SkmSection>
     <SkmContainer>
-      <SkmPageHeader title="Корзина" description="Stub на mock-данных. Цены — по запросу.">
+      <SkmPageHeader
+        title="Корзина"
+        description="Проверьте позиции перед оформлением заявки."
+      >
         <template #breadcrumbs>
           <SkmBreadcrumbs :items="breadcrumbs" />
         </template>
       </SkmPageHeader>
 
       <SkmEmpty
-        v-if="!lines.length"
+        v-if="cart.isEmpty.value && !cart.loading.value"
         title="Корзина пуста"
         description="Добавьте товары с карточки продукта."
       >
         <template #actions>
-          <SkmButton to="/catalog" variant="outline">
-            В каталог
-          </SkmButton>
+          <SkmButton to="/catalog" variant="outline"> В каталог </SkmButton>
         </template>
       </SkmEmpty>
 
-      <div
-        v-else
-        class="grid gap-8 lg:grid-cols-[1fr_280px]"
-      >
+      <div v-else class="grid gap-8 lg:grid-cols-[1fr_280px]">
         <div>
           <SkmCartLine
-            v-for="line in lines"
-            :key="line.id"
-            v-model:quantity="line.quantity"
+            v-for="line in cart.items.value"
+            :key="line.productId"
             :title="line.title"
-            :to="line.to"
+            :to="`/product/${line.slug}`"
+            :image-src="line.photo?.url ?? null"
             :sku="line.sku"
-            @remove="askRemove(line.id)"
+            :price-label="formatCartPriceLabel(line.price)"
+            :unavailable="!line.isAvailable"
+            :model-value="line.quantity"
+            @update:model-value="onQuantityChange(line.productId, $event)"
+            @remove="askRemove(line.productId)"
           />
+          <p
+            v-if="cart.hasUnavailable.value"
+            class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+          >
+            Некоторые позиции недоступны. Удалите их, чтобы продолжить
+            оформление.
+          </p>
         </div>
-        <SkmCartSummary :lines-count="lines.length" />
+        <SkmCartSummary
+          :lines-count="cart.linesCount.value"
+          :total-label="totalLabel"
+          :checkout-disabled="cart.hasUnavailable.value"
+        />
       </div>
 
       <SkmConfirmModal
