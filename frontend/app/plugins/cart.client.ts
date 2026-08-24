@@ -1,8 +1,8 @@
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin(async () => {
   const cart = useCartStore();
   const router = useRouter();
 
-  void cart.fetchCart();
+  await cart.fetchCart();
 
   router.afterEach(() => {
     void cart.fetchCart();

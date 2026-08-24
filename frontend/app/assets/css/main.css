@@ -48,6 +48,10 @@
   --color-accent-600: #ea580c;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   @apply bg-white text-neutral-900 antialiased;
 }

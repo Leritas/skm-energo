@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
 import type {
   CatalogBreadcrumb,
   CatalogProductDetail,
@@ -19,12 +20,21 @@ const props = defineProps<{
   similarManufacturerLabel?: (slug: string) => string;
 }>();
 
+const cartStore = useCartStore();
+const { items, hydrated } = storeToRefs(cartStore);
 const cart = useCart();
 const toast = useToast();
 
 const activeTab = ref('desc');
 const qty = ref(1);
 const adding = ref(false);
+
+const cartReady = computed(() => hydrated.value);
+
+const cartLine = computed(() =>
+  items.value.find((item) => item.productId === props.product.id),
+);
+const inCart = computed(() => cartLine.value != null);
 
 const tabItems = [
   { label: 'Описание', value: 'desc', content: '' },
@@ -70,6 +80,19 @@ async function addToCart() {
     adding.value = false;
   }
 }
+
+function handleCartAction() {
+  if (inCart.value) {
+    cart.openDrawer();
+    return;
+  }
+
+  void addToCart();
+}
+
+onMounted(() => {
+  void cartStore.ensureHydrated();
+});
 </script>
 
 <template>
@@ -115,11 +138,21 @@ async function addToCart() {
         {{ product.description }}
       </p>
 
-      <div class="mt-6 flex flex-wrap items-center gap-4">
-        <SkmQtyInput v-model="qty" />
-        <SkmButton variant="primary" :disabled="adding" @click="addToCart">
-          {{ ctaLabel }}
-        </SkmButton>
+      <div class="mt-6 flex min-h-10 flex-wrap items-center gap-4">
+        <template v-if="cartReady">
+          <SkmQtyInput v-if="!inCart" v-model="qty" />
+          <SkmButton
+            :variant="inCart ? 'outline' : 'primary'"
+            :disabled="adding"
+            @click="handleCartAction"
+          >
+            {{ inCart ? 'Уже в корзине' : ctaLabel }}
+          </SkmButton>
+        </template>
+        <template v-else>
+          <SkmSkeleton class="h-10 w-[7.25rem] rounded-lg" />
+          <SkmSkeleton class="h-10 w-36 rounded-lg" />
+        </template>
       </div>
     </div>
   </section>

@@ -18,7 +18,7 @@ withDefaults(
     to: undefined,
     imageSrc: null,
     sku: undefined,
-    priceLabel: 'По запросу',
+    priceLabel: 'Цена по запросу',
     unavailable: false,
     compact: false,
   },

@@ -8,6 +8,8 @@ const open = defineModel<boolean>('open', { default: false });
 const theme = CATALOG_SEARCH_SPOTLIGHT_THEME;
 const cart = useCart();
 
+useBodyScrollLock(open);
+
 const positionsLabel = computed(() =>
   cartPositionsLabel(cart.linesCount.value),
 );
@@ -24,21 +26,12 @@ function onKeydown(event: KeyboardEvent) {
   }
 }
 
-watch(open, (isOpen) => {
-  if (import.meta.client) {
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-  }
-});
-
 onMounted(() => {
   window.addEventListener('keydown', onKeydown);
 });
 
 onUnmounted(() => {
   window.removeEventListener('keydown', onKeydown);
-  if (import.meta.client) {
-    document.body.style.overflow = '';
-  }
 });
 
 async function onQuantityChange(productId: number, quantity: number) {

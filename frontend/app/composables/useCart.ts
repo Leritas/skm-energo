@@ -17,6 +17,7 @@ export function useCart() {
     totalQuantity,
     hasUnavailable,
     isEmpty,
+    drawerOpen,
   } = storeToRefs(store);
 
   const updateQuantityDebounced = useDebounceFn(
@@ -33,10 +34,12 @@ export function useCart() {
     totalQuantity,
     hasUnavailable,
     isEmpty,
+    drawerOpen,
     cartPositionsLabel,
     formatCartPriceLabel,
     formatCartTotalLabel,
     cartHasPricedItems,
+    lineByProductId: (productId: number) => store.lineByProductId(productId),
     fetchCart: () => store.fetchCart(),
     ensureHydrated: () => store.ensureHydrated(),
     addItem: (productId: number, quantity: number) =>
@@ -44,5 +47,7 @@ export function useCart() {
     updateQuantity: (productId: number, quantity: number) =>
       updateQuantityDebounced(productId, quantity),
     removeItem: (productId: number) => store.removeItem(productId),
+    openDrawer: () => store.openDrawer(),
+    closeDrawer: () => store.closeDrawer(),
   };
 }

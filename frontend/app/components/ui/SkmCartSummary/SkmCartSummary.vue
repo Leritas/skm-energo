@@ -9,7 +9,7 @@ withDefaults(
     checkoutDisabled?: boolean;
   }>(),
   {
-    totalLabel: 'По запросу',
+    totalLabel: 'Цена по запросу',
     checkoutTo: '/checkout',
     checkoutDisabled: false,
   },

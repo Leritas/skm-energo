@@ -11,6 +11,7 @@ export const useCartStore = defineStore('cart', {
     items: [] as CartLineDto[],
     loading: false,
     hydrated: false,
+    drawerOpen: false,
   }),
 
   getters: {
@@ -19,6 +20,10 @@ export const useCartStore = defineStore('cart', {
       state.items.reduce((sum, item) => sum + item.quantity, 0),
     hasUnavailable: (state) => state.items.some((item) => !item.isAvailable),
     isEmpty: (state) => state.items.length === 0,
+    lineByProductId:
+      (state) =>
+      (productId: number): CartLineDto | undefined =>
+        state.items.find((item) => item.productId === productId),
   },
 
   actions: {
@@ -33,6 +38,9 @@ export const useCartStore = defineStore('cart', {
       try {
         const cart = await api<CartDto>('/cart', { auth: false });
         this.setCart(cart);
+      } catch {
+        this.items = [];
+        this.hydrated = true;
       } finally {
         this.loading = false;
       }
@@ -73,6 +81,14 @@ export const useCartStore = defineStore('cart', {
         auth: false,
       });
       this.setCart(cart);
+    },
+
+    openDrawer() {
+      this.drawerOpen = true;
+    },
+
+    closeDrawer() {
+      this.drawerOpen = false;
     },
   },
 });
