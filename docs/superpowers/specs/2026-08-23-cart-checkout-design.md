@@ -42,23 +42,25 @@ Implementation slices: [#81](https://github.com/Leritas/skm-energo/issues/81)–
 10. As a **User**, I want checkout blocked until unavailable lines are removed, so that I do not submit invalid requests.
 11. As a **Guest** at checkout, I want to be redirected to login with return URL, so that I can authenticate and continue.
 12. As an **authenticated User**, I want B2B fields prefilled on checkout, so that I do not retype company details.
-13. As an **authenticated User**, I want to add a comment to my order, so that I can specify delivery context or object.
-14. As an **authenticated User**, I want a success page with order number after submit, so that I have a reference for support.
-15. As an **authenticated User**, I want my contact details snapshotted on the order, so that documents reflect what I submitted even if I later edit my profile.
-16. As an **authenticated User**, I want an email confirmation on submit, so that I have written proof the request was received.
-17. As **ops staff**, I want an internal email on new orders, so that I can respond without polling admin.
-18. As a **moderator**, I want to list and open orders in admin, so that I can process client requests.
-19. As a **moderator**, I want to change fulfillment status, so that clients see progress (via profile P2 later).
-20. As a **moderator**, I want to set line prices and order type, so that I can turn a product request into a priced purchase.
-21. As a **moderator**, I want to set payment status manually, so that I can record offline payment before online payments exist.
-22. As a **moderator**, I want to create an order manually for a phone client, so that offline sales enter the same system.
-23. As a **moderator**, I want to link manual orders to an existing User, so that the client sees orders in profile later.
-24. As a **moderator**, I want to create a User in admin when none exists, so that phone orders still attach to an account.
-25. As a **User**, I want a cart badge in the header, so that I see I have pending items without opening `/cart`.
-26. As a **User**, I want catalog tiles to navigate to PDP without an add button, so that the B2B catalog stays uncluttered.
-27. As a **User** with only unpriced lines, I want the order typed as `request-products` with no payment pending, so that the flow matches a quote request.
-28. As a **User** with all lines priced, I want the order typed as `purchase` with `pending_manual` payment, so that payment can be tracked offline.
-29. As **ops**, I want cancelled orders hidden from client profile lists in v1, so that the ЛК stays simple.
+13. As an **authenticated User**, I want to choose whether I order as an individual or a legal entity, so that company requisites are only required when relevant.
+14. As an **authenticated User**, I want company details and contact person in separate form blocks, so that the checkout form is easy to scan.
+15. As an **authenticated User**, I want to add a comment to my order, so that I can specify delivery context or object.
+16. As an **authenticated User**, I want a success page with order number after submit, so that I have a reference for support.
+17. As an **authenticated User**, I want my contact details snapshotted on the order, so that documents reflect what I submitted even if I later edit my profile.
+18. As an **authenticated User**, I want an email confirmation on submit, so that I have written proof the request was received.
+19. As **ops staff**, I want an internal email on new orders, so that I can respond without polling admin.
+20. As a **moderator**, I want to list and open orders in admin, so that I can process client requests.
+21. As a **moderator**, I want to change fulfillment status, so that clients see progress (via profile P2 later).
+22. As a **moderator**, I want to set line prices and order type, so that I can turn a product request into a priced purchase.
+23. As a **moderator**, I want to set payment status manually, so that I can record offline payment before online payments exist.
+24. As a **moderator**, I want to create an order manually for a phone client, so that offline sales enter the same system.
+25. As a **moderator**, I want to link manual orders to an existing User, so that the client sees orders in profile later.
+26. As a **moderator**, I want to create a User in admin when none exists, so that phone orders still attach to an account.
+27. As a **User**, I want a cart badge in the header, so that I see I have pending items without opening `/cart`.
+28. As a **User**, I want catalog tiles to navigate to PDP without an add button, so that the B2B catalog stays uncluttered.
+29. As a **User** with only unpriced lines, I want the order typed as `request-products` with no payment pending, so that the flow matches a quote request.
+30. As a **User** with all lines priced, I want the order typed as `purchase` with `pending_manual` payment, so that payment can be tracked offline.
+31. As **ops**, I want cancelled orders hidden from client profile lists in v1, so that the ЛК stays simple.
 
 ---
 
@@ -69,7 +71,7 @@ Implementation slices: [#81](https://github.com/Leritas/skm-energo/issues/81)–
 - **`Product.price`** — optional `Decimal`; null → «пo запросу» in public UI.
 - **`Cart`** — `guestSessionId?`, `userId?`, `expiresAt`; one active cart per guest session / user.
 - **`CartItem`** — `cartId`, `productId`, `quantity`; unique (cart, product).
-- **`Order`** — `userId`, fulfillment `status`, `paymentStatus`, `type` (`purchase` | `request-products`), contact snapshot fields, `customerNote`, timestamps.
+- **`Order`** — `userId`, fulfillment `status`, `paymentStatus`, `type` (`purchase` | `request-products`), `customerType` (`individual` | `legal_entity`), contact snapshot fields, `customerNote`, timestamps.
 - **`OrderLine`** — `productId`, `quantity`, `unitPrice?` (snapshot at submit).
 
 ### Order type (auto + admin override)
@@ -117,7 +119,7 @@ Display `SKM-{id}` where `id` is Order primary key.
 ### Checkout flow
 
 - `/cart` — edit lines, summary, CTA to checkout.
-- `/checkout` — stepper step 2; prefill User B2B fields; `customerNote`; submit.
+- `/checkout` — stepper step 2; radio **customer type** (`individual` | `legal_entity`); prefill User fields; separate blocks **«Данные компании»** (legal entity only, company required) and **«Контактное лицо»** (always); `customerNote`; submit.
 - `/checkout/success` — stepper step 3; show `SKM-{id}`.
 
 ### Unavailable products in cart
@@ -134,7 +136,9 @@ Display `SKM-{id}` where `id` is Order primary key.
 
 ### Contact snapshot on Order
 
-At submit, copy from User: `name`, `email`, `company`, `phone`, `inn`, `position`, plus `customerNote` from form.
+At submit, copy from checkout form: `customerType`, `name`, `email`, `phone`, plus optional `company`, `inn`, `position` (null when `individual`), and `customerNote`.
+
+Default customer type on checkout open: `legal_entity` if User has `company` filled, else `individual`.
 
 ### Profile tab mapping (feeds #22)
 

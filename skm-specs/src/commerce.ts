@@ -25,6 +25,13 @@ export const PaymentStatus = {
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
 
+export const CustomerType = {
+  individual: 'individual',
+  legalEntity: 'legal_entity',
+} as const;
+
+export type CustomerType = (typeof CustomerType)[keyof typeof CustomerType];
+
 export interface CartLineDto {
   productId: number;
   quantity: number;
@@ -47,4 +54,40 @@ export interface AddCartItemRequest {
 
 export interface UpdateCartItemRequest {
   quantity: number;
+}
+
+export interface OrderLineDto {
+  productId: number;
+  quantity: number;
+  unitPrice: string | null;
+  title: string;
+  sku: string;
+}
+
+export interface OrderDto {
+  id: number;
+  number: string;
+  type: OrderType;
+  status: OrderStatus;
+  paymentStatus: PaymentStatus;
+  customerType: CustomerType;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string | null;
+  customerCompany: string | null;
+  customerInn: string | null;
+  customerPosition: string | null;
+  customerNote: string | null;
+  lines: OrderLineDto[];
+  createdAt: string;
+}
+
+export interface CreateOrderRequest {
+  customerType: CustomerType;
+  name: string;
+  phone: string;
+  company?: string | null;
+  inn?: string | null;
+  position?: string | null;
+  customerNote?: string | null;
 }

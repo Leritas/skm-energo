@@ -75,7 +75,7 @@ _Avoid_: Manufacturer page, brand homepage
 ## Auth & profile
 
 **User**:
-An authenticated account (email + password). B2B profile fields (phone, company, inn, position) live on User, not a separate Profile entity.
+An authenticated account (email + password). Profile fields (phone, company, inn, position) live on User, not a separate Profile entity. Company fields are optional — used when ordering as a legal entity.
 _Avoid_: Client, account (in domain docs)
 
 **Role**:
@@ -116,9 +116,13 @@ _Avoid_: Order kind, order mode (in code identifiers)
 One product + quantity on an Order, with an optional unit price snapshot copied from `Product.price` at checkout. Null unit price means «пo запросу» for that line.
 _Avoid_: CartItem (after checkout), OrderItem (OK in code/DB)
 
+**Checkout customer type**:
+Checkout selector: `individual` (physical person) or `legal_entity` (company / sole proprietor). Determines whether company requisites are shown and required; stored on Order at submit.
+_Avoid_: Customer type (ambiguous with User), buyer kind (in code identifiers)
+
 **Order contact snapshot**:
-Copy of User B2B fields frozen on Order at submit (company, phone, inn, position, name, email) so documents reflect details at order time.
-_Avoid_: Shipping address (v1 uses B2B requisites, not delivery address)
+Copy of checkout contact fields frozen on Order at submit (name, email, phone, customer type, optional company/inn/position, customerNote). For `individual`, company/inn/position are null. Documents reflect details at order time even if the User later edits profile.
+_Avoid_: Shipping address (v1 uses contact + optional company requisites, not delivery address)
 
 **Order number**:
 Public identifier formatted `SKM-{id}` from the Order database id.
