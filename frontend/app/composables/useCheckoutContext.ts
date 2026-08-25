@@ -27,6 +27,7 @@ export type CheckoutContext = {
   totalQuantity: ComputedRef<number>;
   submitDisabled: ComputedRef<boolean>;
   submitting: Ref<boolean>;
+  submitError: Ref<string>;
   submit: () => Promise<void>;
 };
 
@@ -40,6 +41,7 @@ export function useCheckoutContext(): CheckoutContext {
   const { api } = useApi();
 
   const submitting = ref(false);
+  const submitError = ref('');
 
   const form = reactive<CheckoutForm>({
     customerType: profileToCheckoutDefaults({
@@ -132,6 +134,7 @@ export function useCheckoutContext(): CheckoutContext {
     }
 
     submitting.value = true;
+    submitError.value = '';
     try {
       const body: CreateOrderRequest = {
         customerType: form.customerType,
@@ -154,18 +157,36 @@ export function useCheckoutContext(): CheckoutContext {
       const status =
         (error as { statusCode?: number; status?: number })?.statusCode ??
         (error as { status?: number })?.status;
+      const message = (error as { data?: { message?: string | string[] } })
+        ?.data?.message;
+      const detail = Array.isArray(message)
+        ? message.join(', ')
+        : typeof message === 'string'
+          ? message
+          : null;
       if (status === 409) {
+        submitError.value =
+          'В корзине есть недоступные позиции. Удалите их и попробуйте снова.';
         toast.add({
           title: 'Корзина изменилась',
-          description: 'Удалите недоступные позиции и попробуйте снова.',
+          description: submitError.value,
           color: 'warning',
         });
         await cart.fetchCart();
         return;
       }
+      if (status === 400) {
+        submitError.value =
+          detail === 'Cart is empty'
+            ? 'Корзина пуста на сервере. Обновите страницу или вернитесь в корзину.'
+            : (detail ?? 'Проверьте заполнение формы и попробуйте снова.');
+      } else {
+        submitError.value =
+          'Не удалось отправить заявку. Попробуйте ещё раз или свяжитесь с нами.';
+      }
       toast.add({
         title: 'Не удалось отправить заявку',
-        description: 'Попробуйте ещё раз или свяжитесь с нами.',
+        description: submitError.value,
         color: 'danger',
       });
     } finally {
@@ -182,6 +203,7 @@ export function useCheckoutContext(): CheckoutContext {
     totalQuantity,
     submitDisabled,
     submitting,
+    submitError,
     submit,
   };
 }

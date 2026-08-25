@@ -86,6 +86,12 @@ const ctx = useProvidedCheckoutContext();
           <CheckoutCommentBlock />
 
           <div class="mt-auto border-t border-neutral-100 pt-6">
+            <SkmAlert
+              v-if="ctx.submitError.value"
+              class="mb-4"
+              tone="danger"
+              :title="ctx.submitError.value"
+            />
             <CheckoutSubmitNote class="mb-4" />
             <SkmButton
               type="submit"

@@ -21,7 +21,7 @@ const breadcrumbs = [
 const cart = useCart();
 provideCheckoutContext();
 
-await cart.ensureHydrated();
+await cart.fetchCart();
 
 if (cart.isEmpty.value) {
   await navigateTo('/cart');
