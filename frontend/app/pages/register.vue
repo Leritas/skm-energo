@@ -1,34 +1,34 @@
 <script setup lang="ts">
-import { SITE } from '~/constants/site'
+import { SITE } from '~/constants/site';
 
 definePageMeta({
   layout: 'default',
-})
+});
 
 useSeoMeta({
   title: `Регистрация — ${SITE.name}`,
-})
+});
 
-const auth = useAuthStore()
-const name = ref('')
-const email = ref('')
-const password = ref('')
-const error = ref('')
-const loading = ref(false)
+const auth = useAuthStore();
+const name = ref('');
+const email = ref('');
+const password = ref('');
+const error = ref('');
+const loading = ref(false);
 
 async function handleSubmit() {
-  error.value = ''
-  loading.value = true
+  error.value = '';
+  loading.value = true;
   try {
-    await auth.register(name.value, email.value, password.value)
-    await navigateTo('/profile')
-  }
-  catch (e: unknown) {
-    error.value = 'Не удалось зарегистрироваться. Возможно, email уже занят.'
-    console.error(e)
-  }
-  finally {
-    loading.value = false
+    await auth.register(name.value, email.value, password.value);
+    const route = useRoute();
+    const redirect = route.query.returnTo ?? route.query.redirect;
+    await navigateTo(typeof redirect === 'string' ? redirect : '/profile');
+  } catch (e: unknown) {
+    error.value = 'Не удалось зарегистрироваться. Возможно, email уже занят.';
+    console.error(e);
+  } finally {
+    loading.value = false;
   }
 }
 </script>
@@ -37,30 +37,14 @@ async function handleSubmit() {
   <SkmSection>
     <SkmContainer>
       <div class="mx-auto max-w-md">
-        <h1 class="text-3xl font-bold text-neutral-900">
-          Регистрация
-        </h1>
-        <p class="mt-2 text-neutral-600">
-          Создайте аккаунт покупателя.
-        </p>
+        <h1 class="text-3xl font-bold text-neutral-900">Регистрация</h1>
+        <p class="mt-2 text-neutral-600">Создайте аккаунт покупателя.</p>
 
-        <SkmAlert
-          v-if="error"
-          class="mt-6"
-          tone="danger"
-          :title="error"
-        />
+        <SkmAlert v-if="error" class="mt-6" tone="danger" :title="error" />
 
-        <form
-          class="mt-8 space-y-4"
-          @submit.prevent="handleSubmit"
-        >
+        <form class="mt-8 space-y-4" @submit.prevent="handleSubmit">
           <SkmFormField label="Имя">
-            <SkmInput
-              v-model="name"
-              autocomplete="name"
-              required
-            />
+            <SkmInput v-model="name" autocomplete="name" required />
           </SkmFormField>
           <SkmFormField label="Email">
             <SkmInput
@@ -79,11 +63,7 @@ async function handleSubmit() {
               minlength="8"
             />
           </SkmFormField>
-          <SkmButton
-            type="submit"
-            class="w-full"
-            :disabled="loading"
-          >
+          <SkmButton type="submit" class="w-full" :disabled="loading">
             {{ loading ? 'Создание…' : 'Создать аккаунт' }}
           </SkmButton>
         </form>

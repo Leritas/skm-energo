@@ -6,6 +6,11 @@ import type {
 } from '@skm/specs';
 import { defineStore } from 'pinia';
 
+function cartUsesAuth(): boolean {
+  const auth = useAuthStore();
+  return Boolean(auth.accessToken);
+}
+
 export const useCartStore = defineStore('cart', {
   state: () => ({
     items: [] as CartLineDto[],
@@ -32,11 +37,15 @@ export const useCartStore = defineStore('cart', {
       this.hydrated = true;
     },
 
+    invalidate() {
+      this.hydrated = false;
+    },
+
     async fetchCart() {
       const { api } = useApi();
       this.loading = true;
       try {
-        const cart = await api<CartDto>('/cart', { auth: false });
+        const cart = await api<CartDto>('/cart', { auth: cartUsesAuth() });
         this.setCart(cart);
       } catch {
         this.items = [];
@@ -58,7 +67,7 @@ export const useCartStore = defineStore('cart', {
       const cart = await api<CartDto>('/cart/items', {
         method: 'POST',
         body,
-        auth: false,
+        auth: cartUsesAuth(),
       });
       this.setCart(cart);
     },
@@ -69,7 +78,7 @@ export const useCartStore = defineStore('cart', {
       const cart = await api<CartDto>(`/cart/items/${productId}`, {
         method: 'PATCH',
         body,
-        auth: false,
+        auth: cartUsesAuth(),
       });
       this.setCart(cart);
     },
@@ -78,7 +87,7 @@ export const useCartStore = defineStore('cart', {
       const { api } = useApi();
       const cart = await api<CartDto>(`/cart/items/${productId}`, {
         method: 'DELETE',
-        auth: false,
+        auth: cartUsesAuth(),
       });
       this.setCart(cart);
     },

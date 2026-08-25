@@ -16,6 +16,7 @@ import { CatalogModule } from './catalog/catalog.module';
 import { CartModule } from './cart/cart.module';
 import { NewsModule } from './news/news.module';
 import { MediaModule } from './media/media.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { MediaModule } from './media/media.module';
     ProfileModule,
     CatalogModule,
     CartModule,
+    OrdersModule,
     NewsModule,
     MediaModule,
     UsersModule,

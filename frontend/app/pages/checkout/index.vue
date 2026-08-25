@@ -1,64 +1,55 @@
 <script setup lang="ts">
-import { SITE } from '~/constants/site'
+import { SITE } from '~/constants/site';
+import CheckoutForm from '~/components/checkout/CheckoutForm.vue';
+import { provideCheckoutContext } from '~/composables/useCheckoutContext';
+
+definePageMeta({
+  middleware: 'checkout-auth',
+});
 
 useSeoMeta({
   title: `Оформление — ${SITE.name}`,
-  description: 'Checkout stub.',
-})
+  description: 'Оформление заявки на поставку.',
+});
 
 const breadcrumbs = [
   { label: 'Главная', to: '/' },
   { label: 'Корзина', to: '/cart' },
   { label: 'Оформление' },
-]
+];
 
-const steps = [
-  { label: 'Корзина' },
-  { label: 'Данные' },
-  { label: 'Подтверждение' },
-]
+const cart = useCart();
+provideCheckoutContext();
+
+await cart.fetchCart();
+
+if (cart.isEmpty.value) {
+  await navigateTo('/cart');
+}
 </script>
 
 <template>
-  <SkmSection>
+  <SkmSection class="pb-24">
     <SkmContainer>
       <SkmPageHeader
         title="Оформление запроса"
-        description="Stub checkout без платёжной логики."
+        description="Проверьте состав и укажите контактные данные."
       >
         <template #breadcrumbs>
           <SkmBreadcrumbs :items="breadcrumbs" />
         </template>
       </SkmPageHeader>
 
-      <SkmStepper
-        :steps="steps"
-        :current="1"
-        class="mb-10"
-      />
+      <div
+        v-if="cart.hasUnavailable.value"
+        class="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950"
+      >
+        В корзине есть недоступные позиции. Удалите их в
+        <NuxtLink to="/cart" class="font-medium underline">корзине</NuxtLink>,
+        чтобы продолжить.
+      </div>
 
-      <SkmAlert
-        title="B2B-запрос"
-        description="После отправки менеджер уточнит наличие и сроки поставки."
-        tone="accent"
-        icon="i-lucide-info"
-        class="mb-8 max-w-xl"
-      />
-
-      <form class="max-w-md space-y-4">
-        <SkmFormField label="Компания" required>
-          <SkmInput placeholder="ООО «…»" />
-        </SkmFormField>
-        <SkmFormField label="Контакт" required>
-          <SkmInput placeholder="Имя и телефон" />
-        </SkmFormField>
-        <SkmFormField label="Комментарий">
-          <SkmTextarea :rows="3" placeholder="Срок, объект, доп. требования" />
-        </SkmFormField>
-        <SkmButton type="button" variant="primary">
-          Отправить запрос
-        </SkmButton>
-      </form>
+      <CheckoutForm v-else />
     </SkmContainer>
   </SkmSection>
 </template>
