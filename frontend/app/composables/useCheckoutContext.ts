@@ -165,21 +165,18 @@ export function useCheckoutContext(): CheckoutContext {
           ? message
           : null;
       if (status === 409) {
-        submitError.value =
-          'В корзине есть недоступные позиции. Удалите их и попробуйте снова.';
-        toast.add({
-          title: 'Корзина изменилась',
-          description: submitError.value,
-          color: 'warning',
-        });
         await cart.fetchCart();
+        await navigateTo('/cart?checkoutError=unavailable');
+        return;
+      }
+      if (status === 400 && detail === 'Cart is empty') {
+        await cart.fetchCart();
+        await navigateTo('/cart?checkoutError=empty');
         return;
       }
       if (status === 400) {
         submitError.value =
-          detail === 'Cart is empty'
-            ? 'Корзина пуста на сервере. Обновите страницу или вернитесь в корзину.'
-            : (detail ?? 'Проверьте заполнение формы и попробуйте снова.');
+          detail ?? 'Проверьте заполнение формы и попробуйте снова.';
       } else {
         submitError.value =
           'Не удалось отправить заявку. Попробуйте ещё раз или свяжитесь с нами.';

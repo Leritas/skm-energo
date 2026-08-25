@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CHECKOUT_STEPS } from '~/constants/checkout';
+import CheckoutStepper from './CheckoutStepper.vue';
 
 withDefaults(
   defineProps<{
@@ -12,11 +12,7 @@ withDefaults(
 </script>
 
 <template>
-  <SkmStepper
-    :steps="[...CHECKOUT_STEPS]"
-    :current="currentStep"
-    class="mb-8"
-  />
+  <CheckoutStepper :current="currentStep" />
   <div
     class="-mx-4 overflow-hidden rounded-2xl border border-neutral-200 lg:-mx-0"
   >

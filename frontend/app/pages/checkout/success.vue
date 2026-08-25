@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { OrderDto } from '@skm/specs';
+import CheckoutStepper from '~/components/checkout/CheckoutStepper.vue';
 import { SITE } from '~/constants/site';
 import { formatCartPriceLabel } from '~/utils/cart';
 import { deriveCheckoutOrderPreview } from '~/utils/checkout-order-preview';
@@ -80,6 +81,12 @@ const totalLabel = computed(() => {
 <template>
   <SkmSection>
     <SkmContainer>
+      <CheckoutStepper
+        v-if="order && !loadError"
+        :current="2"
+        class="mx-auto max-w-2xl"
+      />
+
       <div v-if="order && !loadError" class="mx-auto max-w-2xl text-center">
         <div
           class="mx-auto flex size-14 items-center justify-center rounded-full bg-emerald-100 text-emerald-700"
@@ -128,7 +135,9 @@ const totalLabel = computed(() => {
 
         <div class="mt-8 flex flex-wrap justify-center gap-3">
           <SkmButton to="/catalog" variant="outline">В каталог</SkmButton>
-          <SkmButton to="/profile" variant="primary">В профиль</SkmButton>
+          <SkmButton to="/profile/orders/active" variant="primary">
+            Мои заявки
+          </SkmButton>
         </div>
       </div>
     </SkmContainer>

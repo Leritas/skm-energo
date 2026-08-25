@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CheckoutStepper from '~/components/checkout/CheckoutStepper.vue';
 import { SITE } from '~/constants/site';
 import { formatCartPriceLabel, formatCartTotalLabel } from '~/utils/cart';
 
@@ -7,11 +8,23 @@ useSeoMeta({
   description: 'Корзина запроса поставки.',
 });
 
+const route = useRoute();
 const breadcrumbs = [{ label: 'Главная', to: '/' }, { label: 'Корзина' }];
 
 const cart = useCart();
 
 await cart.ensureHydrated();
+
+const checkoutErrorMessage = computed(() => {
+  const code = route.query.checkoutError;
+  if (code === 'empty') {
+    return 'Корзина пуста — добавьте товары перед оформлением.';
+  }
+  if (code === 'unavailable') {
+    return 'Некоторые позиции стали недоступны. Удалите их и попробуйте снова.';
+  }
+  return null;
+});
 
 const confirmOpen = ref(false);
 const pendingRemoveId = ref<number | null>(null);
@@ -46,6 +59,15 @@ const totalLabel = computed(() => formatCartTotalLabel(cart.items.value));
           <SkmBreadcrumbs :items="breadcrumbs" />
         </template>
       </SkmPageHeader>
+
+      <SkmAlert
+        v-if="checkoutErrorMessage"
+        class="mb-6"
+        tone="warning"
+        :title="checkoutErrorMessage"
+      />
+
+      <CheckoutStepper v-if="!cart.isEmpty.value" :current="0" />
 
       <SkmEmpty
         v-if="cart.isEmpty.value && !cart.loading.value"

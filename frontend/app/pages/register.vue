@@ -10,18 +10,26 @@ useSeoMeta({
 });
 
 const auth = useAuthStore();
+const route = useRoute();
 const name = ref('');
 const email = ref('');
 const password = ref('');
 const error = ref('');
 const loading = ref(false);
 
+const loginTo = computed(() => {
+  const returnTo = route.query.returnTo ?? route.query.redirect;
+  if (typeof returnTo === 'string') {
+    return { path: '/login', query: { returnTo } };
+  }
+  return '/login';
+});
+
 async function handleSubmit() {
   error.value = '';
   loading.value = true;
   try {
     await auth.register(name.value, email.value, password.value);
-    const route = useRoute();
     const redirect = route.query.returnTo ?? route.query.redirect;
     await navigateTo(typeof redirect === 'string' ? redirect : '/profile');
   } catch (e: unknown) {
@@ -71,7 +79,7 @@ async function handleSubmit() {
         <p class="mt-6 text-sm text-neutral-600">
           Уже есть аккаунт?
           <NuxtLink
-            to="/login"
+            :to="loginTo"
             class="font-medium text-accent-600 hover:underline"
           >
             Войти

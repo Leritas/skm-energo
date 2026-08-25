@@ -14,7 +14,7 @@ const ctx = useProvidedCheckoutContext();
 </script>
 
 <template>
-  <CheckoutSplitLayout>
+  <CheckoutSplitLayout :current-step="1">
     <template #left>
       <aside
         class="flex flex-col bg-brand-purple-950 px-6 py-8 text-white sm:px-8"
