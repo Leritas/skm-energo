@@ -5,7 +5,8 @@ import {
   type Permission as PermissionType,
 } from '@skm/specs';
 
-export type AdminSectionId = 'dashboard' | 'catalog' | 'news' | 'users';
+export type AdminSectionId =
+  'dashboard' | 'catalog' | 'news' | 'users' | 'orders';
 
 export interface AdminNavItem {
   id: AdminSectionId;
@@ -61,6 +62,13 @@ export const ADMIN_NAV_ITEMS: readonly AdminNavItem[] = [
     icon: 'i-lucide-users',
     match: '/admin/users',
   },
+  {
+    id: 'orders',
+    label: 'Заказы',
+    to: '/admin/orders',
+    icon: 'i-lucide-shopping-cart',
+    match: '/admin/orders',
+  },
 ] as const;
 
 export function canAccessAdminSection(
@@ -79,6 +87,11 @@ export function canAccessAdminSection(
       ]);
     case 'users':
       return hasAnyPermission(userPermissions, USERS_PERMISSIONS);
+    case 'orders':
+      return hasAnyPermission(userPermissions, [
+        Permission.hasAccessToOrders,
+        Permission.canManageOrders,
+      ]);
     default: {
       const _exhaustive: never = sectionId;
       return _exhaustive;

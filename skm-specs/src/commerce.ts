@@ -91,3 +91,59 @@ export interface CreateOrderRequest {
   position?: string | null;
   customerNote?: string | null;
 }
+
+export interface CreateAdminOrderLineRequest {
+  productId: number;
+  quantity: number;
+  unitPrice?: string | null;
+}
+
+export interface CreateAdminOrderRequest {
+  userId: number;
+  lines: CreateAdminOrderLineRequest[];
+  customerNote?: string | null;
+  customerName?: string | null;
+  customerPhone?: string | null;
+  customerCompany?: string | null;
+  customerInn?: string | null;
+  customerPosition?: string | null;
+  customerType?: CustomerType | null;
+  type?: OrderType | null;
+  paymentStatus?: PaymentStatus | null;
+}
+
+export interface UpdateAdminOrderLineRequest {
+  productId: number;
+  quantity: number;
+  unitPrice?: string | null;
+}
+
+export interface UpdateAdminOrderRequest {
+  status?: OrderStatus;
+  paymentStatus?: PaymentStatus;
+  type?: OrderType;
+  customerNote?: string | null;
+  lines?: UpdateAdminOrderLineRequest[];
+}
+
+export interface ListOrdersAdminResponse {
+  items: OrderDto[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface AdminOrderUserOptionDto {
+  id: number;
+  email: string;
+  name: string;
+  phone: string | null;
+  company: string | null;
+}
+
+export interface AdminOrderProductOptionDto {
+  id: number;
+  title: string;
+  sku: string;
+  price: string | null;
+}
